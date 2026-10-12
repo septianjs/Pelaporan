@@ -1,24 +1,42 @@
+
+# Log files
 *.log
+
+# Operating system
 .DS_Store
+Thumbs.db
+
+# Environment and secrets
 .env
 .env.backup
 .env.production
+/auth.json
+
+# PHP and Laravel
 .phpactor.json
 .phpunit.result.cache
+/.phpunit.cache
+/vendor
+/storage/*.key
+/storage/pail
+Homestead.json
+Homestead.yaml
+
+# IDE and editors
 /.fleet
 /.idea
 /.nova
-/.phpunit.cache
 /.vscode
 /.zed
-/auth.json
+
+# Node.js and frontend build
 /node_modules
 /public/build
 /public/hot
 /public/storage
-/storage/*.key
-/storage/pail
-/vendor
-Homestead.json
-Homestead.yaml
-Thumbs.db
+
+# Ada compiled object files
+*.o
+
+# Ada Library Information
+*.ali
