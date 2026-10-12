@@ -1,0 +1,16 @@
+{
+  "appId": "com.bpsdm.pelaporan",
+  "appName": "PELAPORAN PENGAWASAN LINGKUNGAN KANTOR BPSDM",
+  "webDir": "dist",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https",
+    "cleartext": true
+  },
+  "plugins": {
+    "Camera": {
+      "permissionsType": "prompt"
+    }
+  }
+}
+
