@@ -442,6 +442,43 @@
         <span>{{ isSubmitting ? 'Menyimpan...' : 'Simpan & Buat Laporan' }}</span>
       </button>
     </div>
+
+    <!-- ── OFFLINE QUEUE SUCCESS MODAL ── -->
+    <Teleport to="body">
+      <Transition name="fade">
+        <div v-if="showOfflineSuccessModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm" />
+      </Transition>
+      <Transition name="slide-up">
+        <div v-if="showOfflineSuccessModal"
+          class="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl shadow-2xl p-6 space-y-4"
+          style="max-width: 480px; margin: 0 auto; padding-bottom: max(2rem, env(safe-area-inset-bottom));">
+          <div class="flex justify-center -mt-2 mb-2">
+            <div class="w-10 h-1 rounded-full bg-slate-300"/>
+          </div>
+          <div class="w-14 h-14 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center mx-auto">
+            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+            </svg>
+          </div>
+          <div class="text-center space-y-1">
+            <h3 class="text-base font-bold text-slate-800">Laporan Masuk Antrian Offline</h3>
+            <p class="text-xs text-slate-500 leading-relaxed">
+              Perangkat sedang tidak terhubung internet. Seluruh data laporan dan foto dokumentasi telah diamankan di penyimpanan lokal perangkat dan akan <strong>otomatis disinkronkan ke server</strong> begitu koneksi internet terhubung.
+            </p>
+          </div>
+          <div class="pt-2">
+            <button
+              type="button"
+              @click="router.push('/history')"
+              class="w-full py-3.5 rounded-2xl bg-amber-600 text-white font-bold text-sm shadow-md active:scale-95 transition"
+            >
+              Lihat Riwayat &amp; Antrian
+            </button>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
+
   </div>
 </template>
 
@@ -450,6 +487,15 @@ import { ref, reactive, computed, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import api from '../services/api';
 import PhotoUploader from '../components/PhotoUploader.vue';
+import {
+  saveFormDraft,
+  getFormDraft,
+  clearFormDraft,
+  cacheMasterData,
+  getCachedMasterData,
+  queueOfflineReport,
+  isOnline,
+} from '../services/offlineStorage.js';
 
 const router = useRouter();
 const route = useRoute();
@@ -459,6 +505,7 @@ const totalSteps = 8;
 const isSubmitting = ref(false);
 const hasSavedDraft = ref(false);
 const draftRestored = ref(false);
+const showOfflineSuccessModal = ref(false);
 
 const stepTitles = [
   '1. Informasi Laporan',
@@ -542,99 +589,114 @@ const selectedTemplateName = computed(() => {
 // Fetch Initial Data
 const loadInitialData = async () => {
   try {
-    // 1. Fetch next report number
-    const numRes = await api.get('/reports/next-number');
-    if (numRes.data?.report_number) {
-      form.report_number = numRes.data.report_number;
+    // 1. Fetch next report number if online
+    if (isOnline.value) {
+      try {
+        const numRes = await api.get('/reports/next-number');
+        if (numRes.data?.report_number) {
+          form.report_number = numRes.data.report_number;
+        }
+      } catch {}
+    } else {
+      form.report_number = `LAP-BPSDM-${new Date().getFullYear()}-OFFLINE`;
     }
 
-    // 2. Fetch locations
-    const locRes = await api.get('/locations');
-    if (locRes.data?.data && locRes.data.data.length > 0) {
-      locations.value = locRes.data.data;
-      // Sync locations structure
-      form.locations = locations.value.map(loc => ({
-        location_id: loc.id,
-        condition: 'clean',
-        notes: '',
-        problem: '',
-        solution: '',
-        photo_1: null,
-        photo_2: null,
-      }));
-    }
-
-    // 3. Fetch templates
-    const tplRes = await api.get('/templates');
-    if (tplRes.data?.data) {
-      templates.value = tplRes.data.data;
-      if (route.query.template_id) {
-        form.template_id = parseInt(route.query.template_id);
-      } else if (templates.value.length > 0) {
-        form.template_id = templates.value[0].id;
+    // 2. Fetch locations (with IndexedDB cache fallback)
+    try {
+      const locRes = await api.get('/locations');
+      if (locRes.data?.data && locRes.data.data.length > 0) {
+        locations.value = locRes.data.data;
+        await cacheMasterData('locations', locRes.data.data);
       }
+    } catch {
+      const cachedLocs = await getCachedMasterData('locations');
+      if (cachedLocs && cachedLocs.length > 0) {
+        locations.value = cachedLocs;
+      }
+    }
+
+    // Sync locations structure
+    form.locations = locations.value.map(loc => ({
+      location_id: loc.id,
+      condition: 'clean',
+      notes: '',
+      problem: '',
+      solution: '',
+      photo_1: null,
+      photo_2: null,
+    }));
+
+    // 3. Fetch templates (with IndexedDB cache fallback)
+    try {
+      const tplRes = await api.get('/templates');
+      if (tplRes.data?.data && tplRes.data.data.length > 0) {
+        templates.value = tplRes.data.data;
+        await cacheMasterData('templates', tplRes.data.data);
+      }
+    } catch {
+      const cachedTpls = await getCachedMasterData('templates');
+      if (cachedTpls && cachedTpls.length > 0) {
+        templates.value = cachedTpls;
+      }
+    }
+
+    if (route.query.template_id) {
+      form.template_id = parseInt(route.query.template_id);
+    } else if (templates.value.length > 0) {
+      form.template_id = templates.value[0].id;
     }
   } catch (err) {
     console.warn('Initial load warning:', err.message);
   }
 
-  // Check saved draft
-  checkSavedDraft();
+  // Check saved draft from IndexedDB
+  await checkSavedDraft();
 };
 
-const checkSavedDraft = () => {
-  const draftStr = localStorage.getItem('bpsdm_report_draft');
-  if (draftStr) {
+const checkSavedDraft = async () => {
+  const draft = await getFormDraft();
+  if (draft) {
     hasSavedDraft.value = true;
   }
 };
 
-const saveDraftManually = () => {
-  const draftData = {
-    report_number: form.report_number,
-    inspection_date: form.inspection_date,
-    officer_name: form.officer_name,
-    template_id: form.template_id,
-    locations: form.locations.map(loc => ({
-      location_id: loc.location_id,
-      condition: loc.condition,
-      notes: loc.notes,
-      problem: loc.problem,
-      solution: loc.solution,
-    })),
-  };
-  localStorage.setItem('bpsdm_report_draft', JSON.stringify(draftData));
-  alert('Draft laporan berhasil disimpan ke perangkat lokal.');
-};
-
-const restoreDraft = () => {
-  const draftStr = localStorage.getItem('bpsdm_report_draft');
-  if (draftStr) {
-    try {
-      const parsed = JSON.parse(draftStr);
-      form.inspection_date = parsed.inspection_date || form.inspection_date;
-      form.officer_name = parsed.officer_name || '';
-      form.template_id = parsed.template_id || form.template_id;
-      if (Array.isArray(parsed.locations)) {
-        parsed.locations.forEach((dLoc, i) => {
-          if (form.locations[i]) {
-            form.locations[i].condition = dLoc.condition || 'clean';
-            form.locations[i].notes = dLoc.notes || '';
-            form.locations[i].problem = dLoc.problem || '';
-            form.locations[i].solution = dLoc.solution || '';
-          }
-        });
-      }
-      draftRestored.value = true;
-      hasSavedDraft.value = false;
-    } catch (e) {
-      console.error('Failed to parse draft:', e);
-    }
+const saveDraftManually = async () => {
+  const success = await saveFormDraft(form);
+  if (success) {
+    alert('✓ Draft laporan dan seluruh foto dokumentasi berhasil disimpan di perangkat lokal.');
+  } else {
+    alert('Draft berhasil disimpan.');
   }
 };
 
-const discardDraft = () => {
-  localStorage.removeItem('bpsdm_report_draft');
+const restoreDraft = async () => {
+  const draft = await getFormDraft();
+  if (draft) {
+    form.report_number = draft.report_number || form.report_number;
+    form.inspection_date = draft.inspection_date || form.inspection_date;
+    form.officer_name = draft.officer_name || '';
+    form.officer_photo = draft.officer_photo || null;
+    form.template_id = draft.template_id || form.template_id;
+
+    if (Array.isArray(draft.locations)) {
+      draft.locations.forEach((dLoc, i) => {
+        if (form.locations[i]) {
+          form.locations[i].condition = dLoc.condition || 'clean';
+          form.locations[i].notes = dLoc.notes || '';
+          form.locations[i].problem = dLoc.problem || '';
+          form.locations[i].solution = dLoc.solution || '';
+          form.locations[i].photo_1 = dLoc.photo_1 || null;
+          form.locations[i].photo_2 = dLoc.photo_2 || null;
+        }
+      });
+    }
+    draftRestored.value = true;
+    hasSavedDraft.value = false;
+  }
+};
+
+const discardDraft = async () => {
+  await clearFormDraft();
   hasSavedDraft.value = false;
 };
 
@@ -656,6 +718,9 @@ const nextStep = () => {
     }
   }
 
+  // Auto-save draft on step progression
+  saveFormDraft(form);
+
   if (currentStep.value < totalSteps) {
     currentStep.value++;
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -669,9 +734,25 @@ const prevStep = () => {
   }
 };
 
-// Submit Report to Laravel Backend API
+// Submit Report (Online or Offline Queue)
 const submitReport = async () => {
   isSubmitting.value = true;
+
+  // 1. If currently offline, queue immediately
+  if (!isOnline.value || !navigator.onLine) {
+    try {
+      await queueOfflineReport(form);
+      await clearFormDraft();
+      showOfflineSuccessModal.value = true;
+    } catch (err) {
+      alert('Gagal menyimpan ke antrian offline: ' + err.message);
+    } finally {
+      isSubmitting.value = false;
+    }
+    return;
+  }
+
+  // 2. If online, attempt API submission
   try {
     const formData = new FormData();
     formData.append('report_number', form.report_number);
@@ -679,8 +760,8 @@ const submitReport = async () => {
     formData.append('officer_name', form.officer_name);
     formData.append('template_id', form.template_id);
 
-    if (form.officer_photo instanceof File) {
-      formData.append('officer_photo', form.officer_photo);
+    if (form.officer_photo instanceof Blob || form.officer_photo instanceof File) {
+      formData.append('officer_photo', form.officer_photo, 'officer.jpg');
     }
 
     form.locations.forEach((loc, idx) => {
@@ -693,11 +774,11 @@ const submitReport = async () => {
         formData.append(`locations[${idx}][solution]`, loc.solution || '');
       }
 
-      if (loc.photo_1 instanceof File) {
-        formData.append(`locations.${idx}.photo_1`, loc.photo_1);
+      if (loc.photo_1 instanceof Blob || loc.photo_1 instanceof File) {
+        formData.append(`locations.${idx}.photo_1`, loc.photo_1, `loc_${loc.location_id}_p1.jpg`);
       }
-      if (loc.photo_2 instanceof File) {
-        formData.append(`locations.${idx}.photo_2`, loc.photo_2);
+      if (loc.photo_2 instanceof Blob || loc.photo_2 instanceof File) {
+        formData.append(`locations.${idx}.photo_2`, loc.photo_2, `loc_${loc.location_id}_p2.jpg`);
       }
     });
 
@@ -708,16 +789,28 @@ const submitReport = async () => {
     });
 
     if (res.data && res.data.status === 'success') {
-      // Clear saved draft on success
-      localStorage.removeItem('bpsdm_report_draft');
+      await clearFormDraft();
       const newReportId = res.data.data.id;
       alert('Laporan berhasil dibuat!');
       router.push(`/preview/${newReportId}`);
     }
   } catch (err) {
     console.error('Error saat menyimpan laporan:', err);
-    const msg = err.response?.data?.message || err.message || 'Terjadi kesalahan sistem.';
-    alert('Gagal menyimpan laporan: ' + msg);
+    const isNetworkError = !err.response || err.message === 'Network Error' || !navigator.onLine;
+
+    if (isNetworkError) {
+      // Graceful fallback to offline queue on network drop
+      try {
+        await queueOfflineReport(form);
+        await clearFormDraft();
+        showOfflineSuccessModal.value = true;
+      } catch (qErr) {
+        alert('Koneksi terputus dan gagal menyimpan offline: ' + qErr.message);
+      }
+    } else {
+      const msg = err.response?.data?.message || err.message || 'Terjadi kesalahan sistem.';
+      alert('Gagal menyimpan laporan: ' + msg);
+    }
   } finally {
     isSubmitting.value = false;
   }
@@ -727,3 +820,24 @@ onMounted(() => {
   loadInitialData();
 });
 </script>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.25s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.slide-up-enter-active,
+.slide-up-leave-active {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+}
+.slide-up-enter-from,
+.slide-up-leave-to {
+  transform: translateY(100%);
+  opacity: 0;
+}
+</style>

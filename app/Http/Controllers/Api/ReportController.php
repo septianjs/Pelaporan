@@ -8,9 +8,15 @@ use App\Models\Report;
 use App\Models\ReportLocation;
 use App\Models\ReportPhoto;
 use App\Models\Template;
+use App\Services\ReportPdfService;
+use App\Services\ReportTemplateEngineService;
+use App\Mail\ReportSubmittedMail;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -37,19 +43,57 @@ class ReportController extends Controller
             $query->whereDate('inspection_date', $request->input('date'));
         }
 
-        $reports = $query->paginate($request->input('per_page', 15));
+        if ($request->filled('month')) {
+            $parts = explode('-', $request->input('month'));
+            if (count($parts) === 2) {
+                $query->whereYear('inspection_date', (int)$parts[0])
+                      ->whereMonth('inspection_date', (int)$parts[1]);
+            }
+        }
+
+        if ($request->filled('template_id')) {
+            $query->where('template_id', $request->input('template_id'));
+        }
+
+        // Filter by condition status ('clean' = all clean, 'needs_attention' = has problem)
+        if ($request->input('condition_status') === 'needs_attention') {
+            $query->whereHas('reportLocations', function ($q) {
+                $q->where('condition', 'needs_attention');
+            });
+        } elseif ($request->input('condition_status') === 'clean') {
+            $query->whereDoesntHave('reportLocations', function ($q) {
+                $q->where('condition', 'needs_attention');
+            });
+        }
+
+        $reports = $query->paginate($request->input('per_page', 20));
+
+        // Quick Stats Summary
+        $stats = [
+            'total' => Report::count(),
+            'this_month' => Report::whereYear('inspection_date', date('Y'))
+                ->whereMonth('inspection_date', date('m'))
+                ->count(),
+            'needs_attention' => Report::whereHas('reportLocations', function ($q) {
+                $q->where('condition', 'needs_attention');
+            })->count(),
+        ];
 
         return response()->json([
             'status' => 'success',
-            'data' => $reports,
+            'data'   => $reports,
+            'stats'  => $stats,
         ]);
     }
 
     /**
-     * Store a newly created report in storage.
+     * Store a newly created report in storage and automatically generate its PPTX and 16:9 PDF.
      */
-    public function store(Request $request): JsonResponse
-    {
+    public function store(
+        Request $request,
+        ReportTemplateEngineService $engine,
+        ReportPdfService $pdfService
+    ): JsonResponse {
         $validated = $request->validate([
             'inspection_date' => 'required|date',
             'officer_name' => 'required|string|max:255',
@@ -58,7 +102,7 @@ class ReportController extends Controller
             'locations' => 'required|array|min:1',
         ]);
 
-        return DB::transaction(function () use ($request, $validated) {
+        $report = DB::transaction(function () use ($request, $validated) {
             $year = date('Y', strtotime($validated['inspection_date']));
             $reportNumber = $request->input('report_number') ?: Report::generateNextNumber((int)$year);
 
@@ -132,14 +176,36 @@ class ReportController extends Controller
                 }
             }
 
-            $report->load(['template', 'reportLocations.location', 'reportLocations.reportPhotos']);
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Laporan berhasil disimpan.',
-                'data' => $report,
-            ], 201);
+            return $report;
         });
+
+        // 1. Generate PPTX presentation using Template Engine
+        try {
+            $engine->generatePresentation($report);
+            $report->refresh();
+        } catch (\Throwable $e) {
+            Log::error("Template Engine Error for Report #{$report->id}: " . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+        }
+
+        // 2. Generate 16:9 Widescreen PDF
+        try {
+            $pdfService->generatePdf($report);
+            $report->refresh();
+        } catch (\Throwable $e) {
+            Log::error("PDF Generation Error for Report #{$report->id}: " . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+        }
+
+        $report->load(['template', 'reportLocations.location', 'reportLocations.reportPhotos']);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Laporan berhasil disimpan, PPTX dan PDF 16:9 siap digunakan.',
+            'data' => $report,
+        ], 201);
     }
 
     /**
@@ -157,7 +223,180 @@ class ReportController extends Controller
     }
 
     /**
-     * Remove the specified report.
+     * Trigger manual generation / regeneration of PPTX for a report.
+     */
+    public function generatePptx(int $id, ReportTemplateEngineService $engine): JsonResponse
+    {
+        $report = Report::findOrFail($id);
+        try {
+            $engine->generatePresentation($report);
+            $report->refresh();
+            $report->load(['template', 'reportLocations.location', 'reportLocations.reportPhotos']);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Presentasi PPTX berhasil digenerate.',
+                'data' => $report,
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal membuat presentasi PPTX: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Trigger manual generation / regeneration of 16:9 PDF for a report.
+     */
+    public function generatePdf(int $id, ReportPdfService $pdfService): JsonResponse
+    {
+        $report = Report::findOrFail($id);
+        try {
+            $pdfService->generatePdf($report);
+            $report->refresh();
+            $report->load(['template', 'reportLocations.location', 'reportLocations.reportPhotos']);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Dokumen PDF 16:9 berhasil digenerate.',
+                'data' => $report,
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal membuat dokumen PDF: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Download the generated PPTX presentation.
+     */
+    public function downloadPptx(int $id)
+    {
+        $report = Report::findOrFail($id);
+
+        if (!$report->pptx_path) {
+            $engine = app(ReportTemplateEngineService::class);
+            $engine->generatePresentation($report);
+            $report->refresh();
+        }
+
+        $fullPath = storage_path("app/public/{$report->pptx_path}");
+        if (!file_exists($fullPath)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'File PPTX belum tersedia di server.',
+            ], 404);
+        }
+
+        $cleanReportNum = preg_replace('/[^A-Za-z0-9_\-]/', '_', $report->report_number);
+        $downloadName = "Laporan_{$cleanReportNum}.pptx";
+
+        return response()->download($fullPath, $downloadName, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        ]);
+    }
+
+    /**
+     * Download or stream the generated 16:9 PDF presentation.
+     */
+    public function downloadPdf(int $id, Request $request)
+    {
+        $report = Report::findOrFail($id);
+
+        if (!$report->pdf_path) {
+            $pdfService = app(ReportPdfService::class);
+            $pdfService->generatePdf($report);
+            $report->refresh();
+        }
+
+        $fullPath = storage_path("app/public/{$report->pdf_path}");
+        if (!file_exists($fullPath)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'File PDF belum tersedia di server.',
+            ], 404);
+        }
+
+        $cleanReportNum = preg_replace('/[^A-Za-z0-9_\-]/', '_', $report->report_number);
+        $downloadName = "Laporan_{$cleanReportNum}.pdf";
+
+        // If inline=1 (e.g. for previewing inside mobile webview or browser tab)
+        if ($request->boolean('inline')) {
+            return response()->file($fullPath, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="' . $downloadName . '"',
+            ]);
+        }
+
+        return response()->download($fullPath, $downloadName, [
+            'Content-Type' => 'application/pdf',
+        ]);
+    }
+
+    /**
+     * Send the report with 16:9 PDF attached via email.
+     */
+    public function sendEmail(Request $request, int $id, ReportPdfService $pdfService): JsonResponse
+    {
+        $validated = $request->validate([
+            'email' => 'required|email',
+            'subject' => 'nullable|string|max:255',
+            'notes' => 'nullable|string|max:1000',
+        ]);
+
+        $report = Report::with(['template', 'reportLocations.location', 'reportLocations.reportPhotos'])
+            ->findOrFail($id);
+
+        // Ensure 16:9 PDF exists; generate if missing
+        if (!$report->pdf_path || !file_exists(storage_path("app/public/{$report->pdf_path}"))) {
+            try {
+                $pdfService->generatePdf($report);
+                $report->refresh();
+                $report->load(['template', 'reportLocations.location', 'reportLocations.reportPhotos']);
+            } catch (\Throwable $e) {
+                Log::error("Failed to generate PDF before emailing Report #{$id}: " . $e->getMessage());
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Gagal membuat file PDF untuk lampiran email: ' . $e->getMessage(),
+                ], 500);
+            }
+        }
+
+        try {
+            Mail::to($validated['email'])->send(
+                new ReportSubmittedMail(
+                    $report,
+                    $validated['notes'] ?? null,
+                    $validated['subject'] ?? null
+                )
+            );
+
+            return response()->json([
+                'status' => 'success',
+                'message' => "Laporan berhasil dikirim ke alamat email {$validated['email']}.",
+                'data' => [
+                    'recipient' => $validated['email'],
+                    'report_number' => $report->report_number,
+                    'has_pdf_attached' => !empty($report->pdf_path),
+                ],
+            ]);
+        } catch (\Throwable $e) {
+            Log::error("Failed to send email for Report #{$id}: " . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal mengirim email: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Remove the specified report and associated files.
      */
     public function destroy(int $id): JsonResponse
     {
@@ -177,9 +416,10 @@ class ReportController extends Controller
             }
         }
 
-        // Delete PDF if exists
-        if ($report->pdf_path && Storage::disk('public')->exists($report->pdf_path)) {
-            Storage::disk('public')->delete($report->pdf_path);
+        // Delete report files directory (PPTX, PDF, temp files)
+        $reportDir = storage_path("app/public/reports/{$report->id}");
+        if (File::isDirectory($reportDir)) {
+            File::deleteDirectory($reportDir);
         }
 
         $report->delete();
@@ -190,4 +430,3 @@ class ReportController extends Controller
         ]);
     }
 }
-

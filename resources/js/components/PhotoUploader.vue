@@ -261,7 +261,7 @@ watch(
     if (typeof val === 'string' && val) {
       previewUrl.value = val;
       sizeLabel.value = '';
-    } else if (val instanceof File) {
+    } else if (val instanceof Blob || val instanceof File) {
       previewUrl.value = URL.createObjectURL(val);
     } else if (!val) {
       previewUrl.value = null;
