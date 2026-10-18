@@ -16,110 +16,130 @@ use Illuminate\Support\Facades\File;
 class BuiltinTemplateGeneratorService
 {
     /**
-     * Definition of 10 distinct built-in templates with unique visual styles
+     * Definition of 10 distinct, highly colorful, gapless built-in templates
      */
     public static function getTemplateDefinitions(): array
     {
         return [
             [
                 'key' => 'corporate-blue',
-                'name' => 'Corporate Blue',
-                'description' => 'Template formal bernuansa biru korporat dengan layout simetris dan rapi.',
-                'primary_color' => '1E3A8A',    // Deep Navy
-                'accent_color' => '0284C7',     // Sky Blue
-                'bg_color' => 'F8FAFC',         // Slate 50
+                'name' => 'Royal Sapphire',
+                'description' => 'Nuansa biru sapphire elegan dengan aksen emas cerah dan kontras tinggi.',
+                'primary_color' => '1E3A8A',    // Royal Navy
+                'secondary_color' => '2563EB',  // Electric Blue
+                'accent_color' => 'F59E0B',     // Amber Gold
+                'bg_color' => 'EFF6FF',         // Soft Ice Canvas
                 'card_bg' => 'FFFFFF',
-                'style_type' => 'card_modern',
+                'card_alt' => 'DBEAFE',
+                'style_type' => 'royal_sapphire',
             ],
             [
                 'key' => 'government-formal',
-                'name' => 'Government Formal',
-                'description' => 'Template institusi kedinasan formal dengan perpaduan warna hijau botol dan emas.',
-                'primary_color' => '065F46',    // Emerald / Pine
-                'accent_color' => 'D97706',     // Amber / Gold
-                'bg_color' => 'FAFBF9',
+                'name' => 'Emerald Forest',
+                'description' => 'Identitas hijau zamrud mewah dan emas prestisius berkarakter dinas resmi.',
+                'primary_color' => '064E3B',    // Deep Emerald Pine
+                'secondary_color' => '059669',  // Radiant Emerald
+                'accent_color' => 'F59E0B',     // Imperial Gold
+                'bg_color' => 'ECFDF5',         // Soft Mint Sage Canvas
                 'card_bg' => 'FFFFFF',
-                'style_type' => 'institutional_header',
+                'card_alt' => 'D1FAE5',
+                'style_type' => 'emerald_forest',
             ],
             [
                 'key' => 'modern-clean',
-                'name' => 'Modern Clean',
-                'description' => 'Desain kontemporer berorientasi minimalis dengan aksen teal yang segar.',
-                'primary_color' => '0F172A',    // Slate 900
-                'accent_color' => '0D9488',     // Teal 600
-                'bg_color' => 'F1F5F9',
+                'name' => 'Oceanic Teal',
+                'description' => 'Perpaduan segar toska samudra dengan aksen oranye terbenam yang energik.',
+                'primary_color' => '115E59',    // Deep Ocean Teal
+                'secondary_color' => '0D9488',  // Vivid Turquoise
+                'accent_color' => 'F97316',     // Sunset Orange
+                'bg_color' => 'F0FDFA',         // Aquamarine Canvas
                 'card_bg' => 'FFFFFF',
-                'style_type' => 'split_hero',
+                'card_alt' => 'CCFBF1',
+                'style_type' => 'oceanic_teal',
             ],
             [
                 'key' => 'minimal-professional',
-                'name' => 'Minimal Professional',
-                'description' => 'Layout hitam-putih presisi dengan aksen merah bata untuk kesan tegas dan profesional.',
-                'primary_color' => '18181B',    // Zinc 900
-                'accent_color' => 'E11D48',     // Rose 600
-                'bg_color' => 'FFFFFF',
-                'card_bg' => 'F4F4F5',
-                'style_type' => 'minimal_grid',
+                'name' => 'Crimson Ruby',
+                'description' => 'Desain tegas berwibawa dengan merah marun gelap dan aksen ruby menyala.',
+                'primary_color' => '881337',    // Deep Burgundy
+                'secondary_color' => 'E11D48',  // Vivid Ruby
+                'accent_color' => 'FBBF24',     // Warm Sand Gold
+                'bg_color' => 'FFF1F2',         // Rose Blush Canvas
+                'card_bg' => 'FFFFFF',
+                'card_alt' => 'FFE4E6',
+                'style_type' => 'crimson_ruby',
             ],
             [
                 'key' => 'executive-report',
-                'name' => 'Executive Report',
-                'description' => 'Tampilan mewah eksekutif dengan nuansa indigo gelap dan sentuhan warna tembaga.',
-                'primary_color' => '1E1B4B',    // Indigo 950
-                'accent_color' => 'B45309',     // Amber 700
-                'bg_color' => 'F8FAFC',
+                'name' => 'Imperial Violet',
+                'description' => 'Nuansa ultraviolet mewah dipadu koral menyala untuk presentasi pimpinan.',
+                'primary_color' => '3B0764',    // Royal Midnight Violet
+                'secondary_color' => '7C3AED',  // Electric Violet
+                'accent_color' => 'F43F5E',     // Vibrant Coral
+                'bg_color' => 'FAF5FF',         // Lilac Glow Canvas
                 'card_bg' => 'FFFFFF',
-                'style_type' => 'executive_banner',
+                'card_alt' => 'F3E8FF',
+                'style_type' => 'imperial_violet',
             ],
             [
                 'key' => 'photo-focus',
-                'name' => 'Photo Focus',
-                'description' => 'Fokus utama pada dokumentasi visual foto berukuran besar dengan panel informasi samping.',
-                'primary_color' => '27272A',    // Zinc 800
-                'accent_color' => 'F59E0B',     // Amber 500
-                'bg_color' => 'FAFAFA',
+                'name' => 'Sunset Terracotta',
+                'description' => 'Kehangatan terakota bumi dengan aksen jingga sunset yang kaya warna.',
+                'primary_color' => '9A3412',    // Rich Terracotta
+                'secondary_color' => 'EA580C',  // Warm Sunset
+                'accent_color' => 'F59E0B',     // Golden Amber
+                'bg_color' => 'FFF7ED',         // Warm Peach Sand Canvas
                 'card_bg' => 'FFFFFF',
-                'style_type' => 'photo_dominant',
+                'card_alt' => 'FFEDD5',
+                'style_type' => 'sunset_terracotta',
             ],
             [
                 'key' => 'elegant-report',
-                'name' => 'Elegant Report',
-                'description' => 'Kombinasi elegan biru malam dengan gradasi ungu lembut dan kartu informasi dinamis.',
-                'primary_color' => '312E81',    // Indigo 900
-                'accent_color' => '7C3AED',     // Violet 600
-                'bg_color' => 'FDF4FF',
+                'name' => 'Royal Magenta',
+                'description' => 'Elegansi magenta anggur dengan aksen kuning sitrun menyala yang berani.',
+                'primary_color' => '701A75',    // Deep Royal Plum
+                'secondary_color' => 'C026D3',  // Vivid Magenta
+                'accent_color' => 'FACC15',     // Bright Citron Gold
+                'bg_color' => 'FDF4FF',         // Orchid Glow Canvas
                 'card_bg' => 'FFFFFF',
-                'style_type' => 'elegant_cards',
+                'card_alt' => 'FAE8FF',
+                'style_type' => 'royal_magenta',
             ],
             [
                 'key' => 'bpsdm-classic',
-                'name' => 'BPSDM Classic',
-                'description' => 'Identitas resmi BPSDM dengan dominasi biru maritim dan aksen kuning keemasan.',
-                'primary_color' => '1D4ED8',    // Blue 700
-                'accent_color' => 'EAB308',     // Yellow 500
-                'bg_color' => 'F0F9FF',
-                'card_bg' => 'FFFFFF',
-                'style_type' => 'bpsdm_badge',
+                'name' => 'BPSDM Heritage Pine',
+                'description' => 'Identitas institusional BPSDM bernuansa Deep Pine dan emas champagne.',
+                'primary_color' => '14251D',    // Deep Pine Institutional
+                'secondary_color' => '1C362A',  // Forest Pine
+                'accent_color' => 'D8C79C',     // Prestige Champagne Gold
+                'bg_color' => 'F4F3EE',         // Warm Stone Canvas
+                'card_bg' => 'FAF9F5',
+                'card_alt' => 'ECEAE3',
+                'style_type' => 'bpsdm_heritage',
             ],
             [
                 'key' => 'modern-government',
-                'name' => 'Modern Government',
-                'description' => 'Tata letak modern untuk instansi pemerintah dengan garis aksen oranye dan cyan cerah.',
-                'primary_color' => '0E7490',    // Cyan 700
-                'accent_color' => 'EA580C',     // Orange 600
-                'bg_color' => 'F8FAFC',
+                'name' => 'Nordic Cobalt',
+                'description' => 'Kombinasi modern biru kobalt dingin dengan aksen jingga api kontras tinggi.',
+                'primary_color' => '1E293B',    // Slate Navy
+                'secondary_color' => '0284C7',  // Cobalt Sky
+                'accent_color' => 'EA580C',     // Blaze Orange
+                'bg_color' => 'F1F5F9',         // Steel Ice Canvas
                 'card_bg' => 'FFFFFF',
-                'style_type' => 'modern_gov',
+                'card_alt' => 'E2E8F0',
+                'style_type' => 'nordic_cobalt',
             ],
             [
                 'key' => 'clean-documentation',
-                'name' => 'Clean Documentation',
-                'description' => 'Format inspeksi teknis lapangan dengan fokus kerapian tabel data dan dokumentasi.',
-                'primary_color' => '334155',    // Slate 700
-                'accent_color' => '059669',     // Emerald 600
-                'bg_color' => 'F8FAFC',
+                'name' => 'Slate & Lime Volt',
+                'description' => 'Tampilan kontemporer grafit gelap dengan aksen hijau neon volt yang tajam.',
+                'primary_color' => '18181B',    // Dark Graphite
+                'secondary_color' => '334155',  // Slate Steel
+                'accent_color' => '84CC16',     // Electric Lime Volt
+                'bg_color' => 'F4F4F5',         // Cool Stone Canvas
                 'card_bg' => 'FFFFFF',
-                'style_type' => 'technical_doc',
+                'card_alt' => 'E4E4E7',
+                'style_type' => 'slate_lime',
             ],
         ];
     }
@@ -181,17 +201,14 @@ class BuiltinTemplateGeneratorService
         $layout->setCX(13.333, DocumentLayout::UNIT_INCH);
         $layout->setCY(7.5, DocumentLayout::UNIT_INCH);
 
-        $primaryColor = $template['primary_color'];
-        $accentColor = $template['accent_color'];
-
         // ----------------------------------------------------
-        // SLIDE 1: COVER
+        // SLIDE 1: COVER (Edge-to-Edge, Zero Dead Space)
         // ----------------------------------------------------
         $coverSlide = $ppt->getActiveSlide();
         $this->buildCoverSlide($coverSlide, $template);
 
         // ----------------------------------------------------
-        // SLIDES 2 - 6: 5 LOCATIONS
+        // SLIDES 2 - 6: 5 LOCATIONS (Full Coverage Layout)
         // ----------------------------------------------------
         $locations = [
             'Halaman Depan Kantor',
@@ -212,9 +229,7 @@ class BuiltinTemplateGeneratorService
     }
 
     /**
-     * Draw a plain filled rectangle (optionally bordered) used as a color
-     * band, card background or accent strip. Returns the shape so callers
-     * can stack more shapes on top of it (z-order = creation order).
+     * Draw a plain filled rectangle used as cards, banners, or color blocks.
      */
     protected function addFilledBox($slide, float $x, float $y, float $w, float $h, string $fillHex, ?string $borderHex = null, float $borderWidth = 1.0)
     {
@@ -237,7 +252,7 @@ class BuiltinTemplateGeneratorService
     }
 
     /**
-     * Thin accent rule (a flattened filled box), used as a divider line.
+     * Thin accent rule used as a divider line.
      */
     protected function addAccentLine($slide, float $x, float $y, float $w, string $colorHex, float $thickness = 3.0)
     {
@@ -245,254 +260,264 @@ class BuiltinTemplateGeneratorService
     }
 
     /**
-     * Build Cover Slide (Slide 1) with placeholders
+     * Build Cover Slide (Slide 1) with rich full-bleed layout and zero empty space
      */
     protected function buildCoverSlide($slide, array $template): void
     {
-        $styleType = $template['style_type'] ?? 'card_modern';
-        $isPhotoDominant = $styleType === 'photo_dominant';
-        $isSplitHero = $styleType === 'split_hero';
-        $isMinimal = $styleType === 'minimal_grid';
+        $primary = new Color('FF' . $template['primary_color']);
+        $accent = new Color('FF' . $template['accent_color']);
+        $white = new Color('FFFFFFFF');
+        $dark = new Color('FF1E293B');
+        $muted = new Color('FF64748B');
 
-        // ── Background canvas ──────────────────────────────────────────
+        // ── 1. Full Canvas Background ──────────────────────────────────
         $this->addFilledBox($slide, 0, 0, 960, 540, $template['bg_color']);
 
-        if ($isSplitHero) {
-            // Variant: full-height colored panel on the left (hero split),
-            // content card floats on the right instead of a top banner.
-            $this->addFilledBox($slide, 0, 0, 330, 540, $template['primary_color']);
-            $this->addAccentLine($slide, 330, 0, 6, $template['accent_color'], 540);
+        // ── 2. Top Header Banner (Full-Bleed 0 to 960) ─────────────────
+        $this->addFilledBox($slide, 0, 0, 960, 105, $template['primary_color']);
+        $this->addAccentLine($slide, 0, 105, 960, $template['accent_color'], 5);
 
-            $badge = $slide->createRichTextShape()->setHeight(30)->setWidth(260)->setOffsetX(40)->setOffsetY(50);
-            $rb = $badge->createTextRun('BPSDM PROVINSI');
-            $rb->getFont()->setBold(true)->setSize(10)->setColor(new Color('FF' . $template['accent_color']));
+        // Header Eyebrow Tag
+        $eyebrow = $slide->createRichTextShape()->setHeight(22)->setWidth(700)->setOffsetX(30)->setOffsetY(18);
+        $rb = $eyebrow->createTextRun('BPSDM PROVINSI • SISTEM PENGAWASAN LINGKUNGAN KANTOR');
+        $rb->getFont()->setBold(true)->setSize(10)->setColor($accent);
 
-            $title = $slide->createRichTextShape()->setHeight(160)->setWidth(260)->setOffsetX(40)->setOffsetY(90);
-            $rt = $title->createTextRun("{{JUDUL_LAPORAN}}\nPENGAWASAN\nLINGKUNGAN\nKANTOR");
-            $rt->getFont()->setBold(true)->setSize(21)->setColor(new Color('FFFFFFFF'));
+        // Header Title
+        $title = $slide->createRichTextShape()->setHeight(48)->setWidth(750)->setOffsetX(30)->setOffsetY(44);
+        $rt = $title->createTextRun('{{JUDUL_LAPORAN}}');
+        $rt->getFont()->setBold(true)->setSize(23)->setColor($white);
 
-            $sub = $slide->createRichTextShape()->setHeight(60)->setWidth(260)->setOffsetX(40)->setOffsetY(440);
-            $rs = $sub->createTextRun("Template: {$template['name']}\n16:9 Widescreen");
-            $rs->getFont()->setSize(9)->setColor(new Color('FFCBD5E1'));
+        // 16:9 Badge on top-right
+        $badge169 = $slide->createRichTextShape()->setHeight(32)->setWidth(140)->setOffsetX(790)->setOffsetY(35);
+        $badge169->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $r169 = $badge169->createTextRun('16:9 WIDESCREEN');
+        $r169->getFont()->setBold(true)->setSize(9)->setColor($accent);
 
-            $metaX = 370; $photoX = 700;
-        } elseif ($isMinimal) {
-            // Variant: no colored header band, high-contrast thin rule only.
-            $this->addAccentLine($slide, 70, 90, 820, $template['accent_color'], 3);
+        // ── 3. Middle Body: Two Balanced, Edge-to-Edge Cards ──────────
+        $bodyY = 122;
+        $bodyH = 360;
 
-            $badge = $slide->createRichTextShape()->setHeight(26)->setWidth(600)->setOffsetX(70)->setOffsetY(40);
-            $rb = $badge->createTextRun('BPSDM PROVINSI · PENGAWASAN LINGKUNGAN KANTOR');
-            $rb->getFont()->setBold(true)->setSize(10)->setColor(new Color('FF' . $template['accent_color']));
+        // ── LEFT CARD: METADATA & SCOPE CHECKLIST (Width: 590) ─────────
+        $this->addFilledBox($slide, 24, $bodyY, 590, $bodyH, $template['card_bg'], $template['accent_color'], 1.5);
+        // Colored accent header inside card
+        $this->addFilledBox($slide, 24, $bodyY, 590, 42, $template['card_alt'] ?? 'E2E8F0');
+        $this->addAccentLine($slide, 24, $bodyY + 42, 590, $template['accent_color'], 2);
 
-            $title = $slide->createRichTextShape()->setHeight(70)->setWidth(850)->setOffsetX(70)->setOffsetY(55);
-            $rt = $title->createTextRun('{{JUDUL_LAPORAN}}');
-            $rt->getFont()->setBold(true)->setSize(27)->setColor(new Color('FF' . $template['primary_color']));
+        $cardHead = $slide->createRichTextShape()->setHeight(32)->setWidth(570)->setOffsetX(36)->setOffsetY($bodyY + 8);
+        $rc1 = $cardHead->createTextRun('NOMOR BERKAS LAPORAN RESMI: ');
+        $rc1->getFont()->setSize(9)->setBold(true)->setColor($muted);
+        $rc2 = $cardHead->createTextRun('{{NOMOR_LAPORAN}}');
+        $rc2->getFont()->setSize(11)->setBold(true)->setColor($primary);
 
-            $metaX = 70; $photoX = 650;
-        } else {
-            // Default / card_modern / institutional_header / others:
-            // full-width colored header band + accent underline (mirrors the PDF cover).
-            $this->addFilledBox($slide, 0, 0, 960, 108, $template['primary_color']);
-            $this->addAccentLine($slide, 0, 108, 960, $template['accent_color'], 5);
+        // Meta Details Row
+        $metaDetails = $slide->createRichTextShape()->setHeight(68)->setWidth(560)->setOffsetX(36)->setOffsetY($bodyY + 54);
+        $pm = $metaDetails->getActiveParagraph();
+        $rm1 = $pm->createTextRun("HARI & TANGGAL PEMERIKSAAN:\n");
+        $rm1->getFont()->setSize(8)->setBold(true)->setColor($muted);
+        $rm2 = $pm->createTextRun("{{HARI_TANGGAL}}\n");
+        $rm2->getFont()->setSize(12)->setBold(true)->setColor($dark);
 
-            $badge = $slide->createRichTextShape()->setHeight(24)->setWidth(700)->setOffsetX(70)->setOffsetY(32);
-            $rb = $badge->createTextRun('BPSDM PROVINSI • PENGAWASAN LINGKUNGAN KANTOR');
-            $rb->getFont()->setBold(true)->setSize(10)->setColor(new Color('FF' . $template['accent_color']));
+        $officerRow = $slide->createRichTextShape()->setHeight(50)->setWidth(560)->setOffsetX(36)->setOffsetY($bodyY + 115);
+        $po = $officerRow->getActiveParagraph();
+        $ro1 = $po->createTextRun("PETUGAS PENGAWAS LAPANGAN:\n");
+        $ro1->getFont()->setSize(8)->setBold(true)->setColor($muted);
+        $ro2 = $po->createTextRun("{{NAMA_PETUGAS}}");
+        $ro2->getFont()->setSize(13)->setBold(true)->setColor($primary);
 
-            $title = $slide->createRichTextShape()->setHeight(50)->setWidth(850)->setOffsetX(70)->setOffsetY(56);
-            $rt = $title->createTextRun('{{JUDUL_LAPORAN}}');
-            $rt->getFont()->setBold(true)->setSize(25)->setColor(new Color('FFFFFFFF'));
+        // Scope of 5 Inspection Points (Gapless, filled card section)
+        $this->addFilledBox($slide, 36, $bodyY + 175, 566, 170, $template['bg_color'], 'CBD5E1', 1);
+        $this->addAccentLine($slide, 36, $bodyY + 175, 566, $template['accent_color'], 3);
 
-            $metaX = 70; $photoX = 650;
+        $scopeTitle = $slide->createRichTextShape()->setHeight(22)->setWidth(540)->setOffsetX(46)->setOffsetY($bodyY + 182);
+        $rst = $scopeTitle->createTextRun('CAKUPAN LOKASI INSPEKSI KEBERSIHAN & TATA KELOLA:');
+        $rst->getFont()->setBold(true)->setSize(9)->setColor($primary);
+
+        $scopeList = $slide->createRichTextShape()->setHeight(130)->setWidth(540)->setOffsetX(46)->setOffsetY($bodyY + 204);
+        $ps = $scopeList->getActiveParagraph();
+        $points = [
+            '1. Halaman Depan & Akses Utama Gedung',
+            '2. Ruang Pelayanan Publik & Informasi',
+            '3. Ruang Kerja & Fasilitas Pegawai',
+            '4. Sarana Toilet & Kebersihan Sanitasi',
+            '5. Area Parkir & Jalur Lingkungan Kantor',
+        ];
+        foreach ($points as $idx => $pt) {
+            $rDot = $ps->createTextRun("[✓] {$pt}\n");
+            $rDot->getFont()->setSize(9)->setColor($dark)->setBold(true);
         }
 
-        $bodyTop = $isSplitHero ? 60 : 150;
-        // split_hero punya panel kiri + foto lebih dekat ke tengah (photoX=700),
-        // jadi kartu meta harus lebih sempit agar tidak tumpang tindih dengan frame foto.
-        $cardW = $isPhotoDominant ? 350 : ($isSplitHero ? 290 : 460);
-        $photoW = $isPhotoDominant ? 300 : 230;
-        $photoH = $photoW;
+        // ── RIGHT CARD: LARGE OFFICER PHOTO (Width: 310) ───────────────
+        $photoX = 626;
+        $this->addFilledBox($slide, $photoX, $bodyY, 310, $bodyH, $template['card_bg'], $template['accent_color'], 1.5);
 
-        // ── Left: meta info card (white card, matches PDF styling) ──────
-        if (!$isMinimal) {
-            $this->addFilledBox($slide, $metaX, $bodyTop, $cardW, 300, $template['card_bg'], 'E2E8F0', 1);
-        }
-        $metaPad = $isMinimal ? 0 : 24;
+        // Photo Frame Header
+        $this->addFilledBox($slide, $photoX, $bodyY, 310, 36, $template['primary_color']);
+        $pHead = $slide->createRichTextShape()->setHeight(26)->setWidth(290)->setOffsetX($photoX + 10)->setOffsetY($bodyY + 6);
+        $pHead->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $rp = $pHead->createTextRun('DOKUMENTASI PETUGAS');
+        $rp->getFont()->setBold(true)->setSize(9)->setColor($white);
 
-        $shapeMeta = $slide->createRichTextShape()
-            ->setHeight(170)
-            ->setWidth($cardW - ($metaPad * 2))
-            ->setOffsetX($metaX + $metaPad)
-            ->setOffsetY($bodyTop + $metaPad);
-
-        $dark = new Color('FF1E293B');
-        $gray = new Color('FF64748B');
-        $primary = new Color('FF' . $template['primary_color']);
-
-        $p1 = $shapeMeta->getActiveParagraph();
-        $r1 = $p1->createTextRun("Nomor Laporan Resmi\n");
-        $r1->getFont()->setSize(9)->setColor($gray)->setBold(true);
-        $r2 = $p1->createTextRun("{{NOMOR_LAPORAN}}\n\n");
-        $r2->getFont()->setBold(true)->setSize(16)->setColor($primary);
-
-        $r3 = $p1->createTextRun("Hari & Tanggal Inspeksi\n");
-        $r3->getFont()->setSize(9)->setColor($gray)->setBold(true);
-        $r4 = $p1->createTextRun("{{HARI_TANGGAL}}\n\n");
-        $r4->getFont()->setBold(true)->setSize(13)->setColor($dark);
-
-        $r5 = $p1->createTextRun("Petugas Pengawas Lapangan\n");
-        $r5->getFont()->setSize(9)->setColor($gray)->setBold(true);
-        $r6 = $p1->createTextRun('{{NAMA_PETUGAS}}');
-        $r6->getFont()->setBold(true)->setSize(15)->setColor($primary);
-
-        // ── Right: officer photo card frame ──────────────────────────────
-        $frameX = $photoX;
-        $frameY = $bodyTop;
-        $frameW = $photoW + 20;
-        $frameH = $photoH + 46;
-
-        $this->addFilledBox($slide, $frameX, $frameY, $frameW, $frameH, $template['card_bg'], $template['accent_color'], 2);
+        // Photo Box
+        $photoBoxW = 286;
+        $photoBoxH = 260;
+        $this->addFilledBox($slide, $photoX + 12, $bodyY + 46, $photoBoxW, $photoBoxH, $template['card_alt'] ?? 'F1F5F9', '94A3B8', 1);
 
         $shapePhoto = $slide->createRichTextShape()
-            ->setHeight($photoH)
-            ->setWidth($photoW)
-            ->setOffsetX($frameX + 10)
-            ->setOffsetY($frameY + 10);
+            ->setHeight($photoBoxH)
+            ->setWidth($photoBoxW)
+            ->setOffsetX($photoX + 12)
+            ->setOffsetY($bodyY + 46);
         $shapePhoto->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $rPhoto = $shapePhoto->createTextRun("\n\n\n[ FOTO PETUGAS ]\n{{FOTO_PETUGAS}}");
-        $rPhoto->getFont()->setBold(true)->setSize(10)->setColor(new Color('FF' . $template['accent_color']));
+        $rPhoto = $shapePhoto->createTextRun("\n\n\n\n[ FOTO PETUGAS ]\n{{FOTO_PETUGAS}}");
+        $rPhoto->getFont()->setBold(true)->setSize(11)->setColor($primary);
 
-        $caption = $slide->createRichTextShape()->setHeight(20)->setWidth($photoW)->setOffsetX($frameX + 10)->setOffsetY($frameY + $photoH + 18);
-        $caption->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $rc = $caption->createTextRun('FOTO PETUGAS PENGAWAS');
-        $rc->getFont()->setBold(true)->setSize(8)->setColor($gray);
+        // Photo Caption Footer
+        $sealBadge = $slide->createRichTextShape()->setHeight(36)->setWidth(286)->setOffsetX($photoX + 12)->setOffsetY($bodyY + 314);
+        $sealBadge->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $rsb = $sealBadge->createTextRun("TERVERIFIKASI RESMI BPSDM\n{{HARI_TANGGAL}}");
+        $rsb->getFont()->setBold(true)->setSize(8)->setColor($primary);
 
-        // ── Footer ──────────────────────────────────────────────────────
-        $this->addAccentLine($slide, $metaX, 500, 960 - $metaX - 40, 'E2E8F0', 1);
-        $shapeFooter = $slide->createRichTextShape()->setHeight(22)->setWidth(850)->setOffsetX($metaX)->setOffsetY(506);
-        $rFoot = $shapeFooter->createTextRun("Template: {$template['name']} (16:9 Widescreen) • Sistem Pelaporan Pengawasan Lingkungan BPSDM");
-        $rFoot->getFont()->setSize(9)->setColor($gray);
+        // ── 4. Full-Bleed Bottom Footer Ribbon ─────────────────────────
+        $this->addFilledBox($slide, 0, 495, 960, 45, $template['primary_color']);
+        $this->addAccentLine($slide, 0, 495, 960, $template['accent_color'], 3);
+
+        $shapeFooter = $slide->createRichTextShape()->setHeight(26)->setWidth(900)->setOffsetX(30)->setOffsetY(507);
+        $rFoot = $shapeFooter->createTextRun("Template: {$template['name']} (16:9 HD) • Sistem Pelaporan Pengawasan Lingkungan Kantor BPSDM • Halaman 1");
+        $rFoot->getFont()->setSize(9)->setColor($white);
     }
 
     /**
-     * Build Location Slide (Slide 2 to 6) with placeholders
+     * Build Location Slide (Slide 2 to 6) with edge-to-edge photos and compact 3-column findings
      */
     protected function buildLocationSlide($slide, array $template, int $locNum, string $defaultName): void
     {
-        $styleType = $template['style_type'] ?? 'card_modern';
-        $isPhotoDominant = $styleType === 'photo_dominant';
-        $isSplitHero = $styleType === 'split_hero';
-        $isMinimal = $styleType === 'minimal_grid';
-
         $primary = new Color('FF' . $template['primary_color']);
         $accent = new Color('FF' . $template['accent_color']);
-        $gray = new Color('FF64748B');
+        $white = new Color('FFFFFFFF');
         $dark = new Color('FF1E293B');
+        $muted = new Color('FF64748B');
 
-        // ── Background canvas ──────────────────────────────────────────
+        // ── 1. Full Canvas Background ──────────────────────────────────
         $this->addFilledBox($slide, 0, 0, 960, 540, $template['bg_color']);
 
-        $contentX = 60;
-
-        if ($isMinimal) {
-            // Thin rule header, no color band — keeps the black/white/rose look.
-            $this->addAccentLine($slide, $contentX, 72, 840, $template['accent_color'], 3);
-        } elseif ($isSplitHero) {
-            // Slim full-height accent stripe on the left edge for brand continuity
-            // with the split-hero cover, without eating into the content width.
-            $this->addFilledBox($slide, 0, 0, 14, 540, $template['primary_color']);
-            $this->addFilledBox($slide, 0, 0, 960, 72, $template['bg_color']); // keep header area plain
-            $contentX = 60;
-        } else {
-            // Default: colored header band, same family as the cover slide.
-            $this->addFilledBox($slide, 0, 0, 960, 70, $template['primary_color']);
-            $this->addAccentLine($slide, 0, 70, 960, $template['accent_color'], 4);
-        }
-
-        $headerTextColor = $isMinimal || $isSplitHero ? $primary : new Color('FFFFFFFF');
-        $headerLabelColor = $isMinimal || $isSplitHero ? $accent : new Color('FFE0E7FF');
+        // ── 2. Top Header Banner (Full-Bleed 0 to 960) ─────────────────
+        $this->addFilledBox($slide, 0, 0, 960, 78, $template['primary_color']);
+        $this->addAccentLine($slide, 0, 78, 960, $template['accent_color'], 4);
 
         $shapeHeader = $slide->createRichTextShape()
-            ->setHeight(55)
-            ->setWidth(820)
-            ->setOffsetX($contentX)
-            ->setOffsetY(14);
+            ->setHeight(56)
+            ->setWidth(680)
+            ->setOffsetX(24)
+            ->setOffsetY(12);
         $pHeader = $shapeHeader->getActiveParagraph();
-        $rTop = $pHeader->createTextRun("TITIK PEMANTAUAN {$locNum} DARI 5\n");
-        $rTop->getFont()->setBold(true)->setSize(10)->setColor($headerLabelColor);
+        $rTop = $pHeader->createTextRun("TITIK PEMANTAUAN {$locNum} DARI 5 • BPSDM LINGKUNGAN KANTOR\n");
+        $rTop->getFont()->setBold(true)->setSize(9)->setColor($accent);
         $rLocName = $pHeader->createTextRun("{{NAMA_LOKASI}}");
-        $rLocName->getFont()->setBold(true)->setSize(19)->setColor($headerTextColor);
+        $rLocName->getFont()->setBold(true)->setSize(19)->setColor($white);
 
-        // ── Photo frames ──────────────────────────────────────────────
-        $photoTop = $isMinimal ? 95 : 90;
-        // photo_dominant tetap lebih besar dari default, tapi tidak terlalu besar —
-        // panel data di bawahnya tetap butuh ruang cukup untuk 4 bagian teks
-        // (kondisi, catatan, permasalahan, solusi) tanpa meluber ke footer.
-        $photoH = $isPhotoDominant ? 240 : 225;
-        $photoW = $isPhotoDominant ? 410 : 395;
-        $gap = 20;
-        $p1X = $contentX;
-        $p2X = $contentX + $photoW + $gap;
+        // Status Badge Pill on Header Right
+        $this->addFilledBox($slide, 720, 18, 216, 42, $template['card_bg'], $template['accent_color'], 2);
+        $shapeStatus = $slide->createRichTextShape()->setHeight(36)->setWidth(208)->setOffsetX(724)->setOffsetY(22);
+        $shapeStatus->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $rst = $shapeStatus->createTextRun("STATUS AREA:\n{{KONDISI}}");
+        $rst->getFont()->setBold(true)->setSize(9)->setColor($primary);
 
-        foreach ([[$p1X, 'DOKUMENTASI 1', '{{FOTO_1}}'], [$p2X, 'DOKUMENTASI 2', '{{FOTO_2}}']] as [$px, $label, $placeholder]) {
-            $this->addFilledBox($slide, $px, $photoTop, $photoW, $photoH, $template['card_bg'], $template['accent_color'], 1);
+        // ── 3. Middle Section: TWO LARGE PHOTOS (Edge-to-Edge) ─────────
+        $photoY = 92;
+        $photoW = 444;
+        $photoH = 228;
+        $p1X = 24;
+        $p2X = 492;
 
-            $labelShape = $slide->createRichTextShape()->setHeight(18)->setWidth($photoW - 16)->setOffsetX($px + 8)->setOffsetY($photoTop + 6);
+        $photos = [
+            [$p1X, 'DOKUMENTASI 1 : PERSPEKTIF UTAMA', '{{FOTO_1}}'],
+            [$p2X, 'DOKUMENTASI 2 : DETAIL AREA PEMANTAUAN', '{{FOTO_2}}'],
+        ];
+
+        foreach ($photos as [$px, $label, $placeholder]) {
+            // Container Card
+            $this->addFilledBox($slide, $px, $photoY, $photoW, $photoH, $template['card_bg'], $template['accent_color'], 1.5);
+            
+            // Header Strip on Photo Frame
+            $this->addFilledBox($slide, $px, $photoY, $photoW, 26, $template['primary_color']);
+            $labelShape = $slide->createRichTextShape()->setHeight(20)->setWidth($photoW - 16)->setOffsetX($px + 8)->setOffsetY($photoY + 4);
             $rLabel = $labelShape->createTextRun($label);
-            $rLabel->getFont()->setBold(true)->setSize(9)->setColor($accent);
+            $rLabel->getFont()->setBold(true)->setSize(8)->setColor($accent);
+
+            // Photo Placeholder Inner Area
+            $innerPhotoY = $photoY + 28;
+            $innerPhotoH = $photoH - 32;
+            $innerPhotoW = $photoW - 8;
+            $this->addFilledBox($slide, $px + 4, $innerPhotoY, $innerPhotoW, $innerPhotoH, $template['card_alt'] ?? 'F1F5F9');
 
             $shapeP = $slide->createRichTextShape()
-                ->setHeight($photoH - 32)
-                ->setWidth($photoW - 16)
-                ->setOffsetX($px + 8)
-                ->setOffsetY($photoTop + 26);
+                ->setHeight($innerPhotoH)
+                ->setWidth($innerPhotoW)
+                ->setOffsetX($px + 4)
+                ->setOffsetY($innerPhotoY);
             $shapeP->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-            $rP = $shapeP->createTextRun("\n\n[ FRAME FOTO ]\n{$placeholder}");
-            $rP->getFont()->setBold(true)->setSize(10)->setColor($gray);
+            $rP = $shapeP->createTextRun("\n\n\n[ FRAME FOTO DOKUMENTASI ]\n{$placeholder}");
+            $rP->getFont()->setBold(true)->setSize(10)->setColor($muted);
         }
 
-        // ── Bottom inspection data panel ─────────────────────────────────
-        $dataTop = $photoTop + $photoH + 15;
-        $dataH = 540 - $dataTop - 35;
-        $dataW = ($p2X + $photoW) - $contentX;
+        // ── 4. Bottom Section: 3-COLUMN STRUCTURED FINDINGS ────────────
+        // Fills the remaining vertical space (330 to 495) with zero empty void
+        $dataY = 328;
+        $dataH = 168;
 
-        if (!$isMinimal) {
-            $this->addFilledBox($slide, $contentX, $dataTop, $dataW, $dataH, $template['card_bg'], 'E2E8F0', 1);
-            $this->addFilledBox($slide, $contentX, $dataTop, 5, $dataH, $template['accent_color']);
-        } else {
-            $this->addAccentLine($slide, $contentX, $dataTop, $dataW, $template['accent_color'], 2);
-        }
+        // Column 1: Catatan Pemantauan (Width: 295)
+        $c1X = 24;
+        $c1W = 295;
+        $this->addFilledBox($slide, $c1X, $dataY, $c1W, $dataH, $template['card_bg'], 'CBD5E1', 1.5);
+        $this->addFilledBox($slide, $c1X, $dataY, $c1W, 28, $template['primary_color']);
+        $h1 = $slide->createRichTextShape()->setHeight(22)->setWidth($c1W - 16)->setOffsetX($c1X + 8)->setOffsetY($dataY + 4);
+        $rh1 = $h1->createTextRun('CATATAN PEMANTAUAN');
+        $rh1->getFont()->setBold(true)->setSize(8)->setColor($white);
 
-        $innerPad = $isMinimal ? 0 : 22;
-        $shapeData = $slide->createRichTextShape()
-            ->setHeight($dataH - ($innerPad * 2))
-            ->setWidth($dataW - ($innerPad * 2) - ($isMinimal ? 0 : 10))
-            ->setOffsetX($contentX + $innerPad + ($isMinimal ? 0 : 10))
-            ->setOffsetY($dataTop + $innerPad);
+        $body1 = $slide->createRichTextShape()->setHeight($dataH - 36)->setWidth($c1W - 16)->setOffsetX($c1X + 8)->setOffsetY($dataY + 32);
+        $p1 = $body1->getActiveParagraph();
+        $rc1 = $p1->createTextRun("Hasil Peninjauan:\n{{CATATAN}}");
+        $rc1->getFont()->setSize(9)->setColor($dark);
 
-        $pData = $shapeData->getActiveParagraph();
-        $rCondLabel = $pData->createTextRun('KONDISI KEBERSIHAN   ');
-        $rCondLabel->getFont()->setBold(true)->setSize(10)->setColor($primary);
-        $rCond = $pData->createTextRun("{{KONDISI}}\n\n");
-        $rCond->getFont()->setBold(true)->setSize(10)->setColor($accent);
+        // Column 2: Identifikasi Masalah (Width: 295)
+        $c2X = 333;
+        $c2W = 295;
+        $this->addFilledBox($slide, $c2X, $dataY, $c2W, $dataH, $template['card_bg'], 'CBD5E1', 1.5);
+        $this->addFilledBox($slide, $c2X, $dataY, $c2W, 28, '991B1B'); // Muted Red Header
+        $h2 = $slide->createRichTextShape()->setHeight(22)->setWidth($c2W - 16)->setOffsetX($c2X + 8)->setOffsetY($dataY + 4);
+        $rh2 = $h2->createTextRun('IDENTIFIKASI PERMASALAHAN');
+        $rh2->getFont()->setBold(true)->setSize(8)->setColor($white);
 
-        $rNotes = $pData->createTextRun("CATATAN PEMANTAUAN\n{{CATATAN}}\n\n");
-        $rNotes->getFont()->setSize(10)->setColor($dark);
+        $body2 = $slide->createRichTextShape()->setHeight($dataH - 36)->setWidth($c2W - 16)->setOffsetX($c2X + 8)->setOffsetY($dataY + 32);
+        $p2 = $body2->getActiveParagraph();
+        $rc2 = $p2->createTextRun("Kendala / Titik Masalah:\n{{PERMASALAHAN}}");
+        $rc2->getFont()->setSize(9)->setColor($dark);
 
-        $rProb = $pData->createTextRun("PERMASALAHAN\n{{PERMASALAHAN}}\n\n");
-        $rProb->getFont()->setSize(10)->setColor($dark);
+        // Column 3: Solusi & Tindak Lanjut (Width: 294)
+        $c3X = 642;
+        $c3W = 294;
+        $this->addFilledBox($slide, $c3X, $dataY, $c3W, $dataH, $template['card_bg'], 'CBD5E1', 1.5);
+        $this->addFilledBox($slide, $c3X, $dataY, $c3W, 28, '166534'); // Muted Green Header
+        $h3 = $slide->createRichTextShape()->setHeight(22)->setWidth($c3W - 16)->setOffsetX($c3X + 8)->setOffsetY($dataY + 4);
+        $rh3 = $h3->createTextRun('SOLUSI & TINDAK LANJUT');
+        $rh3->getFont()->setBold(true)->setSize(8)->setColor($white);
 
-        $rSol = $pData->createTextRun("SOLUSI / TINDAK LANJUT\n{{SOLUSI}}");
-        $rSol->getFont()->setSize(10)->setColor($dark);
+        $body3 = $slide->createRichTextShape()->setHeight($dataH - 36)->setWidth($c3W - 16)->setOffsetX($c3X + 8)->setOffsetY($dataY + 32);
+        $p3 = $body3->getActiveParagraph();
+        $rc3 = $p3->createTextRun("Rekomendasi Tindakan:\n{{SOLUSI}}");
+        $rc3->getFont()->setSize(9)->setColor($dark);
 
-        // ── Footer ──────────────────────────────────────────────────────
-        $shapeFoot = $slide->createRichTextShape()->setHeight(20)->setWidth($dataW)->setOffsetX($contentX)->setOffsetY(508);
-        $rFoot = $shapeFoot->createTextRun('Halaman ' . ($locNum + 1) . " • BPSDM Pengawasan Lingkungan Kantor • Template: {$template['name']}");
-        $rFoot->getFont()->setSize(8)->setColor($gray);
+        // ── 5. Full-Bleed Bottom Footer Ribbon ─────────────────────────
+        $this->addFilledBox($slide, 0, 506, 960, 34, $template['primary_color']);
+        $this->addAccentLine($slide, 0, 506, 960, $template['accent_color'], 2);
+
+        $shapeFoot = $slide->createRichTextShape()->setHeight(22)->setWidth(910)->setOffsetX(24)->setOffsetY(513);
+        $rFoot = $shapeFoot->createTextRun("BPSDM Pengawasan Lingkungan • Halaman " . ($locNum + 1) . " dari 6 • {{NAMA_LOKASI}} • Template: {$template['name']}");
+        $rFoot->getFont()->setSize(8)->setColor($white);
     }
 
     /**
-     * Create high-quality 16:9 Preview PNG image using PHP GD
+     * Create high-quality, colorful, gapless 16:9 Preview PNG image using PHP GD
      */
     protected function createPreviewImage(array $template, string $savePath): void
     {
@@ -520,60 +545,76 @@ class BuiltinTemplateGeneratorService
         $cAccent = imagecolorallocate($img, $accR, $accG, $accB);
         $cWhite = imagecolorallocate($img, 255, 255, 255);
         $cDark = imagecolorallocate($img, 30, 41, 59);
-        $cMuted = imagecolorallocate($img, 148, 163, 184);
-        $cCardBorder = imagecolorallocate($img, 226, 232, 240);
+        $cMuted = imagecolorallocate($img, 100, 116, 139);
+        $cCardBorder = imagecolorallocate($img, 203, 213, 225);
+        $cPhotoBg = imagecolorallocate($img, 226, 232, 240);
+        $cRed = imagecolorallocate($img, 185, 28, 28);
+        $cGreen = imagecolorallocate($img, 22, 101, 52);
 
-        // Fill background
+        // 1. Fill entire background
         imagefilledrectangle($img, 0, 0, $w, $h, $cBg);
 
-        // Header Accent Strip
-        imagefilledrectangle($img, 0, 0, $w, 12, $cPrimary);
-        imagefilledrectangle($img, 0, 12, $w, 16, $cAccent);
+        // 2. Full-bleed Top Header Banner
+        imagefilledrectangle($img, 0, 0, $w, 56, $cPrimary);
+        imagefilledrectangle($img, 0, 56, $w, 60, $cAccent);
 
-        // Simulated Badge
-        imagefilledrectangle($img, 30, 32, 160, 48, $cAccent);
-        imagestring($img, 2, 38, 34, "BPSDM PROVINSI", $cWhite);
+        // Header Text
+        imagestring($img, 2, 16, 10, "BPSDM PROVINSI • PENGAWASAN LINGKUNGAN", $cAccent);
+        imagestring($img, 4, 16, 28, strtoupper($template['name']), $cWhite);
+        imagestring($img, 2, 500, 20, "16:9 WIDESCREEN", $cAccent);
 
-        // Title
-        imagestring($img, 5, 30, 60, "PENGAWASAN LINGKUNGAN", $cPrimary);
-        imagestring($img, 4, 30, 80, "KANTOR BPSDM", $cDark);
+        // 3. Left Section: 2 Photos (Filling width without gap)
+        // Photo 1
+        imagefilledrectangle($img, 16, 68, 310, 220, $cWhite);
+        imagerectangle($img, 16, 68, 310, 220, $cAccent);
+        imagefilledrectangle($img, 16, 68, 310, 84, $cPrimary);
+        imagestring($img, 2, 22, 70, "DOKUMENTASI 1: PERSPEKTIF", $cAccent);
+        imagefilledrectangle($img, 20, 88, 306, 216, $cPhotoBg);
+        imagestring($img, 2, 85, 145, "[ FOTO AREA UTAMA ]", $cMuted);
 
-        // Template Name Watermark Banner
-        imagefilledrectangle($img, 30, 110, 250, 135, $cPrimary);
-        imagestring($img, 4, 38, 114, strtoupper($template['name']), $cWhite);
+        // Photo 2
+        imagefilledrectangle($img, 320, 68, 624, 220, $cWhite);
+        imagerectangle($img, 320, 68, 624, 220, $cAccent);
+        imagefilledrectangle($img, 320, 68, 624, 84, $cPrimary);
+        imagestring($img, 2, 326, 70, "DOKUMENTASI 2: DETAIL", $cAccent);
+        imagefilledrectangle($img, 324, 88, 620, 216, $cPhotoBg);
+        imagestring($img, 2, 395, 145, "[ FOTO TITIK DETAIL ]", $cMuted);
 
-        // Report Meta Card
-        imagefilledrectangle($img, 30, 150, 250, 260, $cWhite);
-        imagerectangle($img, 30, 150, 250, 260, $cCardBorder);
-        imagestring($img, 2, 42, 162, "Nomor Laporan:", $cMuted);
-        imagestring($img, 2, 42, 178, "LAP-BPSDM-2026-0001", $cDark);
-        imagestring($img, 2, 42, 205, "Hari, Tanggal:", $cMuted);
-        imagestring($img, 2, 42, 220, "Kamis, 8 Okt 2026", $cDark);
-        imagestring($img, 2, 42, 240, "Status: Siap", $cAccent);
+        // 4. Bottom Section: 3-Column Structured Findings (No empty space)
+        // Card 1: Catatan
+        imagefilledrectangle($img, 16, 228, 212, 325, $cWhite);
+        imagerectangle($img, 16, 228, 212, 325, $cCardBorder);
+        imagefilledrectangle($img, 16, 228, 212, 244, $cPrimary);
+        imagestring($img, 2, 20, 230, "CATATAN PEMANTAUAN", $cWhite);
+        imagestring($img, 1, 22, 252, "Area bersih & terawat.", $cDark);
+        imagestring($img, 1, 22, 266, "5 Titik pantau lengkap.", $cDark);
+        imagestring($img, 1, 22, 280, "Status: Terverifikasi", $cGreen);
 
-        // Simulated Officer Photo Frame
-        imagefilledrectangle($img, 280, 70, 440, 260, $cWhite);
-        imagerectangle($img, 280, 70, 440, 260, $cAccent);
-        imagefilledrectangle($img, 290, 80, 430, 220, imagecolorallocate($img, 241, 245, 249));
-        imagestring($img, 2, 310, 140, "[ FOTO PETUGAS ]", $cMuted);
-        imagestring($img, 3, 295, 235, "Nama Petugas", $cPrimary);
+        // Card 2: Permasalahan
+        imagefilledrectangle($img, 220, 228, 416, 325, $cWhite);
+        imagerectangle($img, 220, 228, 416, 325, $cCardBorder);
+        imagefilledrectangle($img, 220, 228, 416, 244, $cRed);
+        imagestring($img, 2, 226, 230, "IDENTIFIKASI MASALAH", $cWhite);
+        imagestring($img, 1, 226, 252, "Pengecekan saluran air,", $cDark);
+        imagestring($img, 1, 226, 266, "pemilahan sampah,", $cDark);
+        imagestring($img, 1, 226, 280, "ventilasi udara ruang.", $cDark);
 
-        // Location Thumbnail Card
-        imagefilledrectangle($img, 460, 70, 610, 260, $cWhite);
-        imagerectangle($img, 460, 70, 610, 260, $cCardBorder);
-        imagefilledrectangle($img, 470, 80, 600, 155, imagecolorallocate($img, 241, 245, 249));
-        imagestring($img, 2, 485, 115, "[ DOKUMENTASI 1 ]", $cMuted);
-        imagefilledrectangle($img, 470, 165, 600, 240, imagecolorallocate($img, 241, 245, 249));
-        imagestring($img, 2, 485, 200, "[ DOKUMENTASI 2 ]", $cMuted);
-        imagestring($img, 2, 470, 245, "5 Titik Lokasi Pantau", $cPrimary);
+        // Card 3: Solusi
+        imagefilledrectangle($img, 424, 228, 624, 325, $cWhite);
+        imagerectangle($img, 424, 228, 624, 325, $cCardBorder);
+        imagefilledrectangle($img, 424, 228, 624, 244, $cGreen);
+        imagestring($img, 2, 430, 230, "SOLUSI & TINDAK LANJUT", $cWhite);
+        imagestring($img, 1, 430, 252, "Jadwal sanitasi rutin,", $cDark);
+        imagestring($img, 1, 430, 266, "peremajaan tempat sampah,", $cDark);
+        imagestring($img, 1, 430, 280, "tindak lanjut tim kebersihan.", $cDark);
 
-        // Footer Bar
-        imagefilledrectangle($img, 0, 325, $w, $h, $cPrimary);
-        imagestring($img, 2, 30, 335, "PowerPoint Widescreen 16:9 • 13.333 x 7.5 inch • 6 Halaman Slide", $cWhite);
-        imagestring($img, 2, 530, 335, "BPSDM", $cAccent);
+        // 5. Full-bleed Footer Ribbon
+        imagefilledrectangle($img, 0, 336, $w, $h, $cPrimary);
+        imagefilledrectangle($img, 0, 334, $w, 336, $cAccent);
+        imagestring($img, 2, 16, 342, "PowerPoint Widescreen 16:9 • 6 Halaman Slide • Sistem BPSDM", $cWhite);
+        imagestring($img, 2, 545, 342, "BPSDM PROV", $cAccent);
 
         imagepng($img, $savePath);
         imagedestroy($img);
     }
 }
-

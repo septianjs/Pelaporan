@@ -1,55 +1,53 @@
 <template>
-  <div class="min-h-screen bg-slate-900 flex justify-center items-start sm:py-6">
-    <!-- Mobile Frame Container -->
-    <div class="w-full max-w-md min-h-screen sm:min-h-[844px] bg-slate-50 flex flex-col shadow-2xl sm:rounded-[36px] sm:overflow-hidden sm:border-[6px] sm:border-slate-800 relative">
+  <div class="min-h-screen bg-[#ECEAE3] flex justify-center items-start sm:py-6 selection:bg-[#1A3428] selection:text-white">
+    <!-- Main Frame Container: Seamless mobile edge-to-edge, refined desktop tablet dock -->
+    <div class="w-full max-w-md min-h-screen sm:min-h-[850px] bg-[#FAF9F5] flex flex-col sm:rounded-3xl sm:overflow-hidden sm:border sm:border-stone-300/70 shadow-[0_20px_50px_-15px_rgba(28,25,23,0.08)] relative">
       <!-- Top App Bar -->
       <TopHeader :title="currentTitle" />
 
-      <!-- ── OFFLINE & SYNC BANNER ── -->
-      <div v-if="!isOnline" class="bg-amber-500 text-white text-[11px] font-semibold px-4 py-2 flex items-center justify-between shadow-sm z-30 transition-all">
-        <div class="flex items-center gap-1.5 min-w-0">
-          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636a9 9 0 010 12.728m-3.536-3.536a5 5 0 000-7.072M6 18L18 6"/>
-          </svg>
-          <span class="truncate">Mode Offline — Laporan disimpan lokal</span>
+      <!-- ── OFFLINE & SYNC BANNER (Minimalist Utilitarian) ── -->
+      <div v-if="!isOnline" class="bg-[#FAF2E6] border-b border-[#ECD9BA] text-[#7A4B10] text-[11px] font-medium px-4 py-2 flex items-center justify-between z-30 transition-all">
+        <div class="flex items-center gap-2 min-w-0">
+          <span class="w-2 h-2 rounded-full bg-[#C27D26] animate-pulse shrink-0"></span>
+          <span class="truncate">Mode Offline — Data tersimpan di memori perangkat</span>
         </div>
-        <span v-if="queuedCount > 0" class="bg-white/20 text-white px-2 py-0.5 rounded text-[10px] font-bold shrink-0 ml-2">
+        <span v-if="queuedCount > 0" class="bg-[#EEDBBA] text-[#5C3608] px-2 py-0.5 rounded-full text-[10px] font-semibold tabular-nums shrink-0 ml-2">
           {{ queuedCount }} antrian
         </span>
       </div>
 
-      <div v-else-if="isSyncing" class="bg-blue-600 text-white text-[11px] font-semibold px-4 py-2 flex items-center gap-2 shadow-sm z-30 animate-pulse">
-        <svg class="w-4 h-4 animate-spin shrink-0" fill="none" viewBox="0 0 24 24">
+      <div v-else-if="isSyncing" class="bg-[#E8F1EC] border-b border-[#CFE2D6] text-[#1B422E] text-[11px] font-medium px-4 py-2 flex items-center gap-2 z-30">
+        <svg class="w-3.5 h-3.5 animate-spin shrink-0 text-[#2B6144]" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"/>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
+          <path class="opacity-80" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
         </svg>
-        <span class="truncate">Menyinkronkan {{ queuedCount }} laporan offline ke server...</span>
+        <span class="truncate">Menyinkronkan {{ queuedCount }} laporan ke server pusat...</span>
       </div>
 
-      <div v-else-if="syncSuccessMessage" class="bg-emerald-600 text-white text-[11px] font-semibold px-4 py-2 flex items-center justify-between shadow-sm z-30">
-        <div class="flex items-center gap-1.5 truncate">
-          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div v-else-if="syncSuccessMessage" class="bg-[#EAF3EC] border-b border-[#CCE4D3] text-[#1E4826] text-[11px] font-medium px-4 py-2 flex items-center justify-between z-30">
+        <div class="flex items-center gap-2 truncate">
+          <svg class="w-3.5 h-3.5 text-[#2A6535] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
           </svg>
           <span class="truncate">{{ syncSuccessMessage }}</span>
         </div>
-        <button type="button" @click="syncSuccessMessage = ''" class="text-white/80 hover:text-white px-1">✕</button>
+        <button type="button" @click="syncSuccessMessage = ''" class="text-stone-500 hover:text-stone-800 px-1 font-bold">✕</button>
       </div>
 
       <!-- Pending Queue Bar (Online but pending queue exists) -->
-      <div v-else-if="isOnline && queuedCount > 0" class="bg-indigo-600 text-white text-[11px] font-semibold px-4 py-1.5 flex items-center justify-between shadow-sm z-30">
-        <span class="truncate">{{ queuedCount }} laporan tersimpan di antrian lokal.</span>
+      <div v-else-if="isOnline && queuedCount > 0" class="bg-[#F2EFE8] border-b border-[#E0DACE] text-[#44403C] text-[11px] font-medium px-4 py-2 flex items-center justify-between z-30">
+        <span class="truncate font-medium"><span class="tabular-nums font-semibold">{{ queuedCount }}</span> laporan offline siap dikirim</span>
         <button
           type="button"
           @click="triggerManualSync"
-          class="bg-white text-indigo-700 px-2 py-0.5 rounded text-[10px] font-bold active:scale-95 transition"
+          class="bg-[#1A3428] text-white px-2.5 py-0.5 rounded-lg text-[10px] font-semibold active-press transition"
         >
-          Sinkronkan
+          Kirim Sekarang
         </button>
       </div>
 
       <!-- Scrollable Main Content -->
-      <main class="flex-1 overflow-y-auto pb-6">
+      <main class="flex-1 overflow-y-auto pb-4">
         <router-view v-slot="{ Component }">
           <transition name="fade" mode="out-in">
             <component :is="Component" />

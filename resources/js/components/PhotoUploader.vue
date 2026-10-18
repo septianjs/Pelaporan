@@ -26,21 +26,21 @@
     <div
       v-if="isProcessing"
       :class="aspectRatioClass"
-      class="relative w-full rounded-2xl overflow-hidden bg-slate-800 flex flex-col items-center justify-center gap-3"
+      class="relative w-full rounded-2xl overflow-hidden bg-[#14251D] flex flex-col items-center justify-center gap-3"
     >
       <!-- Spinner -->
-      <svg class="w-10 h-10 text-blue-400 animate-spin" fill="none" viewBox="0 0 24 24">
+      <svg class="w-8 h-8 text-[#D8C79C] animate-spin" fill="none" viewBox="0 0 24 24">
         <circle class="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"/>
-        <path class="opacity-80" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
+        <path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
       </svg>
-      <p class="text-white text-xs font-semibold">Memproses foto…</p>
+      <p class="text-[#FAF8F2] text-xs font-medium">Mengoptimalkan gambar 16:9…</p>
     </div>
 
     <!-- ─── PREVIEW FRAME (object-fit: cover, no stretching) ─── -->
     <div
       v-else-if="previewUrl"
       :class="aspectRatioClass"
-      class="relative w-full rounded-2xl overflow-hidden border-2 border-blue-500/30 bg-slate-900 shadow-md"
+      class="relative w-full rounded-2xl overflow-hidden border border-[#14251D]/25 bg-stone-900 shadow-sm"
     >
       <img
         :src="previewUrl"
@@ -49,14 +49,14 @@
       />
 
       <!-- Overlay bottom bar -->
-      <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent flex flex-col justify-end p-3">
+      <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent flex flex-col justify-end p-3">
         <div class="flex items-center justify-between">
           <!-- Size info badge -->
-          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/90 text-white backdrop-blur-sm">
-            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium bg-black/60 text-[#D8C79C] border border-white/10 backdrop-blur-md">
+            <svg class="w-3 h-3 text-[#34D399]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
             </svg>
-            {{ sizeLabel || 'Foto Tersedia' }}
+            {{ sizeLabel || 'Tersedia' }}
           </span>
 
           <div class="flex items-center gap-2">
@@ -64,10 +64,10 @@
             <button
               type="button"
               @click="showActionSheet = true"
-              class="px-2.5 py-1 rounded-lg bg-white/20 hover:bg-white/30 backdrop-blur-md text-white text-xs font-semibold transition active:scale-95 flex items-center gap-1"
+              class="px-2.5 py-1 rounded-lg bg-white/20 hover:bg-white/30 backdrop-blur-md text-white text-xs font-semibold transition active-press flex items-center gap-1"
             >
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
               </svg>
               Ganti
             </button>
@@ -76,10 +76,10 @@
             <button
               type="button"
               @click="removePhoto"
-              class="px-2.5 py-1 rounded-lg bg-rose-600/80 hover:bg-rose-600 backdrop-blur-md text-white text-xs font-semibold transition active:scale-95 flex items-center gap-1"
+              class="px-2.5 py-1 rounded-lg bg-rose-950/80 hover:bg-rose-900 border border-rose-500/30 backdrop-blur-md text-rose-200 text-xs font-semibold transition active-press flex items-center gap-1"
             >
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
               </svg>
               Hapus
             </button>
@@ -91,44 +91,45 @@
     <!-- ─── EMPTY PLACEHOLDER WITH BUTTONS ─── -->
     <div
       v-else
-      class="border-2 border-dashed border-slate-300 rounded-2xl p-4 bg-slate-50/80 hover:bg-slate-50 transition text-center space-y-3"
+      class="border border-dashed border-[#DDD7C9] rounded-2xl p-4 bg-[#FAF9F5] hover:bg-[#F5F3EC] transition text-center space-y-3"
     >
-      <div class="w-12 h-12 mx-auto rounded-full bg-blue-100 text-blue-700 flex items-center justify-center">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+      <div class="w-10 h-10 mx-auto rounded-xl bg-[#EBF2EE] text-[#1B382B] flex items-center justify-center border border-[#D5E3DA]">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" />
         </svg>
       </div>
 
       <div>
-        <p class="text-xs font-semibold text-slate-700">Belum ada foto dokumentasi</p>
-        <p class="text-[11px] text-slate-400 mt-0.5">Format JPG, PNG, WEBP · Maks. 10 MB</p>
+        <p class="text-xs font-bold text-stone-800">Dokumentasi Belum Diunggah</p>
+        <p class="text-[11px] text-stone-400 mt-0.5">Format JPG / PNG · Format 16:9 otomatis</p>
       </div>
 
-      <!-- Two big buttons -->
+      <!-- Two buttons -->
       <div class="grid grid-cols-2 gap-2 pt-1">
         <button
           type="button"
           :disabled="isProcessing"
           @click="captureFromCamera"
-          class="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-blue-700 text-white text-xs font-semibold shadow-sm hover:bg-blue-800 active:scale-95 transition disabled:opacity-50"
+          class="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-[#14251D] hover:bg-[#1E372A] text-white text-xs font-semibold shadow-sm active-press transition disabled:opacity-50"
         >
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+          <svg class="w-3.5 h-3.5 text-[#D8C79C]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
           </svg>
-          <span>Ambil Foto</span>
+          <span>Buka Kamera</span>
         </button>
 
         <button
           type="button"
           :disabled="isProcessing"
           @click="selectFromGallery"
-          class="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-slate-200 text-slate-800 text-xs font-semibold hover:bg-slate-300 active:scale-95 transition border border-slate-300 disabled:opacity-50"
+          class="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-[#F2F0E8] hover:bg-[#E7E5DC] text-stone-800 text-xs font-semibold active-press transition border border-stone-200/80 disabled:opacity-50"
         >
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          <svg class="w-3.5 h-3.5 text-stone-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
           </svg>
-          <span>Pilih Galeri</span>
+          <span>Pilih Berkas</span>
         </button>
       </div>
     </div>
@@ -155,54 +156,54 @@
       <Transition name="slide-up">
         <div
           v-if="showActionSheet"
-          class="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl shadow-2xl pb-safe"
+          class="fixed bottom-0 left-0 right-0 z-50 bg-[#FAF9F5] rounded-t-3xl shadow-2xl pb-safe border-t border-stone-200"
           style="max-width: 480px; margin: 0 auto;"
         >
           <!-- Handle -->
           <div class="flex justify-center pt-3 pb-1">
-            <div class="w-10 h-1 rounded-full bg-slate-300"/>
+            <div class="w-10 h-1 rounded-full bg-stone-300"/>
           </div>
 
           <div class="px-5 pt-2 pb-6">
-            <p class="text-sm font-bold text-slate-800 text-center mb-4">Ganti Foto</p>
+            <p class="text-sm font-bold text-stone-900 text-center mb-4">Pilih Sumber Foto</p>
 
-            <div class="space-y-3">
+            <div class="space-y-2.5">
               <!-- Kamera -->
               <button
                 type="button"
                 @click="sheetAction('camera')"
-                class="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl bg-blue-600 text-white font-semibold text-sm active:scale-[0.98] transition"
+                class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-[#14251D] text-white font-semibold text-xs active-press transition"
               >
-                <span class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                <span class="w-8 h-8 rounded-lg bg-white/10 text-[#D8C79C] flex items-center justify-center shrink-0">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
                   </svg>
                 </span>
-                <span>📷 Ambil Foto dari Kamera</span>
+                <span>Ambil Foto Baru (Kamera)</span>
               </button>
 
               <!-- Galeri -->
               <button
                 type="button"
                 @click="sheetAction('gallery')"
-                class="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl bg-slate-100 text-slate-800 font-semibold text-sm border border-slate-200 active:scale-[0.98] transition"
+                class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-white text-stone-800 font-semibold text-xs border border-stone-200 active-press transition"
               >
-                <span class="w-9 h-9 rounded-xl bg-slate-200 flex items-center justify-center shrink-0">
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                <span class="w-8 h-8 rounded-lg bg-[#FAF9F5] text-stone-700 flex items-center justify-center shrink-0 border border-stone-200">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
                   </svg>
                 </span>
-                <span>🖼 Pilih dari Galeri</span>
+                <span>Pilih dari Galeri Perangkat</span>
               </button>
 
               <!-- Batal -->
               <button
                 type="button"
                 @click="showActionSheet = false"
-                class="w-full py-3 rounded-2xl text-slate-500 font-semibold text-sm hover:bg-slate-100 active:scale-[0.98] transition"
+                class="w-full py-2.5 rounded-xl text-stone-500 font-semibold text-xs hover:bg-stone-200/60 active-press transition"
               >
-                Batal
+                Tutup Pilihan
               </button>
             </div>
           </div>

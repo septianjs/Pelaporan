@@ -3,29 +3,29 @@
 
     <!-- ── LOADING SKELETON ── -->
     <div v-if="loading" class="space-y-4">
-      <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 animate-pulse space-y-3">
-        <div class="h-5 bg-slate-200 rounded w-1/3"/>
-        <div class="h-3 bg-slate-200 rounded w-2/3"/>
-        <div class="aspect-video bg-slate-200 rounded-2xl w-full"/>
+      <div class="bg-[#FAF9F5] rounded-2xl p-5 border border-[#E3E0D6] animate-pulse space-y-3">
+        <div class="h-5 bg-[#E8E5DC] rounded w-1/3"/>
+        <div class="h-3 bg-[#E8E5DC] rounded w-2/3"/>
+        <div class="aspect-video bg-[#E8E5DC] rounded-xl w-full"/>
       </div>
-      <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 animate-pulse space-y-3">
-        <div class="h-4 bg-slate-200 rounded w-1/4"/>
-        <div class="h-12 bg-slate-200 rounded-xl"/>
-        <div class="h-12 bg-slate-200 rounded-xl"/>
+      <div class="bg-[#FAF9F5] rounded-2xl p-4 border border-[#E3E0D6] animate-pulse space-y-3">
+        <div class="h-4 bg-[#E8E5DC] rounded w-1/4"/>
+        <div class="h-12 bg-[#E8E5DC] rounded-xl"/>
+        <div class="h-12 bg-[#E8E5DC] rounded-xl"/>
       </div>
     </div>
 
     <!-- ── ERROR STATE ── -->
-    <div v-else-if="errorMessage" class="bg-rose-50 border border-rose-200 rounded-2xl p-6 text-center space-y-3">
-      <div class="w-14 h-14 mx-auto rounded-full bg-rose-100 text-rose-600 flex items-center justify-center">
-        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+    <div v-else-if="errorMessage" class="bg-[#FDF0EE] border border-[#F5C7C1] rounded-2xl p-6 text-center space-y-3">
+      <div class="w-14 h-14 mx-auto rounded-2xl bg-[#FBF1EF] border border-[#F3D5CF] text-[#A6382C] flex items-center justify-center">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
             d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
         </svg>
       </div>
-      <p class="text-sm font-bold text-rose-800">{{ errorMessage }}</p>
+      <p class="text-sm font-bold text-[#14251D]">{{ errorMessage }}</p>
       <router-link to="/history"
-        class="inline-flex items-center px-4 py-2 rounded-xl bg-slate-800 text-white text-xs font-semibold">
+        class="inline-flex items-center px-4 py-2 rounded-xl bg-[#14251D] text-[#FAF9F5] text-xs font-semibold active-press transition">
         ← Kembali ke Riwayat
       </router-link>
     </div>
@@ -34,60 +34,64 @@
     <div v-else-if="report" class="space-y-4">
 
       <!-- ── HEADER METADATA ── -->
-      <div class="bg-white rounded-2xl px-4 py-3.5 shadow-sm border border-slate-200">
-        <div class="flex items-center justify-between mb-2">
-          <span class="font-mono text-xs font-bold text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-md border border-blue-100">
+      <div class="bg-[#FAF9F5] rounded-2xl px-4 py-3.5 border border-[#E3E0D6] shadow-sm">
+        <div class="flex items-center justify-between mb-3">
+          <span class="font-mono text-xs font-bold text-[#14251D] bg-[#ECE8DD] px-2.5 py-1 rounded-md border border-[#DCD7CA] tabular-nums">
             {{ report.report_number }}
           </span>
           <span
             :class="[
-              'text-[10px] font-bold px-2 py-0.5 rounded-full',
-              report.status === 'completed' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
+              'text-[10px] font-bold px-2.5 py-0.5 rounded-full border',
+              report.status === 'completed'
+                ? 'bg-[#EAF3EC] text-[#1A3428] border-[#C8E0D0]'
+                : 'bg-[#FAF2DF] text-[#8C6D1F] border-[#EADBBD]'
             ]"
           >
-            {{ report.status === 'completed' ? 'Selesai' : 'Draft' }}
+            {{ report.status === 'completed' ? 'Tersimpan Resmi' : 'Draft' }}
           </span>
         </div>
 
-        <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-slate-600">
+        <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
           <div>
-            <span class="text-slate-400 text-[10px] uppercase font-bold block">Tanggal</span>
-            <span class="font-semibold text-slate-800">{{ report.formatted_date || report.inspection_date }}</span>
+            <span class="text-[#808983] text-[10px] uppercase font-bold tracking-wider block">Tanggal Pemeriksaan</span>
+            <span class="font-semibold text-[#14251D] font-mono tabular-nums">{{ report.formatted_date || report.inspection_date }}</span>
           </div>
           <div>
-            <span class="text-slate-400 text-[10px] uppercase font-bold block">Petugas</span>
-            <span class="font-semibold text-slate-800">{{ report.officer_name }}</span>
+            <span class="text-[#808983] text-[10px] uppercase font-bold tracking-wider block">Petugas Pengawas</span>
+            <span class="font-semibold text-[#14251D]">{{ report.officer_name }}</span>
           </div>
-          <div class="col-span-2">
-            <span class="text-slate-400 text-[10px] uppercase font-bold block">Template</span>
-            <span class="font-semibold text-indigo-600">{{ report.template?.name || 'Default' }}</span>
+          <div class="col-span-2 pt-1 border-t border-[#ECE8DD] flex items-center justify-between">
+            <span class="text-[#808983] text-[10px] uppercase font-bold tracking-wider">Format Dokumen</span>
+            <span class="font-semibold text-[#14251D] text-xs bg-[#ECE8DD] px-2 py-0.5 rounded border border-[#DCD7CA]">
+              {{ report.template?.name || 'Standar BPSDM' }}
+            </span>
           </div>
         </div>
       </div>
 
       <!-- ── SLIDE VIEWER (16:9 CAROUSEL) ── -->
-      <div class="bg-white rounded-2xl p-3 shadow-md border border-slate-200 space-y-3">
+      <div class="bg-[#FAF9F5] rounded-2xl p-3 border border-[#E3E0D6] shadow-sm space-y-3">
 
         <!-- Top navigator -->
         <div class="flex items-center justify-between px-1">
           <div class="flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"/>
-            <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wide">
+            <span class="w-2 h-2 rounded-full bg-[#C8B88A] animate-pulse"/>
+            <h3 class="text-xs font-bold text-[#14251D] uppercase tracking-wider font-mono">
               Slide {{ activeSlideIndex + 1 }}/{{ totalSlides }}
             </h3>
-            <span class="text-[10px] text-slate-400 font-medium">{{ activeSlideTitle }}</span>
+            <span class="text-[10px] text-[#6F7771] font-medium">• {{ activeSlideTitle }}</span>
           </div>
-          <div class="flex items-center gap-1">
+          <div class="flex items-center gap-1.5">
             <button type="button" @click="prevSlide" :disabled="activeSlideIndex === 0"
-              class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center transition active:scale-90">
-              <svg class="w-4 h-4 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
+              class="w-8 h-8 rounded-xl bg-white border border-[#DCD7CA] text-[#14251D] hover:bg-[#F2EFE8] disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center transition active-press">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
               </svg>
             </button>
             <button type="button" @click="nextSlide" :disabled="activeSlideIndex === totalSlides - 1"
-              class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center transition active:scale-90">
-              <svg class="w-4 h-4 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+              class="w-8 h-8 rounded-xl bg-white border border-[#DCD7CA] text-[#14251D] hover:bg-[#F2EFE8] disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center transition active-press">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
               </svg>
             </button>
           </div>
@@ -246,44 +250,47 @@
         </div>
 
         <!-- Dot navigation -->
-        <div class="flex items-center justify-center gap-1.5">
+        <div class="flex items-center justify-center gap-1.5 pt-1">
           <button v-for="(_, idx) in totalSlides" :key="idx" type="button"
             @click="activeSlideIndex = idx"
-            class="h-2 rounded-full transition-all duration-300"
-            :class="activeSlideIndex === idx ? 'w-6 bg-blue-600' : 'w-2 bg-slate-300 hover:bg-slate-400'"/>
+            class="h-1.5 rounded-full transition-all duration-300"
+            :class="activeSlideIndex === idx ? 'w-6 bg-[#14251D]' : 'w-2 bg-[#D8D4C8] hover:bg-[#B3ADA0]'"/>
         </div>
 
         <!-- Swipe hint (only show on mobile) -->
-        <p class="text-center text-[10px] text-slate-400 font-medium">
-          ← Geser untuk navigasi slide →
+        <p class="text-center text-[10px] text-[#808983] font-medium">
+          ← Geser layar ke kiri atau kanan untuk berpindah slide →
         </p>
       </div>
 
       <!-- ── DOKUMEN STATUS CARD ── -->
-      <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-3">
-        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500">Status Dokumen</h4>
+      <div class="bg-[#FAF9F5] rounded-2xl p-4 border border-[#E3E0D6] shadow-sm space-y-3">
+        <div class="flex items-center justify-between">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-[#14251D]">Status Berkas Dokumen</h4>
+          <span class="text-[10px] text-[#808983] font-mono">Format 16:9 HD</span>
+        </div>
 
         <div class="space-y-2">
           <!-- PDF status -->
-          <div class="flex items-center justify-between p-2.5 rounded-xl border"
-            :class="hasPdf ? 'bg-rose-50 border-rose-200' : 'bg-slate-50 border-slate-200'">
+          <div class="flex items-center justify-between p-3 rounded-xl border"
+            :class="hasPdf ? 'bg-white border-[#DCD7CA]' : 'bg-[#F2EFE8] border-[#E0DCD0]'">
             <div class="flex items-center gap-2.5">
-              <div class="w-8 h-8 rounded-lg flex items-center justify-center"
-                :class="hasPdf ? 'bg-rose-600' : 'bg-slate-300'">
-                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                :class="hasPdf ? 'bg-[#14251D] text-[#D8C79C]' : 'bg-[#D8D4C8] text-[#808983]'">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
                 </svg>
               </div>
               <div>
-                <p class="text-xs font-bold text-slate-800">Dokumen PDF 16:9</p>
-                <p class="text-[10px]" :class="hasPdf ? 'text-rose-600 font-semibold' : 'text-slate-400'">
-                  {{ hasPdf ? 'Siap diunduh' : 'Belum digenerate' }}
+                <p class="text-xs font-bold text-[#14251D]">Dokumen PDF Resmi</p>
+                <p class="text-[10px]" :class="hasPdf ? 'text-[#1A3428] font-medium' : 'text-[#808983]'">
+                  {{ hasPdf ? 'Siap diunduh / dibagikan' : 'Belum digenerate' }}
                 </p>
               </div>
             </div>
-            <span v-if="hasPdf" class="text-[10px] text-emerald-600 font-bold flex items-center gap-1">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <span v-if="hasPdf" class="text-[10px] text-[#1A3428] font-bold bg-[#EAF3EC] px-2 py-0.5 rounded-full border border-[#C8E0D0] flex items-center gap-1">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
               </svg>
               Tersedia
@@ -291,25 +298,25 @@
           </div>
 
           <!-- PPTX status -->
-          <div class="flex items-center justify-between p-2.5 rounded-xl border"
-            :class="hasPptx ? 'bg-indigo-50 border-indigo-200' : 'bg-slate-50 border-slate-200'">
+          <div class="flex items-center justify-between p-3 rounded-xl border"
+            :class="hasPptx ? 'bg-white border-[#DCD7CA]' : 'bg-[#F2EFE8] border-[#E0DCD0]'">
             <div class="flex items-center gap-2.5">
-              <div class="w-8 h-8 rounded-lg flex items-center justify-center"
-                :class="hasPptx ? 'bg-indigo-600' : 'bg-slate-300'">
-                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                :class="hasPptx ? 'bg-[#1C362A] text-[#FAF9F5]' : 'bg-[#D8D4C8] text-[#808983]'">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                 </svg>
               </div>
               <div>
-                <p class="text-xs font-bold text-slate-800">Presentasi PPTX</p>
-                <p class="text-[10px]" :class="hasPptx ? 'text-indigo-600 font-semibold' : 'text-slate-400'">
-                  {{ hasPptx ? 'Siap diunduh' : 'Belum digenerate' }}
+                <p class="text-xs font-bold text-[#14251D]">Slide Presentasi PPTX</p>
+                <p class="text-[10px]" :class="hasPptx ? 'text-[#1A3428] font-medium' : 'text-[#808983]'">
+                  {{ hasPptx ? 'Siap dipresentasikan' : 'Belum digenerate' }}
                 </p>
               </div>
             </div>
-            <span v-if="hasPptx" class="text-[10px] text-emerald-600 font-bold flex items-center gap-1">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <span v-if="hasPptx" class="text-[10px] text-[#1A3428] font-bold bg-[#EAF3EC] px-2 py-0.5 rounded-full border border-[#C8E0D0] flex items-center gap-1">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
               </svg>
               Tersedia
@@ -319,28 +326,28 @@
       </div>
 
       <!-- ── AKSI EKSPOR ── -->
-      <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-3">
-        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500">Ekspor & Bagikan</h4>
+      <div class="bg-[#FAF9F5] rounded-2xl p-4 border border-[#E3E0D6] shadow-sm space-y-3">
+        <h4 class="text-xs font-bold uppercase tracking-wider text-[#14251D]">Ekspor & Distribusi</h4>
 
         <!-- Generate PDF button (jika belum ada) -->
         <button v-if="!hasPdf" type="button" @click="doGeneratePdf" :disabled="generatingPdf"
-          class="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-rose-600 text-white font-bold text-sm shadow-sm active:scale-[0.98] transition disabled:opacity-60">
+          class="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-[#14251D] text-[#FAF9F5] font-bold text-sm shadow-sm hover:bg-[#1C362A] active-press transition disabled:opacity-60">
           <svg v-if="generatingPdf" class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"/>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
           </svg>
-          <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg v-else class="w-5 h-5 text-[#D8C79C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
           </svg>
-          {{ generatingPdf ? 'Membuat PDF 16:9…' : 'Generate PDF 16:9' }}
+          {{ generatingPdf ? 'Memproses Berkas PDF 16:9…' : 'Generate Dokumen PDF 16:9' }}
         </button>
 
         <!-- PDF action buttons (jika sudah ada) -->
         <div v-else class="grid grid-cols-2 gap-2">
           <button type="button" @click="openPdf"
-            class="flex items-center justify-center gap-1.5 py-3 rounded-xl bg-rose-600 text-white font-bold text-xs shadow-sm active:scale-95 transition">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            class="flex items-center justify-center gap-1.5 py-3 rounded-xl bg-[#14251D] text-[#FAF9F5] font-bold text-xs shadow-sm hover:bg-[#1C362A] active-press transition">
+            <svg class="w-4 h-4 text-[#D8C79C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -349,8 +356,8 @@
             Buka PDF
           </button>
           <button type="button" @click="downloadPdf"
-            class="flex items-center justify-center gap-1.5 py-3 rounded-xl bg-rose-50 border border-rose-300 text-rose-700 font-bold text-xs active:scale-95 transition">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            class="flex items-center justify-center gap-1.5 py-3 rounded-xl bg-white border border-[#DCD7CA] text-[#14251D] font-bold text-xs hover:bg-[#F4F3EE] active-press transition">
+            <svg class="w-4 h-4 text-[#14251D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
             </svg>
@@ -360,57 +367,59 @@
 
         <!-- Generate PPTX button (jika belum ada) -->
         <button v-if="!hasPptx" type="button" @click="doGeneratePptx" :disabled="generatingPptx"
-          class="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-indigo-600 text-white font-bold text-sm shadow-sm active:scale-[0.98] transition disabled:opacity-60">
+          class="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-[#ECEAE3] border border-[#DCD7CA] text-[#14251D] font-bold text-sm hover:bg-[#E3DFD4] active-press transition disabled:opacity-60">
           <svg v-if="generatingPptx" class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"/>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
           </svg>
-          <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg v-else class="w-5 h-5 text-[#14251D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
           </svg>
-          {{ generatingPptx ? 'Membuat Presentasi…' : 'Generate PPTX' }}
+          {{ generatingPptx ? 'Membuat Format PPTX…' : 'Generate Presentasi PPTX' }}
         </button>
 
         <!-- Download PPTX (jika sudah ada) -->
         <button v-else type="button" @click="downloadPptx"
-          class="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-indigo-50 border border-indigo-300 text-indigo-700 font-bold text-sm active:scale-[0.98] transition">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          class="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-[#ECEAE3] border border-[#DCD7CA] text-[#14251D] font-bold text-sm hover:bg-[#E3DFD4] active-press transition">
+          <svg class="w-5 h-5 text-[#14251D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
           </svg>
-          Unduh PPTX
+          Unduh Presentasi PPTX
         </button>
 
         <!-- Share / WhatsApp / Email -->
-        <div class="grid grid-cols-3 gap-2 pt-1 border-t border-slate-100">
+        <div class="grid grid-cols-3 gap-2 pt-2 border-t border-[#ECE8DD]">
           <!-- Share via native share sheet -->
           <button type="button" @click="shareReport" :disabled="!hasPdf || sharing"
-            class="flex items-center justify-center gap-1 py-2.5 rounded-xl bg-blue-600 text-white font-bold text-xs shadow-sm active:scale-95 transition disabled:opacity-40">
+            class="flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-white border border-[#DCD7CA] text-[#14251D] font-bold text-xs hover:bg-[#F4F3EE] active-press transition disabled:opacity-40">
             <svg v-if="sharing" class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"/>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
             </svg>
-            <svg v-else class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg v-else class="w-3.5 h-3.5 text-[#14251D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
             </svg>
-            <span class="truncate">{{ sharing ? 'Bagi…' : 'Bagikan' }}</span>
+            <span class="truncate">{{ sharing ? 'Memproses…' : 'Bagikan' }}</span>
           </button>
 
           <!-- WhatsApp -->
           <button type="button" @click="shareWhatsApp" :disabled="!hasPdf"
-            class="flex items-center justify-center gap-1 py-2.5 rounded-xl bg-emerald-600 text-white font-bold text-xs shadow-sm active:scale-95 transition disabled:opacity-40">
-            <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-            </svg>
+            class="flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-[#1A3428] text-[#FAF9F5] font-bold text-xs hover:bg-[#14251D] active-press transition disabled:opacity-40 shadow-sm">
+            <span class="text-[#D8C79C]">
+              <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+              </svg>
+            </span>
             <span class="truncate">WhatsApp</span>
           </button>
 
           <!-- Email -->
           <button type="button" @click="openEmailModal"
-            class="flex items-center justify-center gap-1 py-2.5 rounded-xl bg-violet-600 text-white font-bold text-xs shadow-sm active:scale-95 transition">
-            <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            class="flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-[#2D4538] text-[#FAF9F5] font-bold text-xs hover:bg-[#23382D] active-press transition">
+            <svg class="w-3.5 h-3.5 shrink-0 text-[#D8C79C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
             </svg>
@@ -419,7 +428,7 @@
         </div>
 
         <!-- Error message for generate -->
-        <p v-if="generateError" class="text-[11px] text-rose-600 font-medium text-center">
+        <p v-if="generateError" class="text-[11px] text-[#A6382C] font-medium text-center">
           {{ generateError }}
         </p>
       </div>
@@ -427,16 +436,16 @@
       <!-- ── NAVIGATION ── -->
       <div class="flex items-center justify-between text-xs px-1">
         <router-link to="/history"
-          class="text-slate-500 hover:text-slate-800 font-semibold flex items-center gap-1">
+          class="text-[#6F7771] hover:text-[#14251D] font-semibold flex items-center gap-1 active-press transition">
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
           </svg>
           Riwayat Laporan
         </router-link>
         <router-link to="/create"
-          class="text-blue-600 hover:text-blue-800 font-bold flex items-center gap-1">
-          + Buat Laporan Baru
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          class="text-[#14251D] hover:text-[#1A3428] font-bold flex items-center gap-1 bg-[#ECE8DD] px-3 py-1.5 rounded-xl border border-[#DCD7CA] active-press transition">
+          + Laporan Baru
+          <svg class="w-3.5 h-3.5 text-[#14251D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
           </svg>
         </router-link>
@@ -447,23 +456,23 @@
     <!-- ── EMAIL BOTTOM SHEET MODAL ── -->
     <Teleport to="body">
       <Transition name="fade">
-        <div v-if="showEmailSheet" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
+        <div v-if="showEmailSheet" class="fixed inset-0 z-50 bg-[#0E1A14]/70 backdrop-blur-sm"
           @click="showEmailSheet = false"/>
       </Transition>
       <Transition name="slide-up">
         <div v-if="showEmailSheet"
-          class="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl shadow-2xl"
+          class="fixed bottom-0 left-0 right-0 z-50 bg-[#FAF9F5] rounded-t-3xl shadow-2xl border-t border-[#E3E0D6]"
           style="max-width: 480px; margin: 0 auto; padding-bottom: max(1.5rem, env(safe-area-inset-bottom));">
           <div class="flex justify-center pt-3 pb-1">
-            <div class="w-10 h-1 rounded-full bg-slate-300"/>
+            <div class="w-10 h-1 rounded-full bg-[#D8D4C8]"/>
           </div>
           <div class="px-5 pt-2 pb-4 space-y-4">
             <div class="flex items-center justify-between">
               <div>
-                <h3 class="text-sm font-bold text-slate-800">Kirim Laporan via Email</h3>
-                <p class="text-xs text-slate-500 font-mono mt-0.5">{{ report?.report_number }}</p>
+                <h3 class="text-sm font-bold text-[#14251D]">Kirim Laporan via Email</h3>
+                <p class="text-xs text-[#6F7771] font-mono mt-0.5 tabular-nums">{{ report?.report_number }}</p>
               </div>
-              <span class="text-[10px] font-bold text-violet-700 bg-violet-50 px-2 py-0.5 rounded-full border border-violet-200">
+              <span class="text-[10px] font-bold text-[#14251D] bg-[#EAF3EC] px-2.5 py-1 rounded-full border border-[#C8E0D0]">
                 PDF 16:9 Otomatis Terlampir
               </span>
             </div>
@@ -471,27 +480,27 @@
             <!-- Email form -->
             <div class="space-y-3">
               <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">
-                  Alamat Email Penerima <span class="text-rose-500">*</span>
+                <label class="block text-xs font-semibold text-[#14251D] mb-1">
+                  Alamat Email Penerima <span class="text-[#A6382C]">*</span>
                 </label>
                 <div class="relative">
                   <input
                     v-model="emailForm.recipient"
                     type="email"
                     placeholder="nama@bpsdm.kemenag.go.id"
-                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500 font-medium"
+                    class="w-full px-3.5 py-2.5 rounded-xl border border-[#DCD7CA] bg-white text-xs text-[#14251D] placeholder-[#9CA39E] focus:outline-none focus:border-[#14251D] focus:ring-1 focus:ring-[#14251D] font-medium"
                     @keyup.enter="sendEmailReport"
                   />
                 </div>
                 <!-- Quick email suggestions -->
-                <div class="flex items-center gap-1.5 mt-1.5 flex-wrap">
-                  <span class="text-[10px] text-slate-400 font-medium">Saran:</span>
+                <div class="flex items-center gap-1.5 mt-2 flex-wrap">
+                  <span class="text-[10px] text-[#808983] font-medium">Saran:</span>
                   <button
                     v-for="suggest in ['pimpinan@bpsdm.go.id', 'sekretariat@bpsdm.go.id', 'arsip.bpsdm@gmail.com']"
                     :key="suggest"
                     type="button"
                     @click="emailForm.recipient = suggest"
-                    class="text-[10px] text-violet-600 bg-violet-50 hover:bg-violet-100 px-2 py-0.5 rounded-md font-medium transition"
+                    class="text-[10px] text-[#14251D] bg-[#EAF3EC] hover:bg-[#D8EADB] px-2 py-0.5 rounded-md font-medium border border-[#C8E0D0] transition"
                   >
                     {{ suggest }}
                   </button>
@@ -499,19 +508,19 @@
               </div>
 
               <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">
+                <label class="block text-xs font-semibold text-[#14251D] mb-1">
                   Catatan Tambahan (Opsional)
                 </label>
                 <textarea
                   v-model="emailForm.notes"
                   rows="2"
                   placeholder="Contoh: Mohon arahan dan tindak lanjut terkait pemantauan hari ini..."
-                  class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
+                  class="w-full px-3.5 py-2 rounded-xl border border-[#DCD7CA] bg-white text-xs text-[#14251D] placeholder-[#9CA39E] focus:outline-none focus:border-[#14251D] focus:ring-1 focus:ring-[#14251D]"
                 ></textarea>
               </div>
 
               <!-- Error message if any -->
-              <p v-if="emailError" class="text-xs text-rose-600 font-medium">
+              <p v-if="emailError" class="text-xs text-[#A6382C] font-medium">
                 {{ emailError }}
               </p>
 
@@ -520,7 +529,7 @@
                 <button
                   type="button"
                   @click="showEmailSheet = false"
-                  class="flex-1 py-3 rounded-xl border border-slate-300 text-slate-700 font-semibold text-xs hover:bg-slate-50 active:scale-95 transition"
+                  class="flex-1 py-3 rounded-xl border border-[#DCD7CA] text-[#6F7771] font-semibold text-xs hover:bg-[#ECEAE3] active-press transition"
                 >
                   Batal
                 </button>
@@ -528,13 +537,13 @@
                   type="button"
                   @click="sendEmailReport"
                   :disabled="sendingEmail || !emailForm.recipient"
-                  class="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-violet-600 text-white font-bold text-xs shadow-md active:scale-95 transition disabled:opacity-50"
+                  class="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-[#14251D] text-[#FAF9F5] font-bold text-xs shadow-sm hover:bg-[#1C362A] active-press transition disabled:opacity-50"
                 >
                   <svg v-if="sendingEmail" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"/>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
                   </svg>
-                  <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg v-else class="w-4 h-4 text-[#D8C79C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                   </svg>
@@ -551,10 +560,10 @@
     <Teleport to="body">
       <Transition name="fade">
         <div v-if="toastMessage"
-          class="fixed bottom-20 left-4 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-2xl shadow-xl text-xs font-semibold"
-          :class="toastType === 'success' ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'"
+          class="fixed bottom-20 left-4 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-2xl shadow-xl text-xs font-semibold border"
+          :class="toastType === 'success' ? 'bg-[#14251D] text-[#FAF9F5] border-[#254234]' : 'bg-[#A6382C] text-white border-[#8F2F24]'"
           style="max-width: 440px; margin-left: auto; margin-right: auto;">
-          <svg v-if="toastType === 'success'" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg v-if="toastType === 'success'" class="w-4 h-4 shrink-0 text-[#D8C79C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
           </svg>
           <svg v-else class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

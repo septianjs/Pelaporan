@@ -1,6 +1,6 @@
 <template>
-  <nav class="sticky bottom-0 z-30 bg-white border-t border-slate-200 shadow-lg safe-bottom">
-    <div class="flex items-center justify-around h-16 max-w-md mx-auto px-2">
+  <nav class="sticky bottom-0 z-30 bg-white/95 backdrop-blur-md border-t border-[#E8E6DE] shadow-[0_-4px_24px_rgba(28,25,23,0.04)] safe-bottom">
+    <div class="flex items-center justify-around h-16 max-w-md mx-auto px-3">
       <!-- Beranda -->
       <router-link
         to="/"
@@ -10,19 +10,30 @@
         <a
           :href="href"
           @click="navigate"
-          :class="[
-            'flex flex-col items-center justify-center flex-1 py-1 text-xs font-medium transition',
-            isActive ? 'text-blue-700 font-semibold' : 'text-slate-500 hover:text-slate-700'
-          ]"
+          class="flex flex-col items-center justify-center flex-1 h-full py-1 text-center group active-press transition"
         >
-          <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-          </svg>
-          <span>Beranda</span>
+          <div
+            :class="[
+              'w-9 h-7 rounded-lg flex items-center justify-center transition-all duration-200',
+              isActive ? 'bg-[#14251D] text-white shadow-sm' : 'text-stone-500 group-hover:text-stone-800'
+            ]"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955a1.126 1.126 0 011.592 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+            </svg>
+          </div>
+          <span
+            :class="[
+              'text-[10px] tracking-tight mt-1 transition-colors',
+              isActive ? 'font-bold text-[#14251D]' : 'font-medium text-stone-500'
+            ]"
+          >
+            Beranda
+          </span>
         </a>
       </router-link>
 
-      <!-- Buat Laporan (Special highlighted action button) -->
+      <!-- Buat Laporan -->
       <router-link
         to="/create"
         custom
@@ -31,22 +42,25 @@
         <a
           :href="href"
           @click="navigate"
-          class="flex flex-col items-center justify-center flex-1 -mt-4 group"
+          class="flex flex-col items-center justify-center flex-1 h-full py-1 text-center group active-press transition"
         >
           <div
             :class="[
-              'w-13 h-13 rounded-full flex items-center justify-center shadow-lg transition transform active:scale-95',
-              isActive
-                ? 'bg-blue-800 text-white ring-4 ring-blue-200'
-                : 'bg-blue-700 text-white hover:bg-blue-800'
+              'w-9 h-7 rounded-lg flex items-center justify-center transition-all duration-200',
+              isActive ? 'bg-[#14251D] text-[#D8C79C] shadow-sm' : 'bg-[#EBF1ED] text-[#1B382B] group-hover:bg-[#DEE7E1]'
             ]"
           >
-            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
             </svg>
           </div>
-          <span :class="['text-[11px] font-semibold mt-1', isActive ? 'text-blue-700' : 'text-slate-600']">
-            Buat Laporan
+          <span
+            :class="[
+              'text-[10px] tracking-tight mt-1 transition-colors',
+              isActive ? 'font-bold text-[#14251D]' : 'font-semibold text-[#1B382B]'
+            ]"
+          >
+            Input Laporan
           </span>
         </a>
       </router-link>
@@ -60,15 +74,26 @@
         <a
           :href="href"
           @click="navigate"
-          :class="[
-            'flex flex-col items-center justify-center flex-1 py-1 text-xs font-medium transition',
-            isActive ? 'text-blue-700 font-semibold' : 'text-slate-500 hover:text-slate-700'
-          ]"
+          class="flex flex-col items-center justify-center flex-1 h-full py-1 text-center group active-press transition"
         >
-          <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <span>Riwayat</span>
+          <div
+            :class="[
+              'w-9 h-7 rounded-lg flex items-center justify-center transition-all duration-200',
+              isActive ? 'bg-[#14251D] text-white shadow-sm' : 'text-stone-500 group-hover:text-stone-800'
+            ]"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <span
+            :class="[
+              'text-[10px] tracking-tight mt-1 transition-colors',
+              isActive ? 'font-bold text-[#14251D]' : 'font-medium text-stone-500'
+            ]"
+          >
+            Arsip Riwayat
+          </span>
         </a>
       </router-link>
 
@@ -81,15 +106,26 @@
         <a
           :href="href"
           @click="navigate"
-          :class="[
-            'flex flex-col items-center justify-center flex-1 py-1 text-xs font-medium transition',
-            isActive ? 'text-blue-700 font-semibold' : 'text-slate-500 hover:text-slate-700'
-          ]"
+          class="flex flex-col items-center justify-center flex-1 h-full py-1 text-center group active-press transition"
         >
-          <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
-          </svg>
-          <span>Template</span>
+          <div
+            :class="[
+              'w-9 h-7 rounded-lg flex items-center justify-center transition-all duration-200',
+              isActive ? 'bg-[#14251D] text-white shadow-sm' : 'text-stone-500 group-hover:text-stone-800'
+            ]"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
+            </svg>
+          </div>
+          <span
+            :class="[
+              'text-[10px] tracking-tight mt-1 transition-colors',
+              isActive ? 'font-bold text-[#14251D]' : 'font-medium text-stone-500'
+            ]"
+          >
+            Template
+          </span>
         </a>
       </router-link>
     </div>
