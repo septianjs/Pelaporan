@@ -100,6 +100,9 @@ class ReportController extends Controller
             'template_id' => 'required|exists:templates,id',
             'officer_photo' => 'nullable|file|mimes:jpg,jpeg,png,webp|max:10240',
             'locations' => 'required|array|min:1',
+            'locations.*.location_id' => 'required|exists:locations,id',
+            'locations.*.name' => 'required|string|max:150',
+            'locations.*.condition' => 'required|in:clean,needs_attention',
         ]);
 
         $report = DB::transaction(function () use ($request, $validated) {
@@ -136,9 +139,17 @@ class ReportController extends Controller
                     ? 'needs_attention'
                     : 'clean';
 
+                $customName = trim((string)($locData['name'] ?? ''));
+                if ($customName === '') {
+                    // Fallback ke nama master jika field kosong (seharusnya sudah divalidasi required).
+                    $masterLocation = Location::find($locationId);
+                    $customName = $masterLocation->name ?? "Lokasi {$index}";
+                }
+
                 $reportLocation = ReportLocation::create([
                     'report_id' => $report->id,
                     'location_id' => $locationId,
+                    'name' => $customName,
                     'condition' => $condition,
                     'notes' => $condition === 'clean' ? ($locData['notes'] ?? null) : null,
                     'problem' => $condition === 'needs_attention' ? ($locData['problem'] ?? null) : null,
@@ -306,22 +317,35 @@ class ReportController extends Controller
     {
         $report = Report::findOrFail($id);
 
-        if (!$report->pdf_path) {
-            $pdfService = app(ReportPdfService::class);
-            $pdfService->generatePdf($report);
-            $report->refresh();
+        $fullPath = $report->pdf_path ? storage_path("app/public/{$report->pdf_path}") : null;
+
+        // Regenerasi jika belum ada, atau file rusak/kosong (0 byte).
+        if (!$fullPath || !file_exists($fullPath) || filesize($fullPath) === 0) {
+            try {
+                $pdfService = app(ReportPdfService::class);
+                $pdfService->generatePdf($report);
+                $report->refresh();
+                $fullPath = storage_path("app/public/{$report->pdf_path}");
+            } catch (\Throwable $e) {
+                Log::error("Failed to generate PDF for download, Report #{$id}: " . $e->getMessage());
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Gagal membuat file PDF: ' . $e->getMessage(),
+                ], 500);
+            }
         }
 
-        $fullPath = storage_path("app/public/{$report->pdf_path}");
-        if (!file_exists($fullPath)) {
+        if (!file_exists($fullPath) || filesize($fullPath) === 0) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'File PDF belum tersedia di server.',
             ], 404);
         }
 
-        $cleanReportNum = preg_replace('/[^A-Za-z0-9_\-]/', '_', $report->report_number);
-        $downloadName = "Laporan_{$cleanReportNum}.pdf";
+        // Nama dasar file yang dilihat pengguna saat mengunduh/membagikan laporan.
+        // Nama penyimpanan internal (unik per laporan, berisi nomor laporan) tetap
+        // dipakai di disk agar tidak saling menimpa antar laporan; keduanya sengaja dipisah.
+        $downloadName = 'laporan ring lingkungan BPSDM.pdf';
 
         // If inline=1 (e.g. for previewing inside mobile webview or browser tab)
         if ($request->boolean('inline')) {
@@ -350,12 +374,14 @@ class ReportController extends Controller
         $report = Report::with(['template', 'reportLocations.location', 'reportLocations.reportPhotos'])
             ->findOrFail($id);
 
-        // Ensure 16:9 PDF exists; generate if missing
-        if (!$report->pdf_path || !file_exists(storage_path("app/public/{$report->pdf_path}"))) {
+        // Ensure 16:9 PDF exists and is valid (not empty); generate/regenerate if missing or broken.
+        $pdfFullPath = $report->pdf_path ? storage_path("app/public/{$report->pdf_path}") : null;
+        if (!$pdfFullPath || !file_exists($pdfFullPath) || filesize($pdfFullPath) === 0) {
             try {
                 $pdfService->generatePdf($report);
                 $report->refresh();
                 $report->load(['template', 'reportLocations.location', 'reportLocations.reportPhotos']);
+                $pdfFullPath = storage_path("app/public/{$report->pdf_path}");
             } catch (\Throwable $e) {
                 Log::error("Failed to generate PDF before emailing Report #{$id}: " . $e->getMessage());
                 return response()->json([
@@ -363,6 +389,15 @@ class ReportController extends Controller
                     'message' => 'Gagal membuat file PDF untuk lampiran email: ' . $e->getMessage(),
                 ], 500);
             }
+        }
+
+        // Jangan pernah mengirim email "berhasil" tanpa lampiran PDF yang valid.
+        if (!file_exists($pdfFullPath) || filesize($pdfFullPath) === 0) {
+            Log::error("PDF attachment missing/empty when emailing Report #{$id}");
+            return response()->json([
+                'status' => 'error',
+                'message' => 'File PDF lampiran tidak valid atau kosong, email tidak dikirim.',
+            ], 500);
         }
 
         try {

@@ -61,10 +61,9 @@ class ReportSubmittedMail extends Mailable
 
         if ($this->report->pdf_path) {
             $pdfFullPath = storage_path("app/public/{$this->report->pdf_path}");
-            if (file_exists($pdfFullPath)) {
-                $cleanNum = preg_replace('/[^A-Za-z0-9_\-]/', '_', $this->report->report_number);
+            if (file_exists($pdfFullPath) && filesize($pdfFullPath) > 0) {
                 $attachments[] = Attachment::fromPath($pdfFullPath)
-                    ->as("Laporan_{$cleanNum}.pdf")
+                    ->as('laporan ring lingkungan BPSDM.pdf')
                     ->withMime('application/pdf');
             }
         }

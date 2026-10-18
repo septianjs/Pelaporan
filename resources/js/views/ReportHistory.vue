@@ -740,15 +740,18 @@ const shareWhatsApp = () => {
 const nativeShare = async () => {
   const rep = shareTarget.value;
   if (!rep) return;
-  try {
-    const result = await sharePdfDocument(rep);
-    if (result.method === 'native-file') {
+  const result = await sharePdfDocument(rep);
+  if (result.success) {
+    if (result.method === 'native-file' || result.method === 'web-file') {
       showToast('Dokumen PDF berhasil dibagikan!');
+    } else if (result.method === 'web-open') {
+      showToast('PDF dibuka di tab baru untuk dibagikan manual.');
     }
     showShareSheet.value = false;
-  } catch (err) {
-    if (!err.message?.includes('cancelled')) showToast('Gagal membagikan.', 'error');
+  } else if (!result.cancelled) {
+    showToast(result.error || 'Gagal membagikan.', 'error');
   }
+  // result.cancelled === true: user backed out, keep the sheet open silently.
 };
 
 const copyPdfLink = async () => {

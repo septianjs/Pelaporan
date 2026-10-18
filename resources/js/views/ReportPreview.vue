@@ -177,7 +177,7 @@
                     TITIK PEMANTAUAN {{ activeSlideIndex }} DARI 5
                   </p>
                   <h4 class="text-[11px] font-bold leading-tight truncate">
-                    {{ currentLocation.location?.name || ('Lokasi ' + activeSlideIndex) }}
+                    {{ currentLocation.display_name || currentLocation.location?.name || ("Lokasi " + activeSlideIndex) }}
                   </h4>
                 </div>
                 <span :class="[
@@ -616,7 +616,7 @@ const hasPptx = computed(() => !!report.value?.pptx_path);
 
 const activeSlideTitle = computed(() => {
   if (activeSlideIndex.value === 0) return 'Cover Laporan';
-  return currentLocation.value?.location?.name || `Lokasi ${activeSlideIndex.value}`;
+  return currentLocation.value?.display_name || currentLocation.value?.location?.name || `Lokasi ${activeSlideIndex.value}`;
 });
 
 const currentLocation = computed(() => {
@@ -728,13 +728,17 @@ const shareReport = async () => {
   generateError.value = '';
   try {
     const result = await sharePdfDocument(report.value);
-    if (result.method === 'native-file') {
-      showToast('Dokumen PDF berhasil dibagikan!', 'success');
+    if (result.success) {
+      if (result.method === 'native-file' || result.method === 'web-file') {
+        showToast('Dokumen PDF berhasil dibagikan!', 'success');
+      } else if (result.method === 'web-open') {
+        showToast('PDF dibuka di tab baru untuk dibagikan manual.', 'success');
+      }
+      // native-url / web-url: the OS share sheet already shows its own confirmation.
+    } else if (!result.cancelled) {
+      generateError.value = 'Gagal membagikan laporan: ' + (result.error || 'Terjadi kesalahan.');
     }
-  } catch (err) {
-    if (!err.message?.includes('cancelled') && !err.message?.includes('Cancel')) {
-      generateError.value = 'Gagal membagikan laporan: ' + (err.message || 'Error');
-    }
+    // result.cancelled === true: user backed out of the share sheet, nothing to show.
   } finally {
     sharing.value = false;
   }

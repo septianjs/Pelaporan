@@ -51,6 +51,26 @@
       </div>
     </div>
 
+    <!-- ── GAGAL MEMUAT (state error eksplisit, bukan daftar kosong diam-diam) ── -->
+    <div v-else-if="loadError" class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 text-center space-y-3">
+      <div class="w-12 h-12 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center mx-auto">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+      <div>
+        <p class="text-sm font-bold text-slate-800">Daftar template tidak bisa dimuat</p>
+        <p class="text-xs text-slate-500 mt-1">Periksa koneksi internet Anda, lalu coba lagi.</p>
+      </div>
+      <button
+        type="button"
+        @click="fetchTemplates"
+        class="px-4 py-2 rounded-xl bg-slate-800 text-white text-xs font-bold active:scale-95 transition"
+      >
+        Coba Lagi
+      </button>
+    </div>
+
     <!-- ── TEMPLATE CARDS ── -->
     <div v-else class="space-y-4">
       <div
@@ -191,22 +211,54 @@
         </div>
       </Transition>
     </Teleport>
+
+    <!-- ── TOAST NOTIFICATION ── -->
+    <Teleport to="body">
+      <Transition name="toast">
+        <div v-if="toast.show"
+          class="fixed top-safe left-1/2 -translate-x-1/2 z-[60] px-4 py-3 rounded-2xl shadow-xl text-sm font-semibold flex items-center gap-2 min-w-[200px] max-w-[90vw]"
+          :class="toast.type === 'success' ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'"
+          style="top: max(1.5rem, env(safe-area-inset-top));">
+          <svg v-if="toast.type === 'success'" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+          </svg>
+          <svg v-else class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          {{ toast.message }}
+        </div>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import api from '../services/api.js';
 
 const templates = ref([]);
 const loading = ref(true);
+const loadError = ref(false);
 const showDeleteSheet = ref(false);
 const templateToDelete = ref(null);
 const isDeleting = ref(false);
 
+// Toast (konsisten dengan ReportHistory, ReportPreview & CreateReport)
+const toast = reactive({ show: false, message: '', type: 'success' });
+let toastTimer = null;
+const showToast = (message, type = 'success') => {
+  clearTimeout(toastTimer);
+  toast.message = message;
+  toast.type = type;
+  toast.show = true;
+  toastTimer = setTimeout(() => { toast.show = false; }, 3000);
+};
+
 // ── Fetch templates ───────────────────────────────────────────────────────────
 const fetchTemplates = async () => {
   loading.value = true;
+  loadError.value = false;
   try {
     const res = await api.get('/templates');
     if (res.data?.data) {
@@ -214,6 +266,8 @@ const fetchTemplates = async () => {
     }
   } catch (err) {
     console.error('Gagal mengambil template:', err);
+    loadError.value = true;
+    showToast('Gagal memuat daftar template. Periksa koneksi Anda.', 'error');
   } finally {
     loading.value = false;
   }
@@ -232,9 +286,13 @@ const deleteTemplate = async () => {
     await api.delete(`/templates/${templateToDelete.value.id}`);
     templates.value = templates.value.filter((t) => t.id !== templateToDelete.value.id);
     showDeleteSheet.value = false;
+    showToast('Template berhasil dihapus.');
     templateToDelete.value = null;
   } catch (err) {
     console.error('Gagal menghapus template:', err);
+    const msg = err.response?.data?.message || 'Gagal menghapus template. Coba lagi.';
+    showToast(msg, 'error');
+    // Sheet dibiarkan terbuka agar pesan error terlihat jelas oleh pengguna.
   } finally {
     isDeleting.value = false;
   }
@@ -246,6 +304,14 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.toast-enter-active,
+.toast-leave-active { transition: all 0.25s ease; }
+.toast-enter-from,
+.toast-leave-to {
+  opacity: 0;
+  transform: translateX(-50%) translateY(-16px);
+}
+
 .slide-up-enter-active,
 .slide-up-leave-active {
   transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1);

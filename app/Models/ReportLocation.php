@@ -14,6 +14,7 @@ class ReportLocation extends Model
     protected $fillable = [
         'report_id',
         'location_id',
+        'name',
         'condition', // 'clean' or 'needs_attention'
         'notes',
         'problem',
@@ -22,6 +23,7 @@ class ReportLocation extends Model
 
     protected $appends = [
         'condition_label',
+        'display_name',
     ];
 
     public function report(): BelongsTo
@@ -44,6 +46,23 @@ class ReportLocation extends Model
         return $this->condition === 'clean'
             ? 'Kondisi Sudah Bersih dan Rapi'
             : 'Kondisi Masih Perlu Penanganan Khusus';
+    }
+
+    /**
+     * Nama lokasi yang ditampilkan: diutamakan nama yang diisi user sendiri
+     * untuk laporan ini, dengan fallback ke nama lokasi master (untuk data lama).
+     */
+    public function getDisplayNameAttribute(): string
+    {
+        if (!empty($this->name)) {
+            return $this->name;
+        }
+
+        if ($this->relationLoaded('location') && $this->location) {
+            return $this->location->name;
+        }
+
+        return $this->location?->name ?? 'Lokasi';
     }
 }
 

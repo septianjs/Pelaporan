@@ -42,7 +42,7 @@ export function formatWhatsAppMessage(report) {
     msg += `⚠️ *${attentionLocations.length} Titik Perlu Penanganan*\n\n`;
     msg += `*Rincian Temuan & Solusi:*\n`;
     attentionLocations.forEach((loc, idx) => {
-      const locName = loc.location?.name || `Lokasi ${idx + 1}`;
+      const locName = loc.display_name || loc.name || loc.location?.name || `Lokasi ${idx + 1}`;
       msg += `${idx + 1}. *${locName}*\n`;
       if (loc.problem) msg += `   • *Masalah:* ${loc.problem}\n`;
       if (loc.solution) msg += `   • *Solusi:* ${loc.solution}\n`;
@@ -60,18 +60,34 @@ export function formatWhatsAppMessage(report) {
 /**
  * Share PDF file natively via Capacitor Share or Web Share API
  */
+function isCancellation(err) {
+  const msg = (err?.message || '').toLowerCase();
+  return (
+    err?.name === 'AbortError' ||
+    msg.includes('cancel') ||
+    msg.includes('dismiss') ||
+    // Capacitor Share plugin on Android returns this when the user backs out
+    // of the native chooser sheet without picking a target app.
+    msg.includes('share canceled') ||
+    msg.includes('share_canceled')
+  );
+}
+
 export async function sharePdfDocument(report) {
-  const cleanNum = (report.report_number || `LAP-${report.id}`).replace(/[^A-Za-z0-9_\-]/g, '_');
-  const fileName = `Laporan_${cleanNum}.pdf`;
+  const fileName = 'laporan ring lingkungan BPSDM.pdf';
   const title = `Laporan ${report.report_number}`;
   const text = `${title} • ${report.formatted_date || report.inspection_date} • Petugas: ${report.officer_name}`;
   const pdfUrl = `${api.defaults.baseURL}/reports/${report.id}/pdf`;
 
   // 1. Native Android / iOS via Capacitor
   if (Capacitor.isNativePlatform()) {
+    let fileWriteFailed = false;
     try {
       // Fetch binary PDF blob
       const res = await api.get(`/reports/${report.id}/pdf`, { responseType: 'blob' });
+      if (!res.data || res.data.size === 0) {
+        return { success: false, method: 'native-file', error: 'File PDF kosong, tidak bisa dibagikan.' };
+      }
       const base64Data = await blobToBase64(res.data);
 
       // Save to temporary cache directory
@@ -94,25 +110,42 @@ export async function sharePdfDocument(report) {
         files: [fileResult.uri],
         dialogTitle: 'Bagikan Laporan (PDF 16:9)',
       });
+      // Share.share() resolving means the user picked a target app and the OS
+      // handed the file off to it — this is the real success signal.
       return { success: true, method: 'native-file' };
     } catch (err) {
-      if (err.message?.includes('cancelled') || err.message?.includes('Cancel') || err.name === 'AbortError') {
-        return { success: true, method: 'cancelled' };
+      if (isCancellation(err)) {
+        // User backing out of the share sheet is NOT a successful share.
+        return { success: false, cancelled: true, method: 'cancelled' };
       }
-      // Fallback to URL share if file write fails
-      await Share.share({
-        title,
-        text,
-        url: pdfUrl,
-        dialogTitle: 'Bagikan Tautan Laporan',
-      });
-      return { success: true, method: 'native-url' };
+      fileWriteFailed = true;
+      // Fall through to URL-based fallback below, in its own try/catch.
+    }
+
+    if (fileWriteFailed) {
+      try {
+        await Share.share({
+          title,
+          text,
+          url: pdfUrl,
+          dialogTitle: 'Bagikan Tautan Laporan',
+        });
+        return { success: true, method: 'native-url' };
+      } catch (err2) {
+        if (isCancellation(err2)) {
+          return { success: false, cancelled: true, method: 'cancelled' };
+        }
+        return { success: false, method: 'native-url', error: err2?.message || 'Gagal membagikan file.' };
+      }
     }
   }
 
   // 2. Web Browser environment
   try {
     const res = await api.get(`/reports/${report.id}/pdf`, { responseType: 'blob' });
+    if (!res.data || res.data.size === 0) {
+      return { success: false, method: 'web-file', error: 'File PDF kosong, tidak bisa dibagikan.' };
+    }
     const file = new File([res.data], fileName, { type: 'application/pdf' });
 
     // Check if Web Share API supports file sharing
@@ -131,18 +164,20 @@ export async function sharePdfDocument(report) {
         url: pdfUrl,
       });
       return { success: true, method: 'web-url' };
-    } else {
-      // Fallback open PDF in new window
-      window.open(pdfUrl, '_blank');
-      return { success: true, method: 'web-open' };
     }
-  } catch (err) {
-    if (err.name === 'AbortError' || err.message?.includes('cancelled')) {
-      return { success: true, method: 'cancelled' };
-    }
-    // Ultimate fallback
+
+    // No Web Share API available at all: open the PDF in a new tab so the
+    // user can save/share it manually. This is a real, visible action, so
+    // it is reported as a distinct method rather than a generic "success".
     window.open(pdfUrl, '_blank');
     return { success: true, method: 'web-open' };
+  } catch (err) {
+    if (isCancellation(err)) {
+      return { success: false, cancelled: true, method: 'cancelled' };
+    }
+    // A genuine failure (network error, share API rejection, etc.) must be
+    // surfaced as a failure — we no longer silently swallow it as success.
+    return { success: false, method: 'web-share-failed', error: err?.message || 'Gagal membagikan file.' };
   }
 }
 

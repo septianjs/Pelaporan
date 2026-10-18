@@ -148,32 +148,39 @@
       class="space-y-4"
     >
       <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 space-y-5">
-        <!-- Location Header Badge -->
-        <div class="p-3 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-xl flex items-center justify-between">
+        <!-- Location Header + Nama Lokasi (editable) -->
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-3">
           <div class="flex items-center space-x-2.5">
-            <div class="w-8 h-8 rounded-lg bg-blue-700 text-white font-black text-sm flex items-center justify-center">
+            <div class="w-8 h-8 rounded-xl bg-blue-900 text-white font-black text-sm flex items-center justify-center shrink-0">
               {{ locIdx + 1 }}
             </div>
-            <div>
-              <span class="text-[10px] uppercase font-bold text-blue-600 tracking-wider">Lokasi {{ locIdx + 1 }}</span>
-              <h3 class="text-sm font-black text-slate-800">{{ loc.name }}</h3>
-            </div>
+            <span class="text-[11px] uppercase font-bold text-slate-500 tracking-wider">Titik Pemantauan {{ locIdx + 1 }} dari 5</span>
           </div>
-          <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-200/60 text-blue-800">
-            Titik Pantau
-          </span>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">
+              Nama Lokasi <span class="text-rose-500">*</span>
+            </label>
+            <input
+              v-model="form.locations[locIdx].name"
+              type="text"
+              maxlength="150"
+              placeholder="Mis. Halaman Depan Kantor"
+              class="w-full px-3.5 py-2.5 rounded-xl bg-white text-slate-800 text-sm font-semibold border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition placeholder:text-slate-400 placeholder:font-normal"
+            />
+            <p class="text-[11px] text-slate-400 mt-1">Isi sesuai nama atau ciri lokasi ini di lapangan — bisa diubah dari nama sebelumnya.</p>
+          </div>
         </div>
 
         <!-- DOKUMENTASI 1 -->
         <PhotoUploader
-          :label="`Dokumentasi 1 — ${loc.name}`"
+          :label="`Dokumentasi 1 — ${form.locations[locIdx].name || 'Lokasi ' + (locIdx + 1)}`"
           v-model="form.locations[locIdx].photo_1"
           aspectRatio="16:9"
         />
 
         <!-- DOKUMENTASI 2 -->
         <PhotoUploader
-          :label="`Dokumentasi 2 — ${loc.name}`"
+          :label="`Dokumentasi 2 — ${form.locations[locIdx].name || 'Lokasi ' + (locIdx + 1)}`"
           v-model="form.locations[locIdx].photo_2"
           aspectRatio="16:9"
         />
@@ -381,7 +388,7 @@
               <span class="w-5 h-5 rounded-md bg-slate-100 text-slate-700 font-bold flex items-center justify-center text-[10px]">
                 {{ idx + 1 }}
               </span>
-              <span class="font-medium text-slate-800">{{ loc.name }}</span>
+              <span class="font-medium text-slate-800">{{ form.locations[idx].name || loc.name }}</span>
             </div>
             <span
               :class="[
@@ -479,6 +486,25 @@
       </Transition>
     </Teleport>
 
+    <!-- ── TOAST NOTIFICATION (konsisten dengan ReportHistory & ReportPreview) ── -->
+    <Teleport to="body">
+      <Transition name="toast">
+        <div v-if="toast.show"
+          class="fixed top-safe left-1/2 -translate-x-1/2 z-[60] px-4 py-3 rounded-2xl shadow-xl text-sm font-semibold flex items-center gap-2 min-w-[200px] max-w-[90vw]"
+          :class="toast.type === 'success' ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'"
+          style="top: max(1.5rem, env(safe-area-inset-top));">
+          <svg v-if="toast.type === 'success'" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+          </svg>
+          <svg v-else class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          {{ toast.message }}
+        </div>
+      </Transition>
+    </Teleport>
+
   </div>
 </template>
 
@@ -506,6 +532,17 @@ const isSubmitting = ref(false);
 const hasSavedDraft = ref(false);
 const draftRestored = ref(false);
 const showOfflineSuccessModal = ref(false);
+
+// Toast (mengganti window.alert — konsisten dengan ReportHistory & ReportPreview)
+const toast = reactive({ show: false, message: '', type: 'success' });
+let toastTimer = null;
+const showToast = (message, type = 'success') => {
+  clearTimeout(toastTimer);
+  toast.message = message;
+  toast.type = type;
+  toast.show = true;
+  toastTimer = setTimeout(() => { toast.show = false; }, 3000);
+};
 
 const stepTitles = [
   '1. Informasi Laporan',
@@ -555,11 +592,11 @@ const form = reactive({
   officer_photo: null,
   template_id: 1,
   locations: [
-    { location_id: 1, condition: 'clean', notes: '', problem: '', solution: '', photo_1: null, photo_2: null },
-    { location_id: 2, condition: 'clean', notes: '', problem: '', solution: '', photo_1: null, photo_2: null },
-    { location_id: 3, condition: 'clean', notes: '', problem: '', solution: '', photo_1: null, photo_2: null },
-    { location_id: 4, condition: 'clean', notes: '', problem: '', solution: '', photo_1: null, photo_2: null },
-    { location_id: 5, condition: 'clean', notes: '', problem: '', solution: '', photo_1: null, photo_2: null },
+    { location_id: 1, name: 'Halaman Depan Kantor', condition: 'clean', notes: '', problem: '', solution: '', photo_1: null, photo_2: null },
+    { location_id: 2, name: 'Ruang Pelayanan', condition: 'clean', notes: '', problem: '', solution: '', photo_1: null, photo_2: null },
+    { location_id: 3, name: 'Ruang Kerja', condition: 'clean', notes: '', problem: '', solution: '', photo_1: null, photo_2: null },
+    { location_id: 4, name: 'Toilet', condition: 'clean', notes: '', problem: '', solution: '', photo_1: null, photo_2: null },
+    { location_id: 5, name: 'Area Parkir', condition: 'clean', notes: '', problem: '', solution: '', photo_1: null, photo_2: null },
   ],
 });
 
@@ -615,9 +652,11 @@ const loadInitialData = async () => {
       }
     }
 
-    // Sync locations structure
-    form.locations = locations.value.map(loc => ({
+    // Sync locations structure. `name` diisi dari master sebagai saran awal,
+    // tapi tetap field milik form ini sendiri sehingga bisa diedit bebas oleh user.
+    form.locations = locations.value.map((loc, i) => ({
       location_id: loc.id,
+      name: form.locations[i]?.name || loc.name,
       condition: 'clean',
       notes: '',
       problem: '',
@@ -663,9 +702,9 @@ const checkSavedDraft = async () => {
 const saveDraftManually = async () => {
   const success = await saveFormDraft(form);
   if (success) {
-    alert('✓ Draft laporan dan seluruh foto dokumentasi berhasil disimpan di perangkat lokal.');
+    showToast('Draft dan foto dokumentasi tersimpan di perangkat ini.');
   } else {
-    alert('Draft berhasil disimpan.');
+    showToast('Draft gagal disimpan. Periksa ruang penyimpanan perangkat.', 'error');
   }
 };
 
@@ -681,6 +720,7 @@ const restoreDraft = async () => {
     if (Array.isArray(draft.locations)) {
       draft.locations.forEach((dLoc, i) => {
         if (form.locations[i]) {
+          form.locations[i].name = dLoc.name || form.locations[i].name;
           form.locations[i].condition = dLoc.condition || 'clean';
           form.locations[i].notes = dLoc.notes || '';
           form.locations[i].problem = dLoc.problem || '';
@@ -704,15 +744,19 @@ const discardDraft = async () => {
 const nextStep = () => {
   if (currentStep.value === 1) {
     if (!form.officer_name.trim()) {
-      alert('Mohon masukkan nama petugas pengawas.');
+      showToast('Mohon masukkan nama petugas pengawas.', 'error');
       return;
     }
   } else if (currentStep.value >= 2 && currentStep.value <= 6) {
     const locIdx = currentStep.value - 2;
     const locItem = form.locations[locIdx];
+    if (!locItem.name?.trim()) {
+      showToast('Mohon isi nama lokasi untuk titik pemantauan ini.', 'error');
+      return;
+    }
     if (locItem.condition === 'needs_attention') {
       if (!locItem.problem?.trim() || !locItem.solution?.trim()) {
-        alert('Untuk kondisi perlu penanganan, mohon isi permasalahan dan solusinya.');
+        showToast('Untuk kondisi perlu penanganan, mohon isi permasalahan dan solusinya.', 'error');
         return;
       }
     }
@@ -745,7 +789,7 @@ const submitReport = async () => {
       await clearFormDraft();
       showOfflineSuccessModal.value = true;
     } catch (err) {
-      alert('Gagal menyimpan ke antrian offline: ' + err.message);
+      showToast('Gagal menyimpan ke antrian offline: ' + err.message, 'error');
     } finally {
       isSubmitting.value = false;
     }
@@ -766,6 +810,7 @@ const submitReport = async () => {
 
     form.locations.forEach((loc, idx) => {
       formData.append(`locations[${idx}][location_id]`, loc.location_id);
+      formData.append(`locations[${idx}][name]`, (loc.name || '').trim());
       formData.append(`locations[${idx}][condition]`, loc.condition);
       if (loc.condition === 'clean') {
         formData.append(`locations[${idx}][notes]`, loc.notes || '');
@@ -791,7 +836,9 @@ const submitReport = async () => {
     if (res.data && res.data.status === 'success') {
       await clearFormDraft();
       const newReportId = res.data.data.id;
-      alert('Laporan berhasil dibuat!');
+      // Navigasi langsung ke halaman preview laporan yang baru dibuat —
+      // melihat laporannya sendiri adalah konfirmasi yang lebih jelas
+      // daripada dialog alert() yang harus ditutup dulu secara manual.
       router.push(`/preview/${newReportId}`);
     }
   } catch (err) {
@@ -805,11 +852,11 @@ const submitReport = async () => {
         await clearFormDraft();
         showOfflineSuccessModal.value = true;
       } catch (qErr) {
-        alert('Koneksi terputus dan gagal menyimpan offline: ' + qErr.message);
+        showToast('Koneksi terputus dan gagal menyimpan offline: ' + qErr.message, 'error');
       }
     } else {
       const msg = err.response?.data?.message || err.message || 'Terjadi kesalahan sistem.';
-      alert('Gagal menyimpan laporan: ' + msg);
+      showToast('Gagal menyimpan laporan: ' + msg, 'error');
     }
   } finally {
     isSubmitting.value = false;
@@ -822,6 +869,14 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.toast-enter-active,
+.toast-leave-active { transition: all 0.25s ease; }
+.toast-enter-from,
+.toast-leave-to {
+  opacity: 0;
+  transform: translateX(-50%) translateY(-16px);
+}
+
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.25s ease;

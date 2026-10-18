@@ -111,7 +111,7 @@ class ReportTemplateEngineService
                 /** @var ReportLocation|null $reportLoc */
                 $reportLoc = $locations->get($locIndex);
 
-                $locName = $reportLoc && $reportLoc->location ? $reportLoc->location->name : "Lokasi {$locIndex}";
+                $locName = $reportLoc ? $reportLoc->display_name : "Lokasi {$locIndex}";
                 $conditionText = $reportLoc ? $reportLoc->condition_label : 'Kondisi Sudah Bersih dan Rapi';
                 $notesText = ($reportLoc && $reportLoc->notes) ? $reportLoc->notes : ($reportLoc && $reportLoc->condition === 'clean' ? 'Area terpantau bersih dan terawat dengan baik.' : '-');
                 $problemText = ($reportLoc && $reportLoc->problem) ? $reportLoc->problem : ($reportLoc && $reportLoc->condition === 'needs_attention' ? '-' : 'Tidak ada permasalahan');
