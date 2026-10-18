@@ -1,6 +1,6 @@
 <template>
   <div class="space-y-2">
-    <label v-if="label" class="block text-xs font-bold text-slate-700 uppercase tracking-wide">
+    <label v-if="label" class="block text-xs font-bold text-stone-700 uppercase tracking-wider">
       {{ label }}
       <span v-if="required" class="text-rose-500">*</span>
     </label>
@@ -33,7 +33,7 @@
         <circle class="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"/>
         <path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
       </svg>
-      <p class="text-[#FAF8F2] text-xs font-medium">Mengoptimalkan gambar 16:9…</p>
+      <p class="text-[#FAF8F2] text-xs font-medium">Mengoptimalkan gambar…</p>
     </div>
 
     <!-- ─── PREVIEW FRAME (object-fit: cover, no stretching) ─── -->
@@ -44,15 +44,15 @@
     >
       <img
         :src="previewUrl"
-        alt="Dokumentasi"
-        class="w-full h-full object-cover"
+        :alt="label || 'Dokumentasi'"
+        :class="['w-full h-full object-cover', isSquare ? 'object-[50%_20%]' : 'object-center']"
       />
 
       <!-- Overlay bottom bar -->
       <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent flex flex-col justify-end p-3">
-        <div class="flex items-center justify-between">
-          <!-- Size info badge -->
-          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium bg-black/60 text-[#D8C79C] border border-white/10 backdrop-blur-md">
+        <div :class="['flex items-center', isSquare ? 'justify-center' : 'justify-between']">
+          <!-- Size info badge (disembunyikan pada foto kotak: ruangnya sempit) -->
+          <span v-if="!isSquare" class="inline-flex items-center gap-1.5 whitespace-nowrap px-2.5 py-1 rounded-full text-[10px] font-medium bg-black/60 text-[#D8C79C] border border-white/10 backdrop-blur-md">
             <svg class="w-3 h-3 text-[#34D399]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
             </svg>
@@ -101,8 +101,8 @@
       </div>
 
       <div>
-        <p class="text-xs font-bold text-stone-800">Dokumentasi Belum Diunggah</p>
-        <p class="text-[11px] text-stone-400 mt-0.5">Format JPG / PNG · Format 16:9 otomatis</p>
+        <p class="text-xs font-bold text-stone-800">{{ emptyTitle }}</p>
+        <p class="text-[11px] text-stone-400 mt-0.5">{{ emptyHint }}</p>
       </div>
 
       <!-- Two buttons -->
@@ -249,8 +249,17 @@ const showActionSheet = ref(false);
 const sizeLabel = ref('');
 
 // ── Aspect ratio CSS class ──
+const isSquare = computed(() => props.aspectRatio === 'square');
+
+const emptyTitle = computed(() => (isSquare.value ? 'Foto Belum Diunggah' : 'Dokumentasi Belum Diunggah'));
+const emptyHint = computed(() =>
+  isSquare.value
+    ? 'Format JPG / PNG · Tampil kotak (1:1)'
+    : 'Format JPG / PNG · Format 16:9 otomatis'
+);
+
 const aspectRatioClass = computed(() => {
-  if (props.aspectRatio === 'square') return 'aspect-square';
+  if (props.aspectRatio === 'square') return 'aspect-square max-w-[15rem] mx-auto';
   if (props.aspectRatio === '4:3') return 'aspect-[4/3]';
   return 'aspect-video'; // 16:9 default
 });

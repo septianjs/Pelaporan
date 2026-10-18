@@ -1,7 +1,7 @@
 <template>
-  <div class="min-h-screen bg-[#ECEAE3] flex justify-center items-start sm:py-6 selection:bg-[#1A3428] selection:text-white">
+  <div class="h-dvh sm:h-auto sm:min-h-screen bg-[#ECEAE3] flex justify-center items-start sm:py-6 selection:bg-[#1A3428] selection:text-white">
     <!-- Main Frame Container: Seamless mobile edge-to-edge, refined desktop tablet dock -->
-    <div class="w-full max-w-md min-h-screen sm:min-h-[850px] bg-[#FAF9F5] flex flex-col sm:rounded-3xl sm:overflow-hidden sm:border sm:border-stone-300/70 shadow-[0_20px_50px_-15px_rgba(28,25,23,0.08)] relative">
+    <div class="w-full max-w-md h-dvh sm:h-[850px] bg-[#FAF9F5] flex flex-col overflow-hidden sm:rounded-3xl sm:border sm:border-stone-300/70 shadow-[0_20px_50px_-15px_rgba(28,25,23,0.08)] relative">
       <!-- Top App Bar -->
       <TopHeader :title="currentTitle" />
 
@@ -47,7 +47,7 @@
       </div>
 
       <!-- Scrollable Main Content -->
-      <main class="flex-1 overflow-y-auto pb-4">
+      <main id="app-scroll" class="flex-1 min-h-0 overflow-y-auto overscroll-contain pb-4">
         <router-view v-slot="{ Component }">
           <transition name="fade" mode="out-in">
             <component :is="Component" />
@@ -56,7 +56,7 @@
       </main>
 
       <!-- Bottom Navigation Bar -->
-      <BottomNav />
+      <BottomNav class="shrink-0" />
     </div>
   </div>
 </template>

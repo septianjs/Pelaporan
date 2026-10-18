@@ -1,5 +1,5 @@
 <template>
-  <div class="px-4 py-4 space-y-4">
+  <div class="px-4 pt-4 pb-0 space-y-4">
     <!-- WIZARD STEP HEADER & PROGRESS (Architectural Minimalist) -->
     <div class="bg-white rounded-2xl p-4.5 border border-[#E7E5DE] shadow-[0_2px_8px_rgba(28,25,23,0.03)]">
       <div class="flex items-center justify-between mb-3">
@@ -420,41 +420,43 @@
     <!-- =============================================================== -->
     <!-- WIZARD NAVIGATION BUTTONS (Architectural Floating Controls)     -->
     <!-- =============================================================== -->
-    <div class="sticky bottom-20 z-20 bg-white/95 backdrop-blur-md p-2.5 rounded-2xl shadow-[0_8px_24px_rgba(28,25,23,0.08)] border border-[#E7E5DE] flex items-center gap-2">
-      <!-- Tombol Kembali -->
-      <button
-        v-if="currentStep > 1"
-        type="button"
-        @click="prevStep"
-        class="flex-1 py-2.5 px-3 rounded-xl bg-[#F2F0E8] hover:bg-[#E7E5DC] text-stone-700 text-xs font-semibold active-press transition"
-      >
-        ← Kembali
-      </button>
+    <div class="sticky -bottom-4 -mb-4 z-20 -mx-4 px-4 pt-6 pb-3 bg-gradient-to-t from-[#FAF9F5] from-65% to-transparent pointer-events-none">
+      <div class="pointer-events-auto bg-white/95 backdrop-blur-md p-2.5 rounded-2xl shadow-[0_8px_24px_rgba(28,25,23,0.08)] border border-[#E7E5DE] flex items-center gap-2">
+        <!-- Tombol Kembali -->
+        <button
+          v-if="currentStep > 1"
+          type="button"
+          @click="prevStep"
+          class="flex-1 py-2.5 px-3 rounded-xl bg-[#F2F0E8] hover:bg-[#E7E5DC] text-stone-700 text-xs font-semibold active-press transition"
+        >
+          ← Kembali
+        </button>
 
-      <!-- Tombol Lanjut -->
-      <button
-        v-if="currentStep < totalSteps"
-        type="button"
-        @click="nextStep"
-        class="flex-[2] py-2.5 px-4 rounded-xl bg-[#14251D] hover:bg-[#1E372A] text-white text-xs font-semibold shadow-sm active-press transition flex items-center justify-center gap-1.5"
-      >
-        <span>Lanjutkan</span>
-        <svg class="w-3.5 h-3.5 text-[#D8C79C]" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-        </svg>
-      </button>
+        <!-- Tombol Lanjut -->
+        <button
+          v-if="currentStep < totalSteps"
+          type="button"
+          @click="nextStep"
+          class="flex-[2] py-2.5 px-4 rounded-xl bg-[#14251D] hover:bg-[#1E372A] text-white text-xs font-semibold shadow-sm active-press transition flex items-center justify-center gap-1.5"
+        >
+          <span>Lanjutkan</span>
+          <svg class="w-3.5 h-3.5 text-[#D8C79C]" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+          </svg>
+        </button>
 
-      <!-- Tombol Simpan Laporan (Step 8) -->
-      <button
-        v-if="currentStep === totalSteps"
-        type="button"
-        :disabled="isSubmitting"
-        @click="submitReport"
-        class="flex-[2] py-2.5 px-4 rounded-xl bg-[#14251D] hover:bg-[#1E372A] text-[#EADBBA] text-xs font-bold shadow-md active-press transition disabled:opacity-50 flex items-center justify-center gap-2"
-      >
-        <span v-if="isSubmitting" class="w-4 h-4 border-2 border-[#EADBBA] border-t-transparent rounded-full animate-spin"></span>
-        <span>{{ isSubmitting ? 'Memproses Dokumen...' : 'Simpan & Terbitkan Laporan' }}</span>
-      </button>
+        <!-- Tombol Simpan Laporan (Step 8) -->
+        <button
+          v-if="currentStep === totalSteps"
+          type="button"
+          :disabled="isSubmitting"
+          @click="submitReport"
+          class="flex-[2] py-2.5 px-4 rounded-xl bg-[#14251D] hover:bg-[#1E372A] text-[#EADBBA] text-xs font-bold shadow-md active-press transition disabled:opacity-50 flex items-center justify-center gap-2"
+        >
+          <span v-if="isSubmitting" class="w-4 h-4 border-2 border-[#EADBBA] border-t-transparent rounded-full animate-spin"></span>
+          <span>{{ isSubmitting ? 'Memproses Dokumen...' : 'Simpan & Terbitkan Laporan' }}</span>
+        </button>
+      </div>
     </div>
 
     <!-- ── OFFLINE QUEUE SUCCESS MODAL ── -->
@@ -748,6 +750,12 @@ const discardDraft = async () => {
 };
 
 // Wizard Navigation
+// <main id="app-scroll"> adalah area scroll aplikasi (lihat App.vue); window ikut dijaga untuk mode web biasa.
+const scrollToTop = () => {
+  document.getElementById('app-scroll')?.scrollTo({ top: 0, behavior: 'smooth' });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
 const nextStep = () => {
   if (currentStep.value === 1) {
     if (!form.officer_name.trim()) {
@@ -774,14 +782,14 @@ const nextStep = () => {
 
   if (currentStep.value < totalSteps) {
     currentStep.value++;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    scrollToTop();
   }
 };
 
 const prevStep = () => {
   if (currentStep.value > 1) {
     currentStep.value--;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    scrollToTop();
   }
 };
 

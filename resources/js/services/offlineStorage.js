@@ -1,4 +1,4 @@
-import { ref } from 'vue';
+import { ref, toRaw } from 'vue';
 
 const DB_NAME = 'bpsdm_pelaporan_db';
 const DB_VERSION = 1;
@@ -10,6 +10,18 @@ export const queuedCount = ref(0);
 export const syncSuccessMessage = ref('');
 
 let dbPromise = null;
+
+/**
+ * IndexedDB memakai structured clone, sedangkan form di CreateReport.vue adalah objek reaktif Vue (Proxy)
+ * yang TIDAK bisa di-clone (DataCloneError). Ubah menjadi objek biasa; File/Blob dibiarkan apa adanya.
+ */
+function toPlain(value) {
+  const v = toRaw(value);
+  if (v === null || typeof v !== 'object') return v;
+  if (v instanceof Blob || v instanceof Date) return v;
+  if (Array.isArray(v)) return v.map(toPlain);
+  return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, toPlain(x)]));
+}
 
 /**
  * Open or initialize IndexedDB
@@ -66,13 +78,13 @@ export function openDatabase() {
 export async function saveFormDraft(formData) {
   try {
     const db = await openDatabase();
-    return new Promise((resolve, reject) => {
+    return await new Promise((resolve, reject) => {
       const tx = db.transaction('drafts', 'readwrite');
       const store = tx.objectStore('drafts');
       const record = {
         key: 'current_form_draft',
         updatedAt: new Date().toISOString(),
-        data: formData,
+        data: toPlain(formData),
       };
       const req = store.put(record);
       req.onsuccess = () => resolve(true);
@@ -179,8 +191,8 @@ export async function queueOfflineReport(reportPayload) {
       officer_name: reportPayload.officer_name,
       inspection_date: reportPayload.inspection_date,
       template_id: reportPayload.template_id,
-      officer_photo: reportPayload.officer_photo || null,
-      locations: reportPayload.locations || [],
+      officer_photo: toPlain(reportPayload.officer_photo) || null,
+      locations: toPlain(reportPayload.locations) || [],
       status: 'pending_sync',
     };
     const req = store.add(record);
@@ -256,6 +268,7 @@ export async function syncOfflineQueue(apiInstance) {
 
       item.locations.forEach((loc, idx) => {
         formData.append(`locations[${idx}][location_id]`, loc.location_id);
+        formData.append(`locations[${idx}][name]`, (loc.name || '').trim());
         formData.append(`locations[${idx}][condition]`, loc.condition);
         if (loc.condition === 'clean') {
           formData.append(`locations[${idx}][notes]`, loc.notes || '');
