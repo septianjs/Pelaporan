@@ -19,10 +19,11 @@ class Report extends Model
         'officer_name',
         'officer_photo',
         'template_id',
-        'pptx_path',
         'pdf_path',
         'status',
     ];
+
+    protected $hidden = ['pptx_path'];
 
     protected $casts = [
         'inspection_date' => 'date',
