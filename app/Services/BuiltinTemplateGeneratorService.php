@@ -16,7 +16,7 @@ class BuiltinTemplateGeneratorService
             [
                 'key' => 'corporate-blue',
                 'name' => 'Tropical Pop',
-                'description' => 'Nuansa biru sapphire elegan dengan aksen emas cerah dan kontras tinggi.',
+                'description' => 'Pop art tropis dengan warna violet, koral, bentuk bulat, dan bingkai tebal.',
                 'primary_color' => '7C3AED',    // Royal Navy
                 'secondary_color' => 'F43F5E',  // Electric Blue
                 'accent_color' => 'FDE047',     // Amber Gold
@@ -28,7 +28,7 @@ class BuiltinTemplateGeneratorService
             [
                 'key' => 'government-formal',
                 'name' => 'Batik Nusantara',
-                'description' => 'Identitas hijau zamrud mewah dan emas prestisius berkarakter dinas resmi.',
+                'description' => 'Ornamen geometris terinspirasi batik dengan hijau zamrud dan aksen emas.',
                 'primary_color' => '166534',    // Deep Emerald Pine
                 'secondary_color' => '16A34A',  // Radiant Emerald
                 'accent_color' => 'F59E0B',     // Imperial Gold
@@ -40,7 +40,7 @@ class BuiltinTemplateGeneratorService
             [
                 'key' => 'modern-clean',
                 'name' => 'Comic Pop Art',
-                'description' => 'Perpaduan segar toska samudra dengan aksen oranye terbenam yang energik.',
+                'description' => 'Komik cerah dengan blok warna kontras, garis tebal, dan aksen jingga.',
                 'primary_color' => '0F766E',    // Deep Ocean Teal
                 'secondary_color' => '06B6D4',  // Vivid Turquoise
                 'accent_color' => 'FB923C',     // Sunset Orange
@@ -52,7 +52,7 @@ class BuiltinTemplateGeneratorService
             [
                 'key' => 'minimal-professional',
                 'name' => 'Scrapbook Ceria',
-                'description' => 'Desain tegas berwibawa dengan merah marun gelap dan aksen ruby menyala.',
+                'description' => 'Gaya scrapbook dengan bingkai putus-putus dan panel seperti kolase.',
                 'primary_color' => 'BE123C',    // Deep Burgundy
                 'secondary_color' => 'FB7185',  // Vivid Ruby
                 'accent_color' => 'FBBF24',     // Warm Sand Gold
@@ -64,7 +64,7 @@ class BuiltinTemplateGeneratorService
             [
                 'key' => 'executive-report',
                 'name' => 'Memphis Geometry',
-                'description' => 'Nuansa ultraviolet mewah dipadu koral menyala untuk presentasi pimpinan.',
+                'description' => 'Komposisi Memphis dengan bentuk geometris, sudut kontras, dan warna elektrik.',
                 'primary_color' => '5B21B6',    // Royal Midnight Violet
                 'secondary_color' => '8B5CF6',  // Electric Violet
                 'accent_color' => 'F43F5E',     // Vibrant Coral
@@ -76,7 +76,7 @@ class BuiltinTemplateGeneratorService
             [
                 'key' => 'photo-focus',
                 'name' => 'Festival Nusantara',
-                'description' => 'Kehangatan terakota bumi dengan aksen jingga sunset yang kaya warna.',
+                'description' => 'Nuansa festival Nusantara dengan terracotta, jingga, dan aksen kuning.',
                 'primary_color' => '9A3412',    // Rich Terracotta
                 'secondary_color' => 'EA580C',  // Warm Sunset
                 'accent_color' => 'FACC15',     // Golden Amber
@@ -88,7 +88,7 @@ class BuiltinTemplateGeneratorService
             [
                 'key' => 'elegant-report',
                 'name' => 'Retro Groovy',
-                'description' => 'Elegansi magenta anggur dengan aksen kuning sitrun menyala yang berani.',
+                'description' => 'Retro groovy dengan magenta, bentuk melingkar, dan aksen lime.',
                 'primary_color' => '86198F',    // Deep Royal Plum
                 'secondary_color' => 'D946EF',  // Vivid Magenta
                 'accent_color' => 'A3E635',     // Bright Citron Gold
@@ -100,7 +100,7 @@ class BuiltinTemplateGeneratorService
             [
                 'key' => 'bpsdm-classic',
                 'name' => 'Infografik Pelangi',
-                'description' => 'Identitas institusional BPSDM bernuansa Deep Pine dan emas champagne.',
+                'description' => 'Infografik warna-warni dengan palet biru, toska, dan strip warna.',
                 'primary_color' => '1D4ED8',    // Deep Pine Institutional
                 'secondary_color' => '06B6D4',  // Forest Pine
                 'accent_color' => 'FDE047',     // Prestige Champagne Gold
@@ -112,7 +112,7 @@ class BuiltinTemplateGeneratorService
             [
                 'key' => 'modern-government',
                 'name' => 'Paper Cut Explosion',
-                'description' => 'Kombinasi modern biru kobalt dingin dengan aksen jingga api kontras tinggi.',
+                'description' => 'Paper cut dengan panel bertumpuk dan bayangan warna yang tegas.',
                 'primary_color' => '1E40AF',    // Slate Navy
                 'secondary_color' => '38BDF8',  // Cobalt Sky
                 'accent_color' => 'F97316',     // Blaze Orange
@@ -124,7 +124,7 @@ class BuiltinTemplateGeneratorService
             [
                 'key' => 'clean-documentation',
                 'name' => 'Botanical Maximalist',
-                'description' => 'Tampilan kontemporer grafit gelap dengan aksen hijau neon volt yang tajam.',
+                'description' => 'Botanical maximalist dengan hijau daun, lime, dan bingkai organik.',
                 'primary_color' => '166534',    // Dark Graphite
                 'secondary_color' => '65A30D',  // Slate Steel
                 'accent_color' => 'FACC15',     // Electric Lime Volt
@@ -140,7 +140,7 @@ class BuiltinTemplateGeneratorService
      * Generate preview thumbnails for all ten PDF themes.
      */
     /**
-     * Build only PDF template previews. The application no longer creates PPTX files.
+     * Build only PDF template previews. The application no longer creates PowerPoint files.
      * The template definitions remain the source of the PDF palettes and layouts.
      */
     public function generateAll(): array
