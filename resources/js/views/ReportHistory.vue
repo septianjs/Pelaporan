@@ -261,25 +261,6 @@
               {{ generatingId === rep.id + '_pdf' ? 'PDF…' : '+ PDF' }}
             </button>
 
-            <!-- PPTX: download or generate -->
-            <button v-if="rep.pptx_path" type="button" @click="downloadPptx(rep)"
-              class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#FAF5E8] hover:bg-[#F2EBD7] text-[#865E1E] text-xs font-semibold active-press transition border border-[#E8DCBF]">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
-              </svg>
-              PPTX
-            </button>
-            <button v-else type="button" @click="generatePptx(rep)" :disabled="generatingId === rep.id + '_pptx'"
-              class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#865E1E] text-white text-xs font-semibold active-press transition disabled:opacity-60">
-              <svg v-if="generatingId === rep.id + '_pptx'" class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"/>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
-              </svg>
-              <svg v-else class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
-              </svg>
-              {{ generatingId === rep.id + '_pptx' ? 'PPTX…' : '+ PPTX' }}
-            </button>
 
             <!-- Share / WhatsApp -->
             <button type="button" @click="openShareSheet(rep)"
@@ -577,7 +558,7 @@ const filterStatus = ref('all');
 const filterDate   = ref('');
 const currentPage  = ref(1);
 const totalPages   = ref(1);
-const generatingId = ref(''); // e.g. "5_pdf" or "5_pptx"
+const generatingId = ref(''); // current PDF action
 let   searchTimer  = null;
 
 const stats = reactive({ total: 0, this_month: 0, needs_attention: 0 });
@@ -701,23 +682,8 @@ const generatePdf = async (rep) => {
   }
 };
 
-const generatePptx = async (rep) => {
-  generatingId.value = rep.id + '_pptx';
-  try {
-    const res = await api.post(`/reports/${rep.id}/generate-pptx`);
-    const idx = reports.value.findIndex(r => r.id === rep.id);
-    if (idx !== -1 && res.data?.data) reports.value[idx] = res.data.data;
-    showToast('Presentasi PPTX berhasil dibuat!');
-  } catch {
-    showToast('Gagal membuat PPTX.', 'error');
-  } finally {
-    generatingId.value = '';
-  }
-};
-
 // ── Open / Download ───────────────────────────────────────────────────────────
 const openPdf     = (rep) => window.open(`${pdfUrl(rep)}?inline=1`, '_blank');
-const downloadPptx = (rep) => window.open(`${api.defaults.baseURL}/reports/${rep.id}/pptx`, '_blank');
 
 // ── Share Sheet ───────────────────────────────────────────────────────────────
 const openShareSheet = (rep) => {
