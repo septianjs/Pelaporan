@@ -15,8 +15,8 @@ class BuiltinTemplateGeneratorService
         return [
             [
                 'key' => 'corporate-blue',
-                'name' => 'Tropical Pop',
-                'description' => 'Pop art tropis dengan warna violet, koral, bentuk bulat, dan bingkai tebal.',
+                'name' => 'Tropis Nusantara',
+                'description' => 'Daun tropis, bingkai dekoratif, dan panel foto lebar.',
                 'primary_color' => '7C3AED',    // Royal Navy
                 'secondary_color' => 'F43F5E',  // Electric Blue
                 'accent_color' => 'FDE047',     // Amber Gold
@@ -28,7 +28,7 @@ class BuiltinTemplateGeneratorService
             [
                 'key' => 'government-formal',
                 'name' => 'Batik Nusantara',
-                'description' => 'Ornamen geometris terinspirasi batik dengan hijau zamrud dan aksen emas.',
+                'description' => 'Ornamen tradisional sebagai bingkai dan aksen sudut dengan warna hijau dan emas.',
                 'primary_color' => '166534',    // Deep Emerald Pine
                 'secondary_color' => '16A34A',  // Radiant Emerald
                 'accent_color' => 'F59E0B',     // Imperial Gold
@@ -39,8 +39,8 @@ class BuiltinTemplateGeneratorService
             ],
             [
                 'key' => 'modern-clean',
-                'name' => 'Comic Pop Art',
-                'description' => 'Komik cerah dengan blok warna kontras, garis tebal, dan aksen jingga.',
+                'name' => 'Infografis Geometris',
+                'description' => 'Angka dan panel tegas, komposisi asimetris, serta bentuk geometris.',
                 'primary_color' => '0F766E',    // Deep Ocean Teal
                 'secondary_color' => '06B6D4',  // Vivid Turquoise
                 'accent_color' => 'FB923C',     // Sunset Orange
@@ -51,8 +51,8 @@ class BuiltinTemplateGeneratorService
             ],
             [
                 'key' => 'minimal-professional',
-                'name' => 'Scrapbook Ceria',
-                'description' => 'Gaya scrapbook dengan bingkai putus-putus dan panel seperti kolase.',
+                'name' => 'Jurnal Dokumentasi',
+                'description' => 'Kolase dokumentasi, label keterangan, dan bingkai seperti jurnal.',
                 'primary_color' => 'BE123C',    // Deep Burgundy
                 'secondary_color' => 'FB7185',  // Vivid Ruby
                 'accent_color' => 'FBBF24',     // Warm Sand Gold
@@ -63,8 +63,8 @@ class BuiltinTemplateGeneratorService
             ],
             [
                 'key' => 'executive-report',
-                'name' => 'Memphis Geometry',
-                'description' => 'Komposisi Memphis dengan bentuk geometris, sudut kontras, dan warna elektrik.',
+                'name' => 'Merah Putih Institusional',
+                'description' => 'Tata letak resmi simetris dengan dominasi merah dan putih.',
                 'primary_color' => '5B21B6',    // Royal Midnight Violet
                 'secondary_color' => '8B5CF6',  // Electric Violet
                 'accent_color' => 'F43F5E',     // Vibrant Coral
@@ -75,8 +75,8 @@ class BuiltinTemplateGeneratorService
             ],
             [
                 'key' => 'photo-focus',
-                'name' => 'Festival Nusantara',
-                'description' => 'Nuansa festival Nusantara dengan terracotta, jingga, dan aksen kuning.',
+                'name' => 'Eco Green Report',
+                'description' => 'Tema lingkungan dengan palet hijau dan indikator kondisi kebersihan.',
                 'primary_color' => '9A3412',    // Rich Terracotta
                 'secondary_color' => 'EA580C',  // Warm Sunset
                 'accent_color' => 'FACC15',     // Golden Amber
@@ -87,8 +87,8 @@ class BuiltinTemplateGeneratorService
             ],
             [
                 'key' => 'elegant-report',
-                'name' => 'Retro Groovy',
-                'description' => 'Retro groovy dengan magenta, bentuk melingkar, dan aksen lime.',
+                'name' => 'Arsip Klasik',
+                'description' => 'Warna kertas arsip, bingkai klasik, dan aksen dokumentasi formal.',
                 'primary_color' => '86198F',    // Deep Royal Plum
                 'secondary_color' => 'D946EF',  // Vivid Magenta
                 'accent_color' => 'A3E635',     // Bright Citron Gold
@@ -99,8 +99,8 @@ class BuiltinTemplateGeneratorService
             ],
             [
                 'key' => 'bpsdm-classic',
-                'name' => 'Infografik Pelangi',
-                'description' => 'Infografik warna-warni dengan palet biru, toska, dan strip warna.',
+                'name' => 'Majalah Editorial',
+                'description' => 'Sampul foto dominan, judul kuat, dan komposisi editorial.',
                 'primary_color' => '1D4ED8',    // Deep Pine Institutional
                 'secondary_color' => '06B6D4',  // Forest Pine
                 'accent_color' => 'FDE047',     // Prestige Champagne Gold
@@ -111,8 +111,8 @@ class BuiltinTemplateGeneratorService
             ],
             [
                 'key' => 'modern-government',
-                'name' => 'Paper Cut Explosion',
-                'description' => 'Paper cut dengan panel bertumpuk dan bayangan warna yang tegas.',
+                'name' => 'Blueprint Inspeksi',
+                'description' => 'Gaya teknis biru dengan garis kisi dan bingkai inspeksi.',
                 'primary_color' => '1E40AF',    // Slate Navy
                 'secondary_color' => '38BDF8',  // Cobalt Sky
                 'accent_color' => 'F97316',     // Blaze Orange
@@ -123,8 +123,8 @@ class BuiltinTemplateGeneratorService
             ],
             [
                 'key' => 'clean-documentation',
-                'name' => 'Botanical Maximalist',
-                'description' => 'Botanical maximalist dengan hijau daun, lime, dan bingkai organik.',
+                'name' => 'Emerald Gold Ornamental',
+                'description' => 'Bingkai berlapis dengan hijau zamrud dan ornamen emas simetris.',
                 'primary_color' => '166534',    // Dark Graphite
                 'secondary_color' => '65A30D',  // Slate Steel
                 'accent_color' => 'FACC15',     // Electric Lime Volt
