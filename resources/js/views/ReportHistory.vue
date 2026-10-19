@@ -214,10 +214,7 @@
               </span>
 
               <!-- Dokumen badges -->
-              <span v-if="rep.pptx_path"
-                class="text-[10px] font-semibold text-[#865E1E] bg-[#FAF5E8] px-1.5 py-0.5 rounded border border-[#E8DCBF]">
-                PPTX ✓
-              </span>
+
               <span v-if="rep.pdf_path"
                 class="text-[10px] font-semibold text-[#1B382B] bg-[#EDF4EE] px-1.5 py-0.5 rounded border border-[#CFE1D5]">
                 PDF ✓
@@ -228,7 +225,7 @@
 
         <!-- ── ACTION BUTTONS ── -->
         <div class="pt-2.5 border-t border-stone-100 space-y-2">
-          <!-- Row 1: Preview + PDF + PPTX -->
+          <!-- Row 1: Preview + PDF -->
           <div class="flex items-center gap-1.5">
             <!-- Preview -->
             <router-link :to="`/preview/${rep.id}`"
@@ -394,7 +391,7 @@
             <div class="text-center">
               <p class="text-base font-bold text-[#14251D]">Hapus Dokumen Laporan?</p>
               <p class="text-xs text-[#6F7771] mt-1 leading-relaxed">
-                Nomor <strong class="font-mono text-[#14251D]">{{ reportToDelete?.report_number }}</strong> beserta seluruh berkas foto, PDF, dan PPTX terkait akan dihapus secara permanen.
+                Nomor <strong class="font-mono text-[#14251D]">{{ reportToDelete?.report_number }}</strong> beserta seluruh berkas foto dan PDF terkait akan dihapus secara permanen.
               </p>
             </div>
             <div class="space-y-2">
