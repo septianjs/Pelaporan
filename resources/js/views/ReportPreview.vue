@@ -376,7 +376,7 @@
           {{ generateError }}
         </p>
       </div>
-
+      </div>
       <!-- ── NAVIGATION ── -->
       <div class="flex items-center justify-between text-xs px-1">
         <router-link to="/history"

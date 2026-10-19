@@ -278,10 +278,11 @@ export async function syncOfflineQueue(apiInstance) {
         }
 
         if (loc.photo_1 instanceof Blob || loc.photo_1 instanceof File) {
-          formData.append(`locations.${idx}.photo_1`, loc.photo_1, `loc_${loc.location_id}_p1.jpg`);
+          formData.append(`locations[${idx}][photo_1]`, loc.photo_1, `loc_${loc.location_id}_p1.jpg`);
+          
         }
         if (loc.photo_2 instanceof Blob || loc.photo_2 instanceof File) {
-          formData.append(`locations.${idx}.photo_2`, loc.photo_2, `loc_${loc.location_id}_p2.jpg`);
+          formData.append(`locations[${idx}][photo_2]`, loc.photo_2, `loc_${loc.location_id}_p2.jpg`);
         }
       });
 

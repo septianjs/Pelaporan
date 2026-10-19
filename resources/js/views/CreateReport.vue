@@ -818,9 +818,24 @@ const submitReport = async () => {
     formData.append('inspection_date', form.inspection_date);
     formData.append('officer_name', form.officer_name);
     formData.append('template_id', form.template_id);
+    
+    console.log('[DEBUG FOTO PETUGAS]', {
+      adaFoto: !!form.officer_photo,
+      tipe: form.officer_photo?.constructor?.name,
+      instanceBlob: form.officer_photo instanceof Blob,
+      instanceFile: form.officer_photo instanceof File,
+      ukuran: form.officer_photo?.size,
+      tipeFile: form.officer_photo?.type,
+    });
 
-    if (form.officer_photo instanceof Blob || form.officer_photo instanceof File) {
-      formData.append('officer_photo', form.officer_photo, 'officer.jpg');
+    if (form.officer_photo instanceof Blob) {
+      formData.append(
+        'officer_photo',
+        form.officer_photo,
+        form.officer_photo instanceof File
+          ? (form.officer_photo.name || 'officer.jpg')
+          : 'officer.jpg'
+      );
     }
 
     form.locations.forEach((loc, idx) => {
@@ -835,10 +850,10 @@ const submitReport = async () => {
       }
 
       if (loc.photo_1 instanceof Blob || loc.photo_1 instanceof File) {
-        formData.append(`locations.${idx}.photo_1`, loc.photo_1, `loc_${loc.location_id}_p1.jpg`);
+        formData.append(`locations[${idx}][photo_1]`, loc.photo_1, `loc_${loc.location_id}_p1.jpg`);
       }
       if (loc.photo_2 instanceof Blob || loc.photo_2 instanceof File) {
-        formData.append(`locations.${idx}.photo_2`, loc.photo_2, `loc_${loc.location_id}_p2.jpg`);
+        formData.append(`locations[${idx}][photo_2]`, loc.photo_2, `loc_${loc.location_id}_p2.jpg`);
       }
     });
 
