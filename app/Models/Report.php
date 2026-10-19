@@ -30,7 +30,6 @@ class Report extends Model
 
     protected $appends = [
         'officer_photo_url',
-        'pptx_url',
         'pdf_url',
         'day_name',
         'formatted_date',
@@ -55,14 +54,6 @@ class Report extends Model
     {
         if ($this->officer_photo) {
             return asset('storage/' . $this->officer_photo);
-        }
-        return null;
-    }
-
-    public function getPptxUrlAttribute(): ?string
-    {
-        if ($this->pptx_path) {
-            return asset('storage/' . $this->pptx_path);
         }
         return null;
     }
