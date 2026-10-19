@@ -298,7 +298,7 @@
     <div v-show="currentStep === 7" class="space-y-4">
       <div class="bg-white rounded-2xl p-5 border border-[#E7E5DE] shadow-[0_2px_8px_rgba(28,25,23,0.03)]">
         <h3 class="text-sm font-bold text-stone-900 mb-1">
-          Pilih Format Tema Presentasi Widescreen 16:9
+          Pilih Desain PDF Widescreen 16:9
         </h3>
         <p class="text-xs text-stone-500 mb-4">
           PDF 6 halaman akan dibuat otomatis berdasarkan desain template terpilih.
