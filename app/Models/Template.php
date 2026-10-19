@@ -21,6 +21,8 @@ class Template extends Model
         'active',
     ];
 
+    protected $hidden = ['pptx_path'];
+
     protected $casts = [
         'active' => 'boolean',
     ];
