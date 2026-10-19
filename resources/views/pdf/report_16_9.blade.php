@@ -273,79 +273,136 @@
     float: right;
     text-align: right;
   }
-  /* PDF theme variants: each template changes its composition and decorative language. */
+  /* =========================================================
+     DISTINCT PDF TEMPLATE COMPOSITIONS
+     DomPDF-safe properties only; preserve existing Blade data.
+  ========================================================= */
   .cover-header { position: relative; }
-  .cover-header:after { content: '✦  ✦  ✦'; position: absolute; right: 42pt; top: 15pt; font-size: 24pt; color: #{{ $theme['accent_color'] ?? '0284C7' }}; }
+  .cover-header:after {
+    content: '✦  ✦  ✦';
+    position: absolute; right: 42pt; top: 15pt;
+    font-size: 24pt; color: #{{ $theme['accent_color'] ?? '0284C7' }};
+  }
   .loc-header { position: relative; }
-  .loc-header:after { content: '◆  ◆  ◆'; float: right; color: #{{ $theme['accent_color'] ?? '0284C7' }}; font-size: 12pt; margin-top: -4pt; }
-  .theme-tropical_pop .cover-header { height: 92pt; padding: 18pt 40pt; border-bottom-width: 10pt; }
-  .theme-tropical_pop .cover-card-left { left: 15pt; top: 26pt; border: 3pt solid #{{ $theme['accent_color'] ?? 'F59E0B' }}; border-radius: 24pt; }
-  .theme-tropical_pop .cover-photo-frame { right: 26pt; top: 136pt; border-radius: 22pt; border-width: 5pt; }
-  .theme-tropical_pop .loc-header { border-bottom-width: 9pt; }
-  .theme-tropical_pop .photo-box, .theme-tropical_pop .info-box { border-radius: 18pt; border-width: 3pt; }
-  .theme-batik_nusantara .cover-header { height: 82pt; padding: 20pt 42pt; border-bottom: 8pt double #{{ $theme['accent_color'] ?? 'F59E0B' }}; }
-  .theme-batik_nusantara .cover-card-left { left: 10pt; top: 32pt; border-radius: 2pt; border: 3pt double #{{ $theme['accent_color'] ?? 'F59E0B' }}; }
-  .theme-batik_nusantara .cover-photo-frame { right: 30pt; top: 146pt; border-radius: 2pt; border: 4pt double #{{ $theme['accent_color'] ?? 'F59E0B' }}; }
-  .theme-batik_nusantara .loc-header { border-bottom: 8pt double #{{ $theme['accent_color'] ?? 'F59E0B' }}; }
-  .theme-batik_nusantara .photo-box, .theme-batik_nusantara .info-box { border-radius: 2pt; border: 2pt solid #{{ $theme['primary_color'] ?? '064E3B' }}; }
-  .theme-comic_pop .cover-header { height: 98pt; padding: 20pt 36pt; border-bottom: 10pt solid #{{ $theme['accent_color'] ?? 'F97316' }}; }
-  .theme-comic_pop .cover-title { font-size: 27pt; }
-  .theme-comic_pop .cover-card-left { left: 0; top: 18pt; border: 4pt solid #{{ $theme['primary_color'] ?? '115E59' }}; border-radius: 0; box-shadow: 7pt 7pt 0 #{{ $theme['accent_color'] ?? 'F97316' }}; }
-  .theme-comic_pop .cover-photo-frame { right: 34pt; top: 142pt; border-radius: 0; border: 4pt solid #{{ $theme['primary_color'] ?? '115E59' }}; box-shadow: 7pt 7pt 0 #{{ $theme['accent_color'] ?? 'F97316' }}; }
-  .theme-comic_pop .loc-header { border-bottom-width: 10pt; }
-  .theme-comic_pop .photo-box, .theme-comic_pop .info-box { border-radius: 0; border: 3pt solid #{{ $theme['primary_color'] ?? '115E59' }}; box-shadow: 4pt 4pt 0 #{{ $theme['accent_color'] ?? 'F97316' }}; }
-  .theme-scrapbook .cover-header { height: 76pt; padding: 16pt 46pt; border-bottom: 3pt dashed #{{ $theme['accent_color'] ?? 'FBBF24' }}; }
-  .theme-scrapbook .cover-card-left { left: 35pt; top: 38pt; border: 2pt dashed #{{ $theme['accent_color'] ?? 'FBBF24' }}; }
-  .theme-scrapbook .cover-photo-frame { right: 40pt; top: 142pt; border: 3pt dashed #{{ $theme['accent_color'] ?? 'FBBF24' }}; border-radius: 4pt; }
-  .theme-scrapbook .loc-header { border-bottom: 3pt dashed #{{ $theme['accent_color'] ?? 'FBBF24' }}; }
-  .theme-scrapbook .photo-box, .theme-scrapbook .info-box { border: 2pt dashed #{{ $theme['accent_color'] ?? 'FBBF24' }}; border-radius: 5pt; }
-  .theme-memphis .cover-header { height: 104pt; padding: 24pt 40pt; border-bottom: 12pt solid #{{ $theme['accent_color'] ?? 'F43F5E' }}; }
-  .theme-memphis .cover-card-left { left: 0; top: 16pt; border-radius: 24pt 0 24pt 0; border: 3pt solid #{{ $theme['secondary_color'] ?? '7C3AED' }}; }
-  .theme-memphis .cover-photo-frame { right: 42pt; top: 150pt; border-radius: 0 24pt 0 24pt; border: 4pt solid #{{ $theme['accent_color'] ?? 'F43F5E' }}; }
-  .theme-memphis .loc-header { border-bottom-width: 12pt; }
-  .theme-memphis .photo-box:first-child { border-radius: 18pt 0 18pt 0; }
-  .theme-memphis .photo-box-right { border-radius: 0 18pt 0 18pt; }
-  .theme-memphis .info-box { border-radius: 20pt 0 20pt 0; border: 3pt solid #{{ $theme['secondary_color'] ?? '7C3AED' }}; }
-  .theme-festival .cover-header { height: 90pt; padding: 20pt 50pt; border-bottom: 7pt solid #{{ $theme['accent_color'] ?? 'F59E0B' }}; }
-  .theme-festival .cover-card-left { left: 24pt; top: 22pt; border-left: 9pt solid #{{ $theme['accent_color'] ?? 'F59E0B' }}; border-radius: 4pt 16pt 16pt 4pt; }
-  .theme-festival .cover-photo-frame { right: 18pt; top: 136pt; border: 5pt solid #{{ $theme['accent_color'] ?? 'F59E0B' }}; border-radius: 18pt; }
-  .theme-festival .loc-header { border-bottom: 7pt solid #{{ $theme['accent_color'] ?? 'F59E0B' }}; }
-  .theme-festival .photo-box, .theme-festival .info-box { border-radius: 14pt; border: 2pt solid #{{ $theme['accent_color'] ?? 'F59E0B' }}; }
-  .theme-retro_groovy .cover-header { height: 86pt; padding: 18pt 42pt; border-bottom: 8pt solid #{{ $theme['accent_color'] ?? 'FACC15' }}; }
-  .theme-retro_groovy .cover-title { letter-spacing: 1.5pt; }
-  .theme-retro_groovy .cover-card-left { left: 18pt; top: 30pt; border-radius: 28pt; border: 3pt solid #{{ $theme['secondary_color'] ?? 'C026D3' }}; }
-  .theme-retro_groovy .cover-photo-frame { right: 30pt; top: 148pt; border-radius: 28pt; border: 4pt solid #{{ $theme['accent_color'] ?? 'FACC15' }}; }
-  .theme-retro_groovy .loc-header { border-bottom-width: 8pt; }
-  .theme-retro_groovy .photo-box, .theme-retro_groovy .info-box { border-radius: 22pt; border: 2pt solid #{{ $theme['secondary_color'] ?? 'C026D3' }}; }
-  .theme-rainbow_infographic .cover-header { height: 78pt; padding: 18pt 40pt; border-bottom: 6pt solid #{{ $theme['accent_color'] ?? 'D8C79C' }}; }
-  .theme-rainbow_infographic .cover-card-left { left: 8pt; top: 22pt; border-top: 8pt solid #{{ $theme['secondary_color'] ?? '1C362A' }}; border-radius: 0 0 12pt 12pt; }
-  .theme-rainbow_infographic .cover-photo-frame { right: 22pt; top: 140pt; border: 4pt solid #{{ $theme['secondary_color'] ?? '1C362A' }}; border-radius: 10pt; }
-  .theme-rainbow_infographic .loc-header { border-bottom-width: 6pt; }
-  .theme-rainbow_infographic .photo-box, .theme-rainbow_infographic .info-box { border-radius: 8pt; border: 2pt solid #{{ $theme['secondary_color'] ?? '1C362A' }}; }
-  .theme-paper_cut .cover-header { height: 96pt; padding: 22pt 40pt; border-bottom: 10pt solid #{{ $theme['accent_color'] ?? 'EA580C' }}; }
-  .theme-paper_cut .cover-card-left { left: 32pt; top: 18pt; border: 0; border-left: 10pt solid #{{ $theme['secondary_color'] ?? '0284C7' }}; border-radius: 0; box-shadow: 5pt 5pt 0 #{{ $theme['accent_color'] ?? 'EA580C' }}; }
-  .theme-paper_cut .cover-photo-frame { right: 20pt; top: 142pt; border: 0; border-bottom: 8pt solid #{{ $theme['accent_color'] ?? 'EA580C' }}; border-radius: 0; box-shadow: 5pt 5pt 0 #{{ $theme['secondary_color'] ?? '0284C7' }}; }
-  .theme-paper_cut .loc-header { border-bottom-width: 10pt; }
-  .theme-paper_cut .photo-box, .theme-paper_cut .info-box { border-radius: 0; border: 0; border-bottom: 6pt solid #{{ $theme['accent_color'] ?? 'EA580C' }}; box-shadow: 3pt 3pt 0 #{{ $theme['secondary_color'] ?? '0284C7' }}; }
-  .theme-botanical .cover-header { height: 82pt; padding: 20pt 44pt; border-bottom: 5pt solid #{{ $theme['accent_color'] ?? '84CC16' }}; }
-  .theme-botanical .cover-card-left { left: 18pt; top: 26pt; border: 2pt solid #{{ $theme['secondary_color'] ?? '334155' }}; border-radius: 20pt 4pt 20pt 4pt; }
-  .theme-botanical .cover-photo-frame { right: 28pt; top: 140pt; border: 3pt solid #{{ $theme['accent_color'] ?? '84CC16' }}; border-radius: 20pt 4pt 20pt 4pt; }
-  .theme-botanical .loc-header { border-bottom-width: 5pt; }
-  .theme-botanical .photo-box, .theme-botanical .info-box { border-radius: 16pt 4pt 16pt 4pt; border: 2pt solid #{{ $theme['secondary_color'] ?? '334155' }}; }
-  /* Alternate composition: stacked documentary photos on the left, findings panel on the right. */
-  .theme-paper_cut .photos-container, .theme-rainbow_infographic .photos-container { width: 330pt; margin-bottom: 0; }
-  .theme-paper_cut .photo-box, .theme-rainbow_infographic .photo-box { width: 315pt; float: left; padding: 5pt; }
-  .theme-paper_cut .photo-img, .theme-rainbow_infographic .photo-img { width: 300pt; height: 165pt; }
-  .theme-paper_cut .photo-placeholder, .theme-rainbow_infographic .photo-placeholder { width: 300pt; height: 165pt; line-height: 165pt; }
-  .theme-paper_cut .photo-box-right, .theme-rainbow_infographic .photo-box-right { clear: left; float: left; margin-top: 8pt; }
-  .theme-paper_cut .info-box, .theme-rainbow_infographic .info-box { position: absolute; top: 100pt; right: 28pt; width: 535pt; }
-  .theme-batik_nusantara .photos-container { padding-top: 4pt; }
-  .theme-batik_nusantara .photo-box:first-child { margin-left: 4pt; }
-  .theme-batik_nusantara .photo-box-right { margin-right: 4pt; }
-  .theme-festival .info-box { border-top-width: 7pt; }
-  .theme-memphis .info-box { border-right-width: 8pt; }
-  .theme-retro_groovy .loc-title { letter-spacing: 1pt; }
-  .theme-botanical .info-box { border-left-width: 8pt; }
+  .loc-header:after {
+    content: '◆  ◆  ◆'; float: right;
+    color: #{{ $theme['accent_color'] ?? '0284C7' }};
+    font-size: 12pt; margin-top: -4pt;
+  }
+
+  /* 1. Tropis Nusantara: botanical palette, generous hero photo, rounded frames. */
+  .theme-tropical_pop .cover-header { height: 88pt; padding: 17pt 38pt; border-bottom: 9pt solid #F59E0B; }
+  .theme-tropical_pop .cover-title { font-size: 25pt; }
+  .theme-tropical_pop .cover-card-left { left: 15pt; top: 28pt; width: 300pt; border: 3pt solid #15803D; border-radius: 18pt; }
+  .theme-tropical_pop .cover-photo-frame { right: 24pt; top: 132pt; width: 570pt; height: 344pt; border: 5pt solid #D97706; border-radius: 20pt; }
+  .theme-tropical_pop .cover-photo-img, .theme-tropical_pop .cover-photo-placeholder { width: 550pt; height: 300pt; border-radius: 12pt; }
+  .theme-tropical_pop .loc-header { border-bottom: 8pt solid #D97706; }
+  .theme-tropical_pop .photo-box, .theme-tropical_pop .info-box { border: 3pt solid #15803D; border-radius: 14pt; }
+  .theme-tropical_pop .photo-img, .theme-tropical_pop .photo-placeholder { height: 205pt; }
+
+  /* 2. Batik Nusantara: double-line frame and traditional gold accents. */
+  .theme-batik_nusantara .slide { border: 3pt double #A16207; }
+  .theme-batik_nusantara .cover-header { height: 82pt; padding: 18pt 42pt; border-bottom: 8pt double #F59E0B; }
+  .theme-batik_nusantara .cover-card-left { left: 10pt; top: 30pt; border: 3pt double #A16207; border-radius: 2pt; }
+  .theme-batik_nusantara .cover-photo-frame { right: 28pt; top: 140pt; border: 5pt double #A16207; border-radius: 2pt; }
+  .theme-batik_nusantara .loc-header { border-bottom: 7pt double #F59E0B; }
+  .theme-batik_nusantara .photo-box, .theme-batik_nusantara .info-box { border: 2pt double #A16207; border-radius: 2pt; }
+  .theme-batik_nusantara .photo-label { color: #854D0E; }
+
+  /* 3. Infografis Geometris: bold blocks, asymmetry and oversized location counter. */
+  .theme-comic_pop .cover-header { height: 100pt; padding: 20pt 35pt; border-bottom: 12pt solid #F97316; }
+  .theme-comic_pop .cover-title { font-size: 28pt; }
+  .theme-comic_pop .cover-card-left { left: 0; top: 18pt; width: 285pt; border: 4pt solid #0F766E; border-radius: 0; }
+  .theme-comic_pop .cover-photo-frame { right: 30pt; top: 145pt; width: 545pt; height: 330pt; border: 4pt solid #0F766E; border-radius: 0; }
+  .theme-comic_pop .loc-header { height: 58pt; padding: 8pt 40pt; border-bottom: 10pt solid #F97316; }
+  .theme-comic_pop .loc-counter { font-size: 11pt; color: #FDE047; }
+  .theme-comic_pop .loc-title { font-size: 22pt; }
+  .theme-comic_pop .photo-box, .theme-comic_pop .info-box { border: 3pt solid #0F766E; border-radius: 0; box-shadow: 4pt 4pt 0 #F97316; }
+
+  /* 4. Jurnal Dokumentasi: taped-paper feel and dashed photo frames. */
+  .theme-scrapbook .cover-header { height: 76pt; padding: 16pt 46pt; border-bottom: 3pt dashed #BE123C; }
+  .theme-scrapbook .cover-card-left { left: 30pt; top: 34pt; border: 2pt dashed #BE123C; border-radius: 4pt; }
+  .theme-scrapbook .cover-photo-frame { right: 35pt; top: 138pt; border: 4pt dashed #BE123C; border-radius: 4pt; }
+  .theme-scrapbook .loc-header { border-bottom: 4pt dashed #FBBF24; }
+  .theme-scrapbook .photo-box { border: 3pt dashed #BE123C; border-radius: 3pt; box-shadow: 3pt 3pt 0 #FBBF24; }
+  .theme-scrapbook .info-box { border: 2pt dashed #BE123C; border-radius: 3pt; background: #FFFBEB; }
+  .theme-scrapbook .photo-label { background: #FEF3C7; padding: 5pt; }
+
+  /* 5. Merah Putih Institusional: symmetric official cover and formal red bars. */
+  .theme-memphis .cover-header { height: 88pt; padding: 18pt 50pt; text-align: center; border-bottom: 10pt solid #DC2626; }
+  .theme-memphis .cover-title { font-size: 24pt; letter-spacing: 0.2pt; }
+  .theme-memphis .cover-badge { color: #FCA5A5; }
+  .theme-memphis .cover-card-left { position: absolute; left: 145pt; top: 105pt; width: 670pt; text-align: center; border: 2pt solid #DC2626; border-radius: 0; }
+  .theme-memphis .cover-photo-frame { right: 195pt; top: 250pt; width: 570pt; height: 260pt; border: 4pt solid #DC2626; border-radius: 0; }
+  .theme-memphis .cover-photo-img, .theme-memphis .cover-photo-placeholder { width: 550pt; height: 205pt; border-radius: 0; }
+  .theme-memphis .loc-header { text-align: center; border-bottom: 9pt solid #DC2626; }
+  .theme-memphis .photo-box, .theme-memphis .info-box { border: 2pt solid #B91C1C; border-radius: 0; box-shadow: none; }
+
+  /* 6. Eco Green Report: clean environmental green with strong condition panel. */
+  .theme-festival .cover-header { height: 88pt; padding: 18pt 45pt; border-bottom: 7pt solid #84CC16; }
+  .theme-festival .cover-card-left { left: 24pt; top: 25pt; border-left: 9pt solid #16A34A; border-radius: 4pt 14pt 14pt 4pt; }
+  .theme-festival .cover-photo-frame { right: 22pt; top: 135pt; border: 5pt solid #16A34A; border-radius: 16pt; }
+  .theme-festival .loc-header { border-bottom: 7pt solid #84CC16; }
+  .theme-festival .photo-box, .theme-festival .info-box { border: 2pt solid #16A34A; border-radius: 12pt; }
+  .theme-festival .info-box { border-top: 7pt solid #84CC16; }
+  .theme-festival .badge-clean { background: #DCFCE7; color: #166534; border-color: #86EFAC; }
+
+  /* 7. Arsip Klasik: archival paper, serif-inspired framing and double borders. */
+  .theme-retro_groovy .slide { background: #FFFBEB; }
+  .theme-retro_groovy .cover-header { height: 84pt; padding: 18pt 42pt; border-bottom: 6pt double #92400E; }
+  .theme-retro_groovy .cover-title { font-size: 24pt; letter-spacing: 0.4pt; }
+  .theme-retro_groovy .cover-card-left { left: 18pt; top: 28pt; border: 3pt double #92400E; border-radius: 0; background: #FFFBEB; }
+  .theme-retro_groovy .cover-photo-frame { right: 30pt; top: 143pt; border: 5pt double #92400E; border-radius: 0; background: #FFFBEB; }
+  .theme-retro_groovy .loc-header { background: #78350F; border-bottom: 6pt double #D6A756; }
+  .theme-retro_groovy .photo-box, .theme-retro_groovy .info-box { border: 3pt double #92400E; border-radius: 0; background: #FFFBEB; }
+
+  /* 8. Majalah Editorial: dominant hero image on cover and editorial location grid. */
+  .theme-rainbow_infographic .cover-header { height: 74pt; padding: 16pt 40pt; border-bottom: 5pt solid #0F172A; }
+  .theme-rainbow_infographic .cover-title { font-size: 24pt; }
+  .theme-rainbow_infographic .cover-card-left { left: 35pt; top: 26pt; width: 290pt; border-top: 7pt solid #0F172A; border-radius: 0; }
+  .theme-rainbow_infographic .cover-photo-frame { right: 20pt; top: 130pt; width: 600pt; height: 350pt; border: 0; border-bottom: 8pt solid #0EA5E9; border-radius: 0; }
+  .theme-rainbow_infographic .cover-photo-img, .theme-rainbow_infographic .cover-photo-placeholder { width: 580pt; height: 300pt; border-radius: 0; }
+  .theme-rainbow_infographic .loc-header { background: #0F172A; border-bottom: 6pt solid #0EA5E9; }
+  .theme-rainbow_infographic .photo-box { border: 0; border-bottom: 5pt solid #0EA5E9; border-radius: 0; box-shadow: none; }
+  .theme-rainbow_infographic .info-box { border: 0; border-top: 3pt solid #0F172A; border-radius: 0; box-shadow: none; }
+
+  /* 9. Blueprint Inspeksi: technical blue grid impression and annotation borders. */
+  .theme-paper_cut .slide { background: #EFF6FF; }
+  .theme-paper_cut .cover-header { height: 94pt; padding: 20pt 40pt; border-bottom: 8pt solid #38BDF8; }
+  .theme-paper_cut .cover-card-left { left: 30pt; top: 20pt; border: 2pt solid #1D4ED8; border-radius: 0; box-shadow: 5pt 5pt 0 #BFDBFE; }
+  .theme-paper_cut .cover-photo-frame { right: 22pt; top: 140pt; border: 3pt solid #1D4ED8; border-radius: 0; box-shadow: 5pt 5pt 0 #38BDF8; }
+  .theme-paper_cut .loc-header { background: #1E40AF; border-bottom: 6pt solid #38BDF8; }
+  .theme-paper_cut .photo-box, .theme-paper_cut .info-box { border: 2pt solid #1D4ED8; border-radius: 0; box-shadow: 3pt 3pt 0 #BFDBFE; }
+  .theme-paper_cut .photo-label { color: #1D4ED8; }
+
+  /* 10. Emerald Gold Ornamental: layered gold frame and symmetrical accents. */
+  .theme-botanical .slide { background: #ECFDF5; }
+  .theme-botanical .cover-header { height: 84pt; padding: 18pt 44pt; border-bottom: 5pt double #B8860B; }
+  .theme-botanical .cover-card-left { left: 18pt; top: 26pt; border: 3pt double #B8860B; border-radius: 18pt 3pt 18pt 3pt; }
+  .theme-botanical .cover-photo-frame { right: 28pt; top: 138pt; border: 5pt double #B8860B; border-radius: 18pt 3pt 18pt 3pt; }
+  .theme-botanical .loc-header { background: #064E3B; border-bottom: 5pt double #D4AF37; }
+  .theme-botanical .photo-box, .theme-botanical .info-box { border: 3pt double #B8860B; border-radius: 12pt 2pt 12pt 2pt; }
+  .theme-botanical .info-box { border-left-width: 7pt; }
+
+  /* Alternate asymmetric layouts for editorial and blueprint designs.
+     Keep the two evidence photos and findings visible on the same page. */
+  .theme-paper_cut .photos-container,
+  .theme-rainbow_infographic .photos-container { width: 330pt; margin-bottom: 0; }
+  .theme-paper_cut .photo-box,
+  .theme-rainbow_infographic .photo-box { width: 315pt; float: left; padding: 5pt; margin-bottom: 8pt; }
+  .theme-paper_cut .photo-img,
+  .theme-rainbow_infographic .photo-img,
+  .theme-paper_cut .photo-placeholder,
+  .theme-rainbow_infographic .photo-placeholder { width: 300pt; height: 158pt; }
+  .theme-paper_cut .photo-box-right,
+  .theme-rainbow_infographic .photo-box-right { clear: left; float: left; }
+  .theme-paper_cut .info-box,
+  .theme-rainbow_infographic .info-box { position: absolute; top: 104pt; right: 28pt; width: 535pt; }
+  .theme-paper_cut .loc-body,
+  .theme-rainbow_infographic .loc-body { padding-top: 12pt; }
+  .theme-paper_cut .photo-label,
+  .theme-rainbow_infographic .photo-label { font-size: 8pt; }
+
 </style>
 </head>
 <body class="theme-{{ $theme['style_type'] ?? 'tropical_pop' }}">
