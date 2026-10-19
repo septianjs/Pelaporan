@@ -23,7 +23,7 @@ class BuiltinTemplateGeneratorService
         return [
             [
                 'key' => 'corporate-blue',
-                'name' => 'Royal Sapphire',
+                'name' => 'Tropical Pop',
                 'description' => 'Nuansa biru sapphire elegan dengan aksen emas cerah dan kontras tinggi.',
                 'primary_color' => '1E3A8A',    // Royal Navy
                 'secondary_color' => '2563EB',  // Electric Blue
@@ -31,11 +31,11 @@ class BuiltinTemplateGeneratorService
                 'bg_color' => 'EFF6FF',         // Soft Ice Canvas
                 'card_bg' => 'FFFFFF',
                 'card_alt' => 'DBEAFE',
-                'style_type' => 'royal_sapphire',
+                'style_type' => 'tropical_pop',
             ],
             [
                 'key' => 'government-formal',
-                'name' => 'Emerald Forest',
+                'name' => 'Batik Nusantara',
                 'description' => 'Identitas hijau zamrud mewah dan emas prestisius berkarakter dinas resmi.',
                 'primary_color' => '064E3B',    // Deep Emerald Pine
                 'secondary_color' => '059669',  // Radiant Emerald
@@ -43,11 +43,11 @@ class BuiltinTemplateGeneratorService
                 'bg_color' => 'ECFDF5',         // Soft Mint Sage Canvas
                 'card_bg' => 'FFFFFF',
                 'card_alt' => 'D1FAE5',
-                'style_type' => 'emerald_forest',
+                'style_type' => 'batik_nusantara',
             ],
             [
                 'key' => 'modern-clean',
-                'name' => 'Oceanic Teal',
+                'name' => 'Comic Pop Art',
                 'description' => 'Perpaduan segar toska samudra dengan aksen oranye terbenam yang energik.',
                 'primary_color' => '115E59',    // Deep Ocean Teal
                 'secondary_color' => '0D9488',  // Vivid Turquoise
@@ -55,11 +55,11 @@ class BuiltinTemplateGeneratorService
                 'bg_color' => 'F0FDFA',         // Aquamarine Canvas
                 'card_bg' => 'FFFFFF',
                 'card_alt' => 'CCFBF1',
-                'style_type' => 'oceanic_teal',
+                'style_type' => 'comic_pop',
             ],
             [
                 'key' => 'minimal-professional',
-                'name' => 'Crimson Ruby',
+                'name' => 'Scrapbook Ceria',
                 'description' => 'Desain tegas berwibawa dengan merah marun gelap dan aksen ruby menyala.',
                 'primary_color' => '881337',    // Deep Burgundy
                 'secondary_color' => 'E11D48',  // Vivid Ruby
@@ -67,11 +67,11 @@ class BuiltinTemplateGeneratorService
                 'bg_color' => 'FFF1F2',         // Rose Blush Canvas
                 'card_bg' => 'FFFFFF',
                 'card_alt' => 'FFE4E6',
-                'style_type' => 'crimson_ruby',
+                'style_type' => 'scrapbook',
             ],
             [
                 'key' => 'executive-report',
-                'name' => 'Imperial Violet',
+                'name' => 'Memphis Geometry',
                 'description' => 'Nuansa ultraviolet mewah dipadu koral menyala untuk presentasi pimpinan.',
                 'primary_color' => '3B0764',    // Royal Midnight Violet
                 'secondary_color' => '7C3AED',  // Electric Violet
@@ -79,11 +79,11 @@ class BuiltinTemplateGeneratorService
                 'bg_color' => 'FAF5FF',         // Lilac Glow Canvas
                 'card_bg' => 'FFFFFF',
                 'card_alt' => 'F3E8FF',
-                'style_type' => 'imperial_violet',
+                'style_type' => 'memphis',
             ],
             [
                 'key' => 'photo-focus',
-                'name' => 'Sunset Terracotta',
+                'name' => 'Festival Nusantara',
                 'description' => 'Kehangatan terakota bumi dengan aksen jingga sunset yang kaya warna.',
                 'primary_color' => '9A3412',    // Rich Terracotta
                 'secondary_color' => 'EA580C',  // Warm Sunset
@@ -91,11 +91,11 @@ class BuiltinTemplateGeneratorService
                 'bg_color' => 'FFF7ED',         // Warm Peach Sand Canvas
                 'card_bg' => 'FFFFFF',
                 'card_alt' => 'FFEDD5',
-                'style_type' => 'sunset_terracotta',
+                'style_type' => 'festival',
             ],
             [
                 'key' => 'elegant-report',
-                'name' => 'Royal Magenta',
+                'name' => 'Retro Groovy',
                 'description' => 'Elegansi magenta anggur dengan aksen kuning sitrun menyala yang berani.',
                 'primary_color' => '701A75',    // Deep Royal Plum
                 'secondary_color' => 'C026D3',  // Vivid Magenta
@@ -103,11 +103,11 @@ class BuiltinTemplateGeneratorService
                 'bg_color' => 'FDF4FF',         // Orchid Glow Canvas
                 'card_bg' => 'FFFFFF',
                 'card_alt' => 'FAE8FF',
-                'style_type' => 'royal_magenta',
+                'style_type' => 'retro_groovy',
             ],
             [
                 'key' => 'bpsdm-classic',
-                'name' => 'BPSDM Heritage Pine',
+                'name' => 'Infografik Pelangi',
                 'description' => 'Identitas institusional BPSDM bernuansa Deep Pine dan emas champagne.',
                 'primary_color' => '14251D',    // Deep Pine Institutional
                 'secondary_color' => '1C362A',  // Forest Pine
@@ -115,11 +115,11 @@ class BuiltinTemplateGeneratorService
                 'bg_color' => 'F4F3EE',         // Warm Stone Canvas
                 'card_bg' => 'FAF9F5',
                 'card_alt' => 'ECEAE3',
-                'style_type' => 'bpsdm_heritage',
+                'style_type' => 'rainbow_infographic',
             ],
             [
                 'key' => 'modern-government',
-                'name' => 'Nordic Cobalt',
+                'name' => 'Paper Cut Explosion',
                 'description' => 'Kombinasi modern biru kobalt dingin dengan aksen jingga api kontras tinggi.',
                 'primary_color' => '1E293B',    // Slate Navy
                 'secondary_color' => '0284C7',  // Cobalt Sky
@@ -127,11 +127,11 @@ class BuiltinTemplateGeneratorService
                 'bg_color' => 'F1F5F9',         // Steel Ice Canvas
                 'card_bg' => 'FFFFFF',
                 'card_alt' => 'E2E8F0',
-                'style_type' => 'nordic_cobalt',
+                'style_type' => 'paper_cut',
             ],
             [
                 'key' => 'clean-documentation',
-                'name' => 'Slate & Lime Volt',
+                'name' => 'Botanical Maximalist',
                 'description' => 'Tampilan kontemporer grafit gelap dengan aksen hijau neon volt yang tajam.',
                 'primary_color' => '18181B',    // Dark Graphite
                 'secondary_color' => '334155',  // Slate Steel
@@ -139,7 +139,7 @@ class BuiltinTemplateGeneratorService
                 'bg_color' => 'F4F4F5',         // Cool Stone Canvas
                 'card_bg' => 'FFFFFF',
                 'card_alt' => 'E4E4E7',
-                'style_type' => 'slate_lime',
+                'style_type' => 'botanical',
             ],
         ];
     }
@@ -147,41 +147,27 @@ class BuiltinTemplateGeneratorService
     /**
      * Generate all 10 PPTX files and their preview thumbnails
      */
+    /**
+     * Build only PDF template previews. The application no longer creates PPTX files.
+     * The template definitions remain the source of the PDF palettes and layouts.
+     */
     public function generateAll(): array
     {
-        $dirPptx = storage_path('app/templates/builtin');
         $dirPreviews = storage_path('app/public/previews');
-
-        if (!File::isDirectory($dirPptx)) {
-            File::makeDirectory($dirPptx, 0755, true);
-        }
         if (!File::isDirectory($dirPreviews)) {
             File::makeDirectory($dirPreviews, 0755, true);
         }
 
         $results = [];
-        $templates = self::getTemplateDefinitions();
-
-        foreach ($templates as $t) {
-            $pptxFileName = "{$t['key']}.pptx";
-            $pptxPath = "templates/builtin/{$pptxFileName}";
-            $fullPptxPath = storage_path("app/{$pptxPath}");
-
-            $previewFileName = "{$t['key']}.png";
-            $previewPath = "previews/{$previewFileName}";
+        foreach (self::getTemplateDefinitions() as $template) {
+            $previewPath = "previews/{$template['key']}.png";
             $fullPreviewPath = storage_path("app/public/{$previewPath}");
-
-            // 1. Create PPTX file (6 slides: 1 Cover + 5 Locations)
-            $this->createPptxFile($t, $fullPptxPath);
-
-            // 2. Create Preview Thumbnail image (16:9 PNG via GD)
-            $this->createPreviewImage($t, $fullPreviewPath);
+            $this->createPreviewImage($template, $fullPreviewPath);
 
             $results[] = [
-                'key' => $t['key'],
-                'name' => $t['name'],
-                'description' => $t['description'],
-                'pptx_path' => $pptxPath,
+                'key' => $template['key'],
+                'name' => $template['name'],
+                'description' => $template['description'],
                 'preview_path' => $previewPath,
             ];
         }
