@@ -18,7 +18,8 @@ class TemplateController extends Controller
     public function index(): JsonResponse
     {
         $templates = Template::where('active', true)
-            ->orderBy('type', 'asc') // builtin first, then uploaded
+            ->where('type', 'builtin')
+            ->orderBy('id', 'asc')
             ->orderBy('id', 'asc')
             ->get();
 
