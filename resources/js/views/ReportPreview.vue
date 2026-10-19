@@ -297,38 +297,6 @@
             </span>
           </div>
 
-          <!-- PPTX status -->
-          <div class="flex items-center justify-between p-3 rounded-xl border"
-            :class="hasPptx ? 'bg-white border-[#DCD7CA]' : 'bg-[#F2EFE8] border-[#E0DCD0]'">
-            <div class="flex items-center gap-2.5">
-              <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-                :class="hasPptx ? 'bg-[#1C362A] text-[#FAF9F5]' : 'bg-[#D8D4C8] text-[#808983]'">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                </svg>
-              </div>
-              <div>
-                <p class="text-xs font-bold text-[#14251D]">Slide Presentasi PPTX</p>
-                <p class="text-[10px]" :class="hasPptx ? 'text-[#1A3428] font-medium' : 'text-[#808983]'">
-                  {{ hasPptx ? 'Siap dipresentasikan' : 'Belum digenerate' }}
-                </p>
-              </div>
-            </div>
-            <span v-if="hasPptx" class="text-[10px] text-[#1A3428] font-bold bg-[#EAF3EC] px-2 py-0.5 rounded-full border border-[#C8E0D0] flex items-center gap-1">
-              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
-              </svg>
-              Tersedia
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── AKSI EKSPOR ── -->
-      <div class="bg-[#FAF9F5] rounded-2xl p-4 border border-[#E3E0D6] shadow-sm space-y-3">
-        <h4 class="text-xs font-bold uppercase tracking-wider text-[#14251D]">Ekspor & Distribusi</h4>
-
         <!-- Generate PDF button (jika belum ada) -->
         <button v-if="!hasPdf" type="button" @click="doGeneratePdf" :disabled="generatingPdf"
           class="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-[#14251D] text-[#FAF9F5] font-bold text-sm shadow-sm hover:bg-[#1C362A] active-press transition disabled:opacity-60">
@@ -364,30 +332,6 @@
             Unduh PDF
           </button>
         </div>
-
-        <!-- Generate PPTX button (jika belum ada) -->
-        <button v-if="!hasPptx" type="button" @click="doGeneratePptx" :disabled="generatingPptx"
-          class="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-[#ECEAE3] border border-[#DCD7CA] text-[#14251D] font-bold text-sm hover:bg-[#E3DFD4] active-press transition disabled:opacity-60">
-          <svg v-if="generatingPptx" class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"/>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
-          </svg>
-          <svg v-else class="w-5 h-5 text-[#14251D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-          </svg>
-          {{ generatingPptx ? 'Membuat Format PPTX…' : 'Generate Presentasi PPTX' }}
-        </button>
-
-        <!-- Download PPTX (jika sudah ada) -->
-        <button v-else type="button" @click="downloadPptx"
-          class="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-[#ECEAE3] border border-[#DCD7CA] text-[#14251D] font-bold text-sm hover:bg-[#E3DFD4] active-press transition">
-          <svg class="w-5 h-5 text-[#14251D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-          </svg>
-          Unduh Presentasi PPTX
-        </button>
 
         <!-- Share / WhatsApp / Email -->
         <div class="grid grid-cols-3 gap-2 pt-2 border-t border-[#ECE8DD]">
@@ -594,7 +538,7 @@ const activeSlideIndex = ref(0);
 const totalSlides = ref(6);
 
 const generatingPdf = ref(false);
-const generatingPptx = ref(false);
+
 const sharing = ref(false);
 const generateError = ref('');
 
@@ -621,7 +565,7 @@ const themeColors = computed(() => {
 
 // ── Computed ──
 const hasPdf  = computed(() => !!report.value?.pdf_path);
-const hasPptx = computed(() => !!report.value?.pptx_path);
+
 
 const activeSlideTitle = computed(() => {
   if (activeSlideIndex.value === 0) return 'Cover Laporan';
@@ -705,20 +649,6 @@ const doGeneratePdf = async () => {
   }
 };
 
-// ── Generate PPTX ──
-const doGeneratePptx = async () => {
-  generatingPptx.value = true;
-  generateError.value = '';
-  try {
-    const res = await api.post(`/reports/${report.value.id}/generate-pptx`);
-    if (res.data?.data) report.value = res.data.data;
-  } catch (err) {
-    generateError.value = err.response?.data?.message || 'Gagal membuat PPTX.';
-  } finally {
-    generatingPptx.value = false;
-  }
-};
-
 // ── Open / Download ──
 const openPdf = () => {
   window.open(`${baseUrl}/reports/${report.value.id}/pdf?inline=1`, '_blank');
@@ -726,7 +656,6 @@ const openPdf = () => {
 const downloadPdf = () => {
   window.open(`${baseUrl}/reports/${report.value.id}/pdf`, '_blank');
 };
-const downloadPptx = () => {
   window.open(`${baseUrl}/reports/${report.value.id}/pptx`, '_blank');
 };
 
