@@ -17,12 +17,12 @@ class BuiltinTemplateGeneratorService
                 'key' => 'corporate-blue',
                 'name' => 'Tropis Nusantara',
                 'description' => 'Daun tropis, bingkai dekoratif, dan panel foto lebar.',
-                'primary_color' => '7C3AED',    // Royal Navy
-                'secondary_color' => 'F43F5E',  // Electric Blue
-                'accent_color' => 'FDE047',     // Amber Gold
-                'bg_color' => 'FDF2F8',         // Soft Ice Canvas
+                'primary_color' => '166534',    // Royal Navy
+                'secondary_color' => '15803D',  // Electric Blue
+                'accent_color' => 'D97706',     // Amber Gold
+                'bg_color' => 'F0FDF4',         // Soft Ice Canvas
                 'card_bg' => 'FFFFFF',
-                'card_alt' => 'FCE7F3',
+                'card_alt' => 'DCFCE7',
                 'style_type' => 'tropical_pop',
             ],
             [
@@ -43,7 +43,7 @@ class BuiltinTemplateGeneratorService
                 'description' => 'Angka dan panel tegas, komposisi asimetris, serta bentuk geometris.',
                 'primary_color' => '0F766E',    // Deep Ocean Teal
                 'secondary_color' => '06B6D4',  // Vivid Turquoise
-                'accent_color' => 'FB923C',     // Sunset Orange
+                'accent_color' => 'F97316',     // Sunset Orange
                 'bg_color' => 'F0FDFA',         // Aquamarine Canvas
                 'card_bg' => 'FFFFFF',
                 'card_alt' => 'CFFAFE',
@@ -65,48 +65,48 @@ class BuiltinTemplateGeneratorService
                 'key' => 'executive-report',
                 'name' => 'Merah Putih Institusional',
                 'description' => 'Tata letak resmi simetris dengan dominasi merah dan putih.',
-                'primary_color' => '5B21B6',    // Royal Midnight Violet
-                'secondary_color' => '8B5CF6',  // Electric Violet
-                'accent_color' => 'F43F5E',     // Vibrant Coral
-                'bg_color' => 'FDF4FF',         // Lilac Glow Canvas
+                'primary_color' => '991B1B',    // Royal Midnight Violet
+                'secondary_color' => 'DC2626',  // Electric Violet
+                'accent_color' => 'FCA5A5',     // Vibrant Coral
+                'bg_color' => 'FFFFFF',         // Lilac Glow Canvas
                 'card_bg' => 'FFFFFF',
-                'card_alt' => 'EDE9FE',
+                'card_alt' => 'FEE2E2',
                 'style_type' => 'memphis',
             ],
             [
                 'key' => 'photo-focus',
                 'name' => 'Eco Green Report',
                 'description' => 'Tema lingkungan dengan palet hijau dan indikator kondisi kebersihan.',
-                'primary_color' => '9A3412',    // Rich Terracotta
-                'secondary_color' => 'EA580C',  // Warm Sunset
-                'accent_color' => 'FACC15',     // Golden Amber
-                'bg_color' => 'FFF7ED',         // Warm Peach Sand Canvas
+                'primary_color' => '166534',    // Rich Terracotta
+                'secondary_color' => '16A34A',  // Warm Sunset
+                'accent_color' => '84CC16',     // Golden Amber
+                'bg_color' => 'F0FDF4',         // Warm Peach Sand Canvas
                 'card_bg' => 'FFFFFF',
-                'card_alt' => 'FED7AA',
+                'card_alt' => 'DCFCE7',
                 'style_type' => 'festival',
             ],
             [
                 'key' => 'elegant-report',
                 'name' => 'Arsip Klasik',
                 'description' => 'Warna kertas arsip, bingkai klasik, dan aksen dokumentasi formal.',
-                'primary_color' => '86198F',    // Deep Royal Plum
-                'secondary_color' => 'D946EF',  // Vivid Magenta
-                'accent_color' => 'A3E635',     // Bright Citron Gold
-                'bg_color' => 'FDF4FF',         // Orchid Glow Canvas
+                'primary_color' => '78350F',    // Deep Royal Plum
+                'secondary_color' => '92400E',  // Vivid Magenta
+                'accent_color' => 'D6A756',     // Bright Citron Gold
+                'bg_color' => 'FFFBEB',         // Orchid Glow Canvas
                 'card_bg' => 'FFFFFF',
-                'card_alt' => 'F5D0FE',
+                'card_alt' => 'FEF3C7',
                 'style_type' => 'retro_groovy',
             ],
             [
                 'key' => 'bpsdm-classic',
                 'name' => 'Majalah Editorial',
                 'description' => 'Sampul foto dominan, judul kuat, dan komposisi editorial.',
-                'primary_color' => '1D4ED8',    // Deep Pine Institutional
-                'secondary_color' => '06B6D4',  // Forest Pine
-                'accent_color' => 'FDE047',     // Prestige Champagne Gold
-                'bg_color' => 'F0F9FF',         // Warm Stone Canvas
+                'primary_color' => '0F172A',    // Deep Pine Institutional
+                'secondary_color' => '0EA5E9',  // Forest Pine
+                'accent_color' => '38BDF8',     // Prestige Champagne Gold
+                'bg_color' => 'F8FAFC',         // Warm Stone Canvas
                 'card_bg' => 'FAF9F5',
-                'card_alt' => 'DBEAFE',
+                'card_alt' => 'E0F2FE',
                 'style_type' => 'rainbow_infographic',
             ],
             [
@@ -114,23 +114,23 @@ class BuiltinTemplateGeneratorService
                 'name' => 'Blueprint Inspeksi',
                 'description' => 'Gaya teknis biru dengan garis kisi dan bingkai inspeksi.',
                 'primary_color' => '1E40AF',    // Slate Navy
-                'secondary_color' => '38BDF8',  // Cobalt Sky
-                'accent_color' => 'F97316',     // Blaze Orange
-                'bg_color' => 'FFF7ED',         // Steel Ice Canvas
+                'secondary_color' => '1D4ED8',  // Cobalt Sky
+                'accent_color' => '38BDF8',     // Blaze Orange
+                'bg_color' => 'EFF6FF',         // Steel Ice Canvas
                 'card_bg' => 'FFFFFF',
-                'card_alt' => 'FFE4D6',
+                'card_alt' => 'DBEAFE',
                 'style_type' => 'paper_cut',
             ],
             [
                 'key' => 'clean-documentation',
                 'name' => 'Emerald Gold Ornamental',
                 'description' => 'Bingkai berlapis dengan hijau zamrud dan ornamen emas simetris.',
-                'primary_color' => '166534',    // Dark Graphite
-                'secondary_color' => '65A30D',  // Slate Steel
-                'accent_color' => 'FACC15',     // Electric Lime Volt
-                'bg_color' => 'F7FEE7',         // Cool Stone Canvas
+                'primary_color' => '064E3B',    // Dark Graphite
+                'secondary_color' => '047857',  // Slate Steel
+                'accent_color' => 'D4AF37',     // Electric Lime Volt
+                'bg_color' => 'ECFDF5',         // Cool Stone Canvas
                 'card_bg' => 'FFFFFF',
-                'card_alt' => 'D9F99D',
+                'card_alt' => 'D1FAE5',
                 'style_type' => 'botanical',
             ],
         ];
