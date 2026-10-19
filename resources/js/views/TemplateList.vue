@@ -12,7 +12,7 @@
           </div>
           <div>
             <h2 class="text-base font-bold text-[#14251D]">Katalog Desain PDF</h2>
-            <p class="text-xs text-[#6F7771]">Standar PowerPoint Widescreen 16:9 HD</p>
+            <p class="text-xs text-[#6F7771]">10 tema PDF dekoratif • Widescreen 16:9</p>
           </div>
         </div>
       </div>
@@ -20,8 +20,6 @@
       <p class="text-xs text-[#59635D] leading-relaxed mb-4">
         Setiap desain menghasilkan 6 halaman PDF 16:9: satu sampul dan lima titik pemantauan.
       </p>
-
--link>
     </div>
 
     <!-- ── SECTION TITLE ── -->
@@ -85,7 +83,7 @@
           <!-- Type badge -->
           <div class="absolute top-2 left-2 px-2.5 py-0.5 rounded-md backdrop-blur-md text-[#FAF9F5] text-[10px] font-semibold tracking-wide border border-white/10"
             :class="tpl.type === 'builtin' ? 'bg-[#14251D]/90 text-[#D8C79C]' : 'bg-[#6B5A2E]/90 text-white'">
-            {{ tpl.type === 'builtin' ? 'STANDAR BAWAAN' : 'TEMPLATE UNGGAHAN' }}
+            TEMA PDF
           </div>
 
           <!-- 16:9 tag -->
