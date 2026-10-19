@@ -11,26 +11,17 @@
             </svg>
           </div>
           <div>
-            <h2 class="text-base font-bold text-[#14251D]">Katalog Format Template</h2>
+            <h2 class="text-base font-bold text-[#14251D]">Katalog Desain PDF</h2>
             <p class="text-xs text-[#6F7771]">Standar PowerPoint Widescreen 16:9 HD</p>
           </div>
         </div>
       </div>
 
       <p class="text-xs text-[#59635D] leading-relaxed mb-4">
-        Setiap template tersusun atas 6 slide berstandar resmi (Cover Laporan + 5 Titik Pemantauan Lingkungan BPSDM).
+        Setiap desain menghasilkan 6 halaman PDF 16:9: satu sampul dan lima titik pemantauan.
       </p>
 
-      <router-link
-        to="/templates/upload"
-        class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#14251D] text-[#FAF9F5] rounded-xl text-xs font-semibold shadow-sm hover:bg-[#1C362A] active-press transition"
-      >
-        <svg class="w-4 h-4 text-[#D8C79C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
-        </svg>
-        <span>Unggah Template Kustom (.pptx)</span>
-      </router-link>
+-link>
     </div>
 
     <!-- ── SECTION TITLE ── -->
@@ -118,7 +109,7 @@
 
           <!-- Actions row -->
           <div class="mt-3 pt-3 border-t border-[#ECE8DD] flex items-center justify-between text-[11px] text-[#808983]">
-            <span class="font-mono">6 Slide • {{ tpl.template_key }}.pptx</span>
+            <span class="font-mono">PDF 16:9 • 6 halaman</span>
             <div class="flex items-center gap-2">
               <!-- Delete (only uploaded templates) -->
               <button
