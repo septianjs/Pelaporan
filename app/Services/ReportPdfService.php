@@ -67,6 +67,9 @@ class ReportPdfService
         );
 
         $locationsData = [];
+        $compactPhotoLayout = in_array($theme['style_type'] ?? '', ['paper_cut', 'rainbow_infographic'], true);
+        $locationPhotoWidth = $compactPhotoLayout ? 300 : self::LOC_PHOTO_W;
+        $locationPhotoHeight = $compactPhotoLayout ? 165 : self::LOC_PHOTO_H;
         $reportLocationsByOrder = $report->reportLocations->values();
 
         // Selalu hasilkan tepat 5 entri lokasi (sesuai 5 titik pemantauan tetap),
@@ -90,10 +93,10 @@ class ReportPdfService
                     'problem' => $reportLoc->problem,
                     'solution' => $reportLoc->solution,
                     'photo_1_base64' => $photo1
-                        ? $this->croppedPhotoBase64($photo1->file_path, self::LOC_PHOTO_W, self::LOC_PHOTO_H, $outputDir, "loc_{$idx}_p1")
+                        ? $this->croppedPhotoBase64($photo1->file_path, $locationPhotoWidth, $locationPhotoHeight, $outputDir, "loc_{$idx}_p1")
                         : null,
                     'photo_2_base64' => $photo2
-                        ? $this->croppedPhotoBase64($photo2->file_path, self::LOC_PHOTO_W, self::LOC_PHOTO_H, $outputDir, "loc_{$idx}_p2")
+                        ? $this->croppedPhotoBase64($photo2->file_path, $locationPhotoWidth, $locationPhotoHeight, $outputDir, "loc_{$idx}_p2")
                         : null,
                 ];
             } else {
