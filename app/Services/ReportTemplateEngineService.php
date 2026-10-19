@@ -302,9 +302,10 @@ class ReportTemplateEngineService
      * @param float $targetW Target frame width in points/pixels
      * @param float $targetH Target frame height in points/pixels
      * @param string $dstPath Output cropped JPEG path
+     * @param float $focusY Posisi vertikal crop saat foto lebih tinggi dari frame (0..1, default 0.5)
      * @return bool
      */
-    public function cropImageCover(string $srcPath, float $targetW, float $targetH, string $dstPath): bool
+    public function cropImageCover(string $srcPath, float $targetW, float $targetH, string $dstPath, float $focusY = 0.5): bool
     {
         if (!file_exists($srcPath) || $targetW <= 0 || $targetH <= 0) {
             return false;
@@ -367,7 +368,9 @@ class ReportTemplateEngineService
             $cropW = $srcW;
             $cropH = (int) round($srcW / $targetRatio);
             $cropX = 0;
-            $cropY = (int) round(($srcH - $cropH) / 2);
+            // focusY: 0 = rata atas, 0.5 = tengah (default), 1 = rata bawah.
+            // Untuk foto potret orang dipakai ±0.2 agar kepala tidak terpotong.
+            $cropY = (int) round(($srcH - $cropH) * max(0.0, min(1.0, $focusY)));
         }
 
         // Render at 2x resolution for crisp high-DPI display, max 1920x1080

@@ -17,8 +17,11 @@ class ReportPdfService
     // dipakai untuk crop server-side agar tidak gepeng/distorsi (DomPDF tidak
     // mendukung CSS object-fit sama sekali, jadi crop harus dilakukan manual
     // sebelum gambar dikirim ke template).
-    protected const OFFICER_PHOTO_W = 260;
-    protected const OFFICER_PHOTO_H = 260;
+    // Harus sama dengan .cover-photo-img di report_16_9.blade.php (560pt x 300pt),
+    // kalau tidak foto akan tampak melar/gepeng karena DomPDF tidak mendukung object-fit.
+    protected const OFFICER_PHOTO_W = 560;
+    protected const OFFICER_PHOTO_H = 300;
+    protected const OFFICER_PHOTO_FOCUS_Y = 0.2; // kepala biasanya di bagian atas foto potret
     protected const LOC_PHOTO_W = 400;
     protected const LOC_PHOTO_H = 220;
 
@@ -59,7 +62,8 @@ class ReportPdfService
             self::OFFICER_PHOTO_W,
             self::OFFICER_PHOTO_H,
             $outputDir,
-            'officer'
+            'officer',
+            self::OFFICER_PHOTO_FOCUS_Y
         );
 
         $locationsData = [];
@@ -175,7 +179,7 @@ class ReportPdfService
      * must stay null so the Blade template shows the explicit placeholder
      * instead of a broken/distorted image.
      */
-    protected function croppedPhotoBase64(?string $filePath, int $targetW, int $targetH, string $outputDir, string $tag): ?string
+    protected function croppedPhotoBase64(?string $filePath, int $targetW, int $targetH, string $outputDir, string $tag, float $focusY = 0.5): ?string
     {
         if (!$filePath) return null;
 
@@ -193,7 +197,7 @@ class ReportPdfService
         }
 
         $croppedPath = "{$outputDir}/pdf_cropped_{$tag}.jpg";
-        $ok = $this->imageCropper->cropImageCover($srcPath, $targetW, $targetH, $croppedPath);
+        $ok = $this->imageCropper->cropImageCover($srcPath, $targetW, $targetH, $croppedPath, $focusY);
 
         if (!$ok || !file_exists($croppedPath)) {
             return null;

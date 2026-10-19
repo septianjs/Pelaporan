@@ -1,0 +1,210 @@
+diff --git a/app/Services/ReportPdfService.php b/app/Services/ReportPdfService.php
+index bd7b68b..6af87d4 100644
+--- a/app/Services/ReportPdfService.php
++++ b/app/Services/ReportPdfService.php
+@@ -17,8 +17,11 @@ class ReportPdfService
+     // dipakai untuk crop server-side agar tidak gepeng/distorsi (DomPDF tidak
+     // mendukung CSS object-fit sama sekali, jadi crop harus dilakukan manual
+     // sebelum gambar dikirim ke template).
+-    protected const OFFICER_PHOTO_W = 260;
+-    protected const OFFICER_PHOTO_H = 260;
++    // Harus sama dengan .cover-photo-img di report_16_9.blade.php (560pt x 300pt),
++    // kalau tidak foto akan tampak melar/gepeng karena DomPDF tidak mendukung object-fit.
++    protected const OFFICER_PHOTO_W = 560;
++    protected const OFFICER_PHOTO_H = 300;
++    protected const OFFICER_PHOTO_FOCUS_Y = 0.2; // kepala biasanya di bagian atas foto potret
+     protected const LOC_PHOTO_W = 400;
+     protected const LOC_PHOTO_H = 220;
+ 
+@@ -59,7 +62,8 @@ public function generatePdf(Report $report): string
+             self::OFFICER_PHOTO_W,
+             self::OFFICER_PHOTO_H,
+             $outputDir,
+-            'officer'
++            'officer',
++            self::OFFICER_PHOTO_FOCUS_Y
+         );
+ 
+         $locationsData = [];
+@@ -175,7 +179,7 @@ protected function resolveTheme(?Template $template): array
+      * must stay null so the Blade template shows the explicit placeholder
+      * instead of a broken/distorted image.
+      */
+-    protected function croppedPhotoBase64(?string $filePath, int $targetW, int $targetH, string $outputDir, string $tag): ?string
++    protected function croppedPhotoBase64(?string $filePath, int $targetW, int $targetH, string $outputDir, string $tag, float $focusY = 0.5): ?string
+     {
+         if (!$filePath) return null;
+ 
+@@ -193,7 +197,7 @@ protected function croppedPhotoBase64(?string $filePath, int $targetW, int $targ
+         }
+ 
+         $croppedPath = "{$outputDir}/pdf_cropped_{$tag}.jpg";
+-        $ok = $this->imageCropper->cropImageCover($srcPath, $targetW, $targetH, $croppedPath);
++        $ok = $this->imageCropper->cropImageCover($srcPath, $targetW, $targetH, $croppedPath, $focusY);
+ 
+         if (!$ok || !file_exists($croppedPath)) {
+             return null;
+diff --git a/app/Services/ReportTemplateEngineService.php b/app/Services/ReportTemplateEngineService.php
+index 962b55d..e97b1e6 100644
+--- a/app/Services/ReportTemplateEngineService.php
++++ b/app/Services/ReportTemplateEngineService.php
+@@ -302,9 +302,10 @@ protected function resolvePhotoPath(?string $filePath): ?string
+      * @param float $targetW Target frame width in points/pixels
+      * @param float $targetH Target frame height in points/pixels
+      * @param string $dstPath Output cropped JPEG path
++     * @param float $focusY Posisi vertikal crop saat foto lebih tinggi dari frame (0..1, default 0.5)
+      * @return bool
+      */
+-    public function cropImageCover(string $srcPath, float $targetW, float $targetH, string $dstPath): bool
++    public function cropImageCover(string $srcPath, float $targetW, float $targetH, string $dstPath, float $focusY = 0.5): bool
+     {
+         if (!file_exists($srcPath) || $targetW <= 0 || $targetH <= 0) {
+             return false;
+@@ -367,7 +368,9 @@ public function cropImageCover(string $srcPath, float $targetW, float $targetH,
+             $cropW = $srcW;
+             $cropH = (int) round($srcW / $targetRatio);
+             $cropX = 0;
+-            $cropY = (int) round(($srcH - $cropH) / 2);
++            // focusY: 0 = rata atas, 0.5 = tengah (default), 1 = rata bawah.
++            // Untuk foto potret orang dipakai ±0.2 agar kepala tidak terpotong.
++            $cropY = (int) round(($srcH - $cropH) * max(0.0, min(1.0, $focusY)));
+         }
+ 
+         // Render at 2x resolution for crisp high-DPI display, max 1920x1080
+diff --git a/resources/js/services/reportShare.js b/resources/js/services/reportShare.js
+index ba9df4b..52b000b 100644
+--- a/resources/js/services/reportShare.js
++++ b/resources/js/services/reportShare.js
+@@ -20,7 +20,29 @@ export function blobToBase64(blob) {
+ }
+ 
+ /**
+- * Generate formatted WhatsApp message text with rich details
++ * URL PDF yang bisa dibuka oleh PENERIMA pesan.
++ * Hanya dikembalikan jika alamat server bersifat publik. Path relatif ("/api/..."), localhost,
++ * 10.0.2.2 (emulator Android) dan IP jaringan lokal TIDAK bisa dibuka dari perangkat lain,
++ * jadi untuk kasus itu dikembalikan null (jangan kirim tautan yang pasti rusak).
++ */
++export function getPublicPdfUrl(report) {
++  try {
++    const abs = new URL(`${api.defaults.baseURL}/reports/${report.id}/pdf`, window.location.origin);
++    const h = abs.hostname;
++    const isPrivateHost =
++      h === 'localhost' || h === '127.0.0.1' || h === '10.0.2.2' || h === '[::1]' ||
++      /^10\./.test(h) || /^192\.168\./.test(h) || /^172\.(1[6-9]|2\d|3[01])\./.test(h) ||
++      h.endsWith('.local') || h.endsWith('.test');
++    if (isPrivateHost || !/^https?:$/.test(abs.protocol)) return null;
++    return abs.href;
++  } catch {
++    return null;
++  }
++}
++
++/**
++ * Generate formatted WhatsApp message text.
++ * Sengaja tanpa emoji 4-byte (U+1F4CB dst.): sebagian perangkat/aplikasi menampilkannya sebagai "�".
+  */
+ export function formatWhatsAppMessage(report) {
+   const locations = report.report_locations || [];
+@@ -29,29 +51,30 @@ export function formatWhatsAppMessage(report) {
+   const totalCount = locations.length || 5;
+ 
+   let msg = `*LAPORAN PENGAWASAN LINGKUNGAN KANTOR BPSDM*\n`;
+-  msg += `━━━━━━━━━━━━━━━━━━━━━━\n`;
+-  msg += `📋 *No. Laporan:* ${report.report_number}\n`;
+-  msg += `📅 *Tanggal:* ${report.formatted_date || report.inspection_date}\n`;
+-  msg += `👤 *Petugas Pengawas:* ${report.officer_name}\n`;
+-  msg += `📊 *Ringkasan:* `;
++  msg += `----------------------------------\n`;
++  msg += `*No. Laporan:* ${report.report_number}\n`;
++  msg += `*Tanggal:* ${report.formatted_date || report.inspection_date}\n`;
++  msg += `*Petugas Pengawas:* ${report.officer_name}\n`;
++  msg += `*Ringkasan:* `;
+ 
+   if (attentionLocations.length === 0) {
+-    msg += `✓ *Bersih & Rapi (${cleanCount}/${totalCount} Titik)*\n`;
++    msg += `Bersih & Rapi (${cleanCount}/${totalCount} titik)\n`;
+     msg += `Semua titik pemantauan dalam kondisi bersih, aman, dan rapi.\n`;
+   } else {
+-    msg += `⚠️ *${attentionLocations.length} Titik Perlu Penanganan*\n\n`;
++    msg += `${attentionLocations.length} titik perlu penanganan\n\n`;
+     msg += `*Rincian Temuan & Solusi:*\n`;
+     attentionLocations.forEach((loc, idx) => {
+       const locName = loc.display_name || loc.name || loc.location?.name || `Lokasi ${idx + 1}`;
+       msg += `${idx + 1}. *${locName}*\n`;
+-      if (loc.problem) msg += `   • *Masalah:* ${loc.problem}\n`;
+-      if (loc.solution) msg += `   • *Solusi:* ${loc.solution}\n`;
++      if (loc.problem) msg += `   - *Masalah:* ${loc.problem}\n`;
++      if (loc.solution) msg += `   - *Solusi:* ${loc.solution}\n`;
+     });
+   }
+ 
+-  const pdfUrl = `${api.defaults.baseURL}/reports/${report.id}/pdf`;
+-  msg += `\n📄 *Unduh Dokumen Laporan (PDF 16:9):*\n${pdfUrl}\n`;
+-  msg += `━━━━━━━━━━━━━━━━━━━━━━\n`;
++  const pdfUrl = getPublicPdfUrl(report);
++  msg += `\n*Dokumen Laporan (PDF 16:9):*\n`;
++  msg += pdfUrl ? `${pdfUrl}\n` : `File PDF dikirim terpisah sebagai lampiran.\n`;
++  msg += `----------------------------------\n`;
+   msg += `_Sistem Pelaporan Pengawasan Lingkungan BPSDM_`;
+ 
+   return msg;
+@@ -182,11 +205,13 @@ export async function sharePdfDocument(report) {
+ }
+ 
+ /**
+- * Open WhatsApp with prefilled formatted message
++ * Open WhatsApp with prefilled formatted message.
++ * Mengembalikan { linkIncluded }: false bila tautan PDF tidak disertakan karena server bukan alamat publik
++ * (pemanggil sebaiknya memberi tahu pengguna agar mengirim file lewat tombol Bagikan).
+  */
+ export function openWhatsApp(report) {
+   const text = formatWhatsAppMessage(report);
+   const waUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+   window.open(waUrl, '_blank');
++  return { linkIncluded: getPublicPdfUrl(report) !== null };
+ }
+-
+diff --git a/resources/js/views/ReportHistory.vue b/resources/js/views/ReportHistory.vue
+index 1bbb4a4..19e0af9 100644
+--- a/resources/js/views/ReportHistory.vue
++++ b/resources/js/views/ReportHistory.vue
+@@ -637,7 +637,8 @@ const showToast = (message, type = 'success') => {
+ const countAttentionLocations = (rep) =>
+   rep.report_locations?.filter(l => l.condition === 'needs_attention').length ?? 0;
+ 
+-const pdfUrl = (rep) => `${api.defaults.baseURL}/reports/${rep.id}/pdf`;
++// Selalu URL absolut (path relatif "/api/..." tidak bisa dibuka saat ditempel di tempat lain).
++const pdfUrl = (rep) => new URL(`${api.defaults.baseURL}/reports/${rep.id}/pdf`, window.location.origin).href;
+ 
+ // ── Fetch ──────────────────────────────────────────────────────────────────────
+ const fetchReports = async (page = 1) => {
+@@ -728,8 +729,11 @@ const openShareSheet = (rep) => {
+ const shareWhatsApp = () => {
+   const rep = shareTarget.value;
+   if (!rep) return;
+-  openWhatsApp(rep);
++  const { linkIncluded } = openWhatsApp(rep);
+   showShareSheet.value = false;
++  if (!linkIncluded) {
++    showToast('Tautan PDF tidak disertakan (server bukan alamat publik). Kirim file PDF lewat tombol Bagikan.');
++  }
+ };
+ 
+ const nativeShare = async () => {
+diff --git a/resources/js/views/ReportPreview.vue b/resources/js/views/ReportPreview.vue
+index bf54723..fefaabc 100644
+--- a/resources/js/views/ReportPreview.vue
++++ b/resources/js/views/ReportPreview.vue
+@@ -756,7 +756,10 @@ const shareReport = async () => {
+ // ── WhatsApp Share (Rich Formatted) ──
+ const shareWhatsApp = () => {
+   if (!report.value) return;
+-  openWhatsApp(report.value);
++  const { linkIncluded } = openWhatsApp(report.value);
++  if (!linkIncluded) {
++    showToast('Tautan PDF tidak disertakan (server bukan alamat publik). Kirim file PDF lewat tombol Bagikan.');
++  }
+ };
+ 
+ // ── Email State ──

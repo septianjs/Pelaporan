@@ -20,7 +20,29 @@ export function blobToBase64(blob) {
 }
 
 /**
- * Generate formatted WhatsApp message text with rich details
+ * URL PDF yang bisa dibuka oleh PENERIMA pesan.
+ * Hanya dikembalikan jika alamat server bersifat publik. Path relatif ("/api/..."), localhost,
+ * 10.0.2.2 (emulator Android) dan IP jaringan lokal TIDAK bisa dibuka dari perangkat lain,
+ * jadi untuk kasus itu dikembalikan null (jangan kirim tautan yang pasti rusak).
+ */
+export function getPublicPdfUrl(report) {
+  try {
+    const abs = new URL(`${api.defaults.baseURL}/reports/${report.id}/pdf`, window.location.origin);
+    const h = abs.hostname;
+    const isPrivateHost =
+      h === 'localhost' || h === '127.0.0.1' || h === '10.0.2.2' || h === '[::1]' ||
+      /^10\./.test(h) || /^192\.168\./.test(h) || /^172\.(1[6-9]|2\d|3[01])\./.test(h) ||
+      h.endsWith('.local') || h.endsWith('.test');
+    if (isPrivateHost || !/^https?:$/.test(abs.protocol)) return null;
+    return abs.href;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Generate formatted WhatsApp message text.
+ * Sengaja tanpa emoji 4-byte (U+1F4CB dst.): sebagian perangkat/aplikasi menampilkannya sebagai "�".
  */
 export function formatWhatsAppMessage(report) {
   const locations = report.report_locations || [];
@@ -29,29 +51,30 @@ export function formatWhatsAppMessage(report) {
   const totalCount = locations.length || 5;
 
   let msg = `*LAPORAN PENGAWASAN LINGKUNGAN KANTOR BPSDM*\n`;
-  msg += `━━━━━━━━━━━━━━━━━━━━━━\n`;
-  msg += `📋 *No. Laporan:* ${report.report_number}\n`;
-  msg += `📅 *Tanggal:* ${report.formatted_date || report.inspection_date}\n`;
-  msg += `👤 *Petugas Pengawas:* ${report.officer_name}\n`;
-  msg += `📊 *Ringkasan:* `;
+  msg += `----------------------------------\n`;
+  msg += `*No. Laporan:* ${report.report_number}\n`;
+  msg += `*Tanggal:* ${report.formatted_date || report.inspection_date}\n`;
+  msg += `*Petugas Pengawas:* ${report.officer_name}\n`;
+  msg += `*Ringkasan:* `;
 
   if (attentionLocations.length === 0) {
-    msg += `✓ *Bersih & Rapi (${cleanCount}/${totalCount} Titik)*\n`;
+    msg += `Bersih & Rapi (${cleanCount}/${totalCount} titik)\n`;
     msg += `Semua titik pemantauan dalam kondisi bersih, aman, dan rapi.\n`;
   } else {
-    msg += `⚠️ *${attentionLocations.length} Titik Perlu Penanganan*\n\n`;
+    msg += `${attentionLocations.length} titik perlu penanganan\n\n`;
     msg += `*Rincian Temuan & Solusi:*\n`;
     attentionLocations.forEach((loc, idx) => {
       const locName = loc.display_name || loc.name || loc.location?.name || `Lokasi ${idx + 1}`;
       msg += `${idx + 1}. *${locName}*\n`;
-      if (loc.problem) msg += `   • *Masalah:* ${loc.problem}\n`;
-      if (loc.solution) msg += `   • *Solusi:* ${loc.solution}\n`;
+      if (loc.problem) msg += `   - *Masalah:* ${loc.problem}\n`;
+      if (loc.solution) msg += `   - *Solusi:* ${loc.solution}\n`;
     });
   }
 
-  const pdfUrl = `${api.defaults.baseURL}/reports/${report.id}/pdf`;
-  msg += `\n📄 *Unduh Dokumen Laporan (PDF 16:9):*\n${pdfUrl}\n`;
-  msg += `━━━━━━━━━━━━━━━━━━━━━━\n`;
+  const pdfUrl = getPublicPdfUrl(report);
+  msg += `\n*Dokumen Laporan (PDF 16:9):*\n`;
+  msg += pdfUrl ? `${pdfUrl}\n` : `File PDF dikirim terpisah sebagai lampiran.\n`;
+  msg += `----------------------------------\n`;
   msg += `_Sistem Pelaporan Pengawasan Lingkungan BPSDM_`;
 
   return msg;
@@ -182,11 +205,13 @@ export async function sharePdfDocument(report) {
 }
 
 /**
- * Open WhatsApp with prefilled formatted message
+ * Open WhatsApp with prefilled formatted message.
+ * Mengembalikan { linkIncluded }: false bila tautan PDF tidak disertakan karena server bukan alamat publik
+ * (pemanggil sebaiknya memberi tahu pengguna agar mengirim file lewat tombol Bagikan).
  */
 export function openWhatsApp(report) {
   const text = formatWhatsAppMessage(report);
   const waUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
   window.open(waUrl, '_blank');
+  return { linkIncluded: getPublicPdfUrl(report) !== null };
 }
-

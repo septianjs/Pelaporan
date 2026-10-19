@@ -756,7 +756,10 @@ const shareReport = async () => {
 // ── WhatsApp Share (Rich Formatted) ──
 const shareWhatsApp = () => {
   if (!report.value) return;
-  openWhatsApp(report.value);
+  const { linkIncluded } = openWhatsApp(report.value);
+  if (!linkIncluded) {
+    showToast('Tautan PDF tidak disertakan (server bukan alamat publik). Kirim file PDF lewat tombol Bagikan.');
+  }
 };
 
 // ── Email State ──

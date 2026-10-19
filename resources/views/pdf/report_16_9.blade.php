@@ -34,8 +34,7 @@
   /* ── COVER SLIDE STYLES ── */
   .cover-header {
     background: #{{ $theme['primary_color'] ?? '1E3A8A' }};
-    height: 120pt;
-    width: 100%;
+    height: 70pt;
     padding: 24pt 50pt;
     position: relative;
     border-bottom: 5pt solid #{{ $theme['accent_color'] ?? '0284C7' }};
@@ -61,9 +60,19 @@
     height: 380pt;
     position: relative;
   }
+  /* CATATAN DomPDF (penting saat mengubah layout):
+     - `box-sizing: border-box` TIDAK didukung -> padding & border ditambahkan di LUAR width/height.
+       Jumlahkan semua tinggi (termasuk padding/border) agar tidak melebihi 540pt, kalau tidak
+       konten terlempar ke halaman baru.
+     - Float + teks dinamis di cover pernah memicu page-break salah, jadi kartu kiri memakai
+       position:relative dan frame foto memakai position:absolute (tidak ikut hitungan tinggi parent).
+     - Ukuran foto petugas di sini (560x300pt) HARUS sama dengan OFFICER_PHOTO_W/H di
+       ReportPdfService.php, kalau tidak foto tampak melar. */
   .cover-card-left {
-    width: 480pt;
-    float: left;
+    position: relative;
+    top: 50px;
+    left: 25px;
+    width: 280pt;
     background: #ffffff;
     border-radius: 14pt;
     padding: 24pt;
@@ -92,25 +101,27 @@
     color: #334155;
   }
   .cover-photo-frame {
-    width: 280pt;
-    height: 280pt;
-    float: right;
+    position: Absolute;
+    top: 150pt;
+    right: 20pt;
+    width: 560pt;
+    height: 320pt;
     background: #ffffff;
-    border-radius: 16pt;
+    border-radius: 10pt;
     padding: 8pt;
     border: 2pt solid #{{ $theme['accent_color'] ?? '0284C7' }};
     text-align: center;
     box-shadow: 0 6pt 16pt rgba(0,0,0,0.06);
   }
   .cover-photo-img {
-    width: 260pt;
-    height: 260pt;
+    width: 560pt;
+    height: 300pt;
     border-radius: 12pt;
     object-fit: cover;
   }
   .cover-photo-placeholder {
-    width: 260pt;
-    height: 260pt;
+    width: 560pt;
+    height: 300pt;
     border-radius: 12pt;
     background: #e2e8f0;
     line-height: 260pt;
@@ -132,9 +143,9 @@
   /* ── LOCATION SLIDE STYLES ── */
   .loc-header {
     background: #{{ $theme['primary_color'] ?? '1E3A8A' }};
-    padding: 16pt 45pt;
+    padding: 10pt 45pt;
     color: #ffffff;
-    height: 70pt;
+    height: 44pt;
     border-bottom: 4pt solid #{{ $theme['accent_color'] ?? '0284C7' }};
   }
   .loc-counter {
@@ -245,22 +256,21 @@
   }
   .loc-footer {
     position: absolute;
-    bottom: 10pt;
+    bottom: 14pt;
     left: 45pt;
-    right: 45pt;
+    width: 870pt;
+    height: 14pt;
     font-size: 8pt;
     color: #94a3b8;
     border-top: 1pt solid #e2e8f0;
     padding-top: 5pt;
-    display: table;
-    width: 870pt;
   }
   .footer-left {
-    display: table-cell;
+    float: left;
     text-align: left;
   }
   .footer-right {
-    display: table-cell;
+    float: right;
     text-align: right;
   }
 </style>
@@ -276,7 +286,6 @@
       <h1 class="cover-title">LAPORAN PENGAWASAN LINGKUNGAN KANTOR</h1>
     </div>
 
-    <div class="cover-body">
       <!-- Left Metadata Box -->
       <div class="cover-card-left">
         <div class="meta-group">
@@ -315,7 +324,6 @@
           Foto Petugas Pengawas
         </div>
       </div>
-    </div>
 
     <div class="cover-footer">
       <span>Sistem Informasi Pelaporan Pengawasan Lingkungan Kantor BPSDM • Widescreen 16:9 Presentation Format</span>
@@ -369,7 +377,7 @@
               Status Kebersihan:
             </span>
             @if ($loc['condition'] === 'clean')
-              <span class="badge-clean">✓ {{ $loc['condition_label'] }}</span>
+              <span class="badge-clean"><span style="font-family: 'DejaVu Sans', sans-serif;">&#10003;</span> {{ $loc['condition_label'] }}</span>
             @else
               <span class="badge-attention">! {{ $loc['condition_label'] }}</span>
             @endif

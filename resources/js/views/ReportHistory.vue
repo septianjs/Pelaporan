@@ -637,7 +637,8 @@ const showToast = (message, type = 'success') => {
 const countAttentionLocations = (rep) =>
   rep.report_locations?.filter(l => l.condition === 'needs_attention').length ?? 0;
 
-const pdfUrl = (rep) => `${api.defaults.baseURL}/reports/${rep.id}/pdf`;
+// Selalu URL absolut (path relatif "/api/..." tidak bisa dibuka saat ditempel di tempat lain).
+const pdfUrl = (rep) => new URL(`${api.defaults.baseURL}/reports/${rep.id}/pdf`, window.location.origin).href;
 
 // ── Fetch ──────────────────────────────────────────────────────────────────────
 const fetchReports = async (page = 1) => {
@@ -728,8 +729,11 @@ const openShareSheet = (rep) => {
 const shareWhatsApp = () => {
   const rep = shareTarget.value;
   if (!rep) return;
-  openWhatsApp(rep);
+  const { linkIncluded } = openWhatsApp(rep);
   showShareSheet.value = false;
+  if (!linkIncluded) {
+    showToast('Tautan PDF tidak disertakan (server bukan alamat publik). Kirim file PDF lewat tombol Bagikan.');
+  }
 };
 
 const nativeShare = async () => {
