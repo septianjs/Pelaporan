@@ -3,7 +3,6 @@ import Home from '../views/Home.vue';
 import CreateReport from '../views/CreateReport.vue';
 import ReportHistory from '../views/ReportHistory.vue';
 import TemplateList from '../views/TemplateList.vue';
-import TemplateUpload from '../views/TemplateUpload.vue';
 import ReportPreview from '../views/ReportPreview.vue';
 
 const routes = [
@@ -30,12 +29,6 @@ const routes = [
         name: 'template-list',
         component: TemplateList,
         meta: { title: 'Daftar Template' },
-    },
-    {
-        path: '/templates/upload',
-        name: 'template-upload',
-        component: TemplateUpload,
-        meta: { title: 'Upload Template' },
     },
     {
         path: '/preview/:id?',
