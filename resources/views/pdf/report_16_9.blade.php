@@ -273,9 +273,68 @@
     float: right;
     text-align: right;
   }
+  /* PDF theme variants: each template changes its composition and decorative language. */
+  .cover-header { position: relative; }
+  .cover-header:after { content: '✦  ✦  ✦'; position: absolute; right: 42pt; top: 15pt; font-size: 24pt; color: #{{ $theme['accent_color'] ?? '0284C7' }}; }
+  .loc-header { position: relative; }
+  .loc-header:after { content: '◆  ◆  ◆'; float: right; color: #{{ $theme['accent_color'] ?? '0284C7' }}; font-size: 12pt; margin-top: -4pt; }
+  .theme-tropical_pop .cover-header { height: 92pt; padding: 18pt 40pt; border-bottom-width: 10pt; }
+  .theme-tropical_pop .cover-card-left { left: 15pt; top: 26pt; border: 3pt solid #{{ $theme['accent_color'] ?? 'F59E0B' }}; border-radius: 24pt; }
+  .theme-tropical_pop .cover-photo-frame { right: 26pt; top: 136pt; border-radius: 22pt; border-width: 5pt; }
+  .theme-tropical_pop .loc-header { border-bottom-width: 9pt; }
+  .theme-tropical_pop .photo-box, .theme-tropical_pop .info-box { border-radius: 18pt; border-width: 3pt; }
+  .theme-batik_nusantara .cover-header { height: 82pt; padding: 20pt 42pt; border-bottom: 8pt double #{{ $theme['accent_color'] ?? 'F59E0B' }}; }
+  .theme-batik_nusantara .cover-card-left { left: 10pt; top: 32pt; border-radius: 2pt; border: 3pt double #{{ $theme['accent_color'] ?? 'F59E0B' }}; }
+  .theme-batik_nusantara .cover-photo-frame { right: 30pt; top: 146pt; border-radius: 2pt; border: 4pt double #{{ $theme['accent_color'] ?? 'F59E0B' }}; }
+  .theme-batik_nusantara .loc-header { border-bottom: 8pt double #{{ $theme['accent_color'] ?? 'F59E0B' }}; }
+  .theme-batik_nusantara .photo-box, .theme-batik_nusantara .info-box { border-radius: 2pt; border: 2pt solid #{{ $theme['primary_color'] ?? '064E3B' }}; }
+  .theme-comic_pop .cover-header { height: 98pt; padding: 20pt 36pt; border-bottom: 10pt solid #{{ $theme['accent_color'] ?? 'F97316' }}; }
+  .theme-comic_pop .cover-title { font-size: 27pt; }
+  .theme-comic_pop .cover-card-left { left: 0; top: 18pt; border: 4pt solid #{{ $theme['primary_color'] ?? '115E59' }}; border-radius: 0; box-shadow: 7pt 7pt 0 #{{ $theme['accent_color'] ?? 'F97316' }}; }
+  .theme-comic_pop .cover-photo-frame { right: 34pt; top: 142pt; border-radius: 0; border: 4pt solid #{{ $theme['primary_color'] ?? '115E59' }}; box-shadow: 7pt 7pt 0 #{{ $theme['accent_color'] ?? 'F97316' }}; }
+  .theme-comic_pop .loc-header { border-bottom-width: 10pt; }
+  .theme-comic_pop .photo-box, .theme-comic_pop .info-box { border-radius: 0; border: 3pt solid #{{ $theme['primary_color'] ?? '115E59' }}; box-shadow: 4pt 4pt 0 #{{ $theme['accent_color'] ?? 'F97316' }}; }
+  .theme-scrapbook .cover-header { height: 76pt; padding: 16pt 46pt; border-bottom: 3pt dashed #{{ $theme['accent_color'] ?? 'FBBF24' }}; }
+  .theme-scrapbook .cover-card-left { left: 35pt; top: 38pt; border: 2pt dashed #{{ $theme['accent_color'] ?? 'FBBF24' }}; }
+  .theme-scrapbook .cover-photo-frame { right: 40pt; top: 142pt; border: 3pt dashed #{{ $theme['accent_color'] ?? 'FBBF24' }}; border-radius: 4pt; }
+  .theme-scrapbook .loc-header { border-bottom: 3pt dashed #{{ $theme['accent_color'] ?? 'FBBF24' }}; }
+  .theme-scrapbook .photo-box, .theme-scrapbook .info-box { border: 2pt dashed #{{ $theme['accent_color'] ?? 'FBBF24' }}; border-radius: 5pt; }
+  .theme-memphis .cover-header { height: 104pt; padding: 24pt 40pt; border-bottom: 12pt solid #{{ $theme['accent_color'] ?? 'F43F5E' }}; }
+  .theme-memphis .cover-card-left { left: 0; top: 16pt; border-radius: 24pt 0 24pt 0; border: 3pt solid #{{ $theme['secondary_color'] ?? '7C3AED' }}; }
+  .theme-memphis .cover-photo-frame { right: 42pt; top: 150pt; border-radius: 0 24pt 0 24pt; border: 4pt solid #{{ $theme['accent_color'] ?? 'F43F5E' }}; }
+  .theme-memphis .loc-header { border-bottom-width: 12pt; }
+  .theme-memphis .photo-box:first-child { border-radius: 18pt 0 18pt 0; }
+  .theme-memphis .photo-box-right { border-radius: 0 18pt 0 18pt; }
+  .theme-memphis .info-box { border-radius: 20pt 0 20pt 0; border: 3pt solid #{{ $theme['secondary_color'] ?? '7C3AED' }}; }
+  .theme-festival .cover-header { height: 90pt; padding: 20pt 50pt; border-bottom: 7pt solid #{{ $theme['accent_color'] ?? 'F59E0B' }}; }
+  .theme-festival .cover-card-left { left: 24pt; top: 22pt; border-left: 9pt solid #{{ $theme['accent_color'] ?? 'F59E0B' }}; border-radius: 4pt 16pt 16pt 4pt; }
+  .theme-festival .cover-photo-frame { right: 18pt; top: 136pt; border: 5pt solid #{{ $theme['accent_color'] ?? 'F59E0B' }}; border-radius: 18pt; }
+  .theme-festival .loc-header { border-bottom: 7pt solid #{{ $theme['accent_color'] ?? 'F59E0B' }}; }
+  .theme-festival .photo-box, .theme-festival .info-box { border-radius: 14pt; border: 2pt solid #{{ $theme['accent_color'] ?? 'F59E0B' }}; }
+  .theme-retro_groovy .cover-header { height: 86pt; padding: 18pt 42pt; border-bottom: 8pt solid #{{ $theme['accent_color'] ?? 'FACC15' }}; }
+  .theme-retro_groovy .cover-title { letter-spacing: 1.5pt; }
+  .theme-retro_groovy .cover-card-left { left: 18pt; top: 30pt; border-radius: 28pt; border: 3pt solid #{{ $theme['secondary_color'] ?? 'C026D3' }}; }
+  .theme-retro_groovy .cover-photo-frame { right: 30pt; top: 148pt; border-radius: 28pt; border: 4pt solid #{{ $theme['accent_color'] ?? 'FACC15' }}; }
+  .theme-retro_groovy .loc-header { border-bottom-width: 8pt; }
+  .theme-retro_groovy .photo-box, .theme-retro_groovy .info-box { border-radius: 22pt; border: 2pt solid #{{ $theme['secondary_color'] ?? 'C026D3' }}; }
+  .theme-rainbow_infographic .cover-header { height: 78pt; padding: 18pt 40pt; border-bottom: 6pt solid #{{ $theme['accent_color'] ?? 'D8C79C' }}; }
+  .theme-rainbow_infographic .cover-card-left { left: 8pt; top: 22pt; border-top: 8pt solid #{{ $theme['secondary_color'] ?? '1C362A' }}; border-radius: 0 0 12pt 12pt; }
+  .theme-rainbow_infographic .cover-photo-frame { right: 22pt; top: 140pt; border: 4pt solid #{{ $theme['secondary_color'] ?? '1C362A' }}; border-radius: 10pt; }
+  .theme-rainbow_infographic .loc-header { border-bottom-width: 6pt; }
+  .theme-rainbow_infographic .photo-box, .theme-rainbow_infographic .info-box { border-radius: 8pt; border: 2pt solid #{{ $theme['secondary_color'] ?? '1C362A' }}; }
+  .theme-paper_cut .cover-header { height: 96pt; padding: 22pt 40pt; border-bottom: 10pt solid #{{ $theme['accent_color'] ?? 'EA580C' }}; }
+  .theme-paper_cut .cover-card-left { left: 32pt; top: 18pt; border: 0; border-left: 10pt solid #{{ $theme['secondary_color'] ?? '0284C7' }}; border-radius: 0; box-shadow: 5pt 5pt 0 #{{ $theme['accent_color'] ?? 'EA580C' }}; }
+  .theme-paper_cut .cover-photo-frame { right: 20pt; top: 142pt; border: 0; border-bottom: 8pt solid #{{ $theme['accent_color'] ?? 'EA580C' }}; border-radius: 0; box-shadow: 5pt 5pt 0 #{{ $theme['secondary_color'] ?? '0284C7' }}; }
+  .theme-paper_cut .loc-header { border-bottom-width: 10pt; }
+  .theme-paper_cut .photo-box, .theme-paper_cut .info-box { border-radius: 0; border: 0; border-bottom: 6pt solid #{{ $theme['accent_color'] ?? 'EA580C' }}; box-shadow: 3pt 3pt 0 #{{ $theme['secondary_color'] ?? '0284C7' }}; }
+  .theme-botanical .cover-header { height: 82pt; padding: 20pt 44pt; border-bottom: 5pt solid #{{ $theme['accent_color'] ?? '84CC16' }}; }
+  .theme-botanical .cover-card-left { left: 18pt; top: 26pt; border: 2pt solid #{{ $theme['secondary_color'] ?? '334155' }}; border-radius: 20pt 4pt 20pt 4pt; }
+  .theme-botanical .cover-photo-frame { right: 28pt; top: 140pt; border: 3pt solid #{{ $theme['accent_color'] ?? '84CC16' }}; border-radius: 20pt 4pt 20pt 4pt; }
+  .theme-botanical .loc-header { border-bottom-width: 5pt; }
+  .theme-botanical .photo-box, .theme-botanical .info-box { border-radius: 16pt 4pt 16pt 4pt; border: 2pt solid #{{ $theme['secondary_color'] ?? '334155' }}; }
 </style>
 </head>
-<body>
+<body class="theme-{{ $theme['style_type'] ?? 'tropical_pop' }}">
 
   <!-- ======================================================================= -->
   <!-- SLIDE 1: COVER                                                          -->
@@ -306,9 +365,9 @@
         </div>
 
         <div class="meta-group" style="margin-bottom: 0;">
-          <div class="meta-label">Template Presentasi</div>
+          <div class="meta-label">Tema Desain PDF</div>
           <div style="font-size: 10pt; color: #64748b;">
-            {{ $report->template->name ?? 'Default' }} • 16:9 Widescreen (13.333 × 7.5 inch)
+            {{ $report->template->name ?? 'Default' }} • 16:9 PDF Widescreen 16:9
           </div>
         </div>
       </div>
@@ -326,7 +385,7 @@
       </div>
 
     <div class="cover-footer">
-      <span>Sistem Informasi Pelaporan Pengawasan Lingkungan Kantor BPSDM • Widescreen 16:9 Presentation Format</span>
+      <span>Sistem Informasi Pelaporan Pengawasan Lingkungan Kantor BPSDM • PDF Widescreen 16:9</span>
     </div>
   </div>
 
