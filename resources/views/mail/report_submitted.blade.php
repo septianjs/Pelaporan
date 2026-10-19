@@ -181,7 +181,7 @@
                 BADAN PENGEMBANGAN SUMBER DAYA MANUSIA (BPSDM)
               </p>
               <p style="margin: 0; font-size: 11px; color: #94a3b8;">
-                Sistem Pelaporan Pengawasan Lingkungan Kantor &bull; Otomatisasi Presentasi 16:9
+                Sistem Pelaporan Pengawasan Lingkungan Kantor &bull; Laporan PDF Widescreen 16:9
               </p>
             </td>
           </tr>
