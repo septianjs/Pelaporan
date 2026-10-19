@@ -137,7 +137,7 @@ class BuiltinTemplateGeneratorService
     }
 
     /**
-     * Generate all 10 PPTX files and their preview thumbnails
+     * Generate preview thumbnails for all ten PDF themes.
      */
     /**
      * Build only PDF template previews. The application no longer creates PPTX files.
@@ -169,100 +169,130 @@ class BuiltinTemplateGeneratorService
 
     protected function createPreviewImage(array $template, string $savePath): void
     {
-        $w = 640;
-        $h = 360; // 16:9 ratio exactly
+        if (!extension_loaded('gd')) {
+            return;
+        }
 
+        $w = 640;
+        $h = 360;
         $img = imagecreatetruecolor($w, $h);
         imageantialias($img, true);
 
-        // Parse hex colors
-        $bgR = hexdec(substr($template['bg_color'], 0, 2));
-        $bgG = hexdec(substr($template['bg_color'], 2, 2));
-        $bgB = hexdec(substr($template['bg_color'], 4, 2));
+        $hexColor = static function (string $hex) use ($img): int {
+            $hex = ltrim($hex, '#');
+            return imagecolorallocate($img,
+                hexdec(substr($hex, 0, 2)),
+                hexdec(substr($hex, 2, 2)),
+                hexdec(substr($hex, 4, 2))
+            );
+        };
 
-        $priR = hexdec(substr($template['primary_color'], 0, 2));
-        $priG = hexdec(substr($template['primary_color'], 2, 2));
-        $priB = hexdec(substr($template['primary_color'], 4, 2));
+        $bg = $hexColor($template['bg_color']);
+        $primary = $hexColor($template['primary_color']);
+        $secondary = $hexColor($template['secondary_color']);
+        $accent = $hexColor($template['accent_color']);
+        $white = imagecolorallocate($img, 255, 255, 255);
+        $ink = imagecolorallocate($img, 30, 41, 59);
+        $muted = imagecolorallocate($img, 100, 116, 139);
+        $pale = $hexColor($template['card_alt'] ?? $template['bg_color']);
 
-        $accR = hexdec(substr($template['accent_color'], 0, 2));
-        $accG = hexdec(substr($template['accent_color'], 2, 2));
-        $accB = hexdec(substr($template['accent_color'], 4, 2));
+        imagefilledrectangle($img, 0, 0, $w, $h, $bg);
+        $style = $template['style_type'] ?? 'tropical_pop';
 
-        $cBg = imagecolorallocate($img, $bgR, $bgG, $bgB);
-        $cPrimary = imagecolorallocate($img, $priR, $priG, $priB);
-        $cAccent = imagecolorallocate($img, $accR, $accG, $accB);
-        $cWhite = imagecolorallocate($img, 255, 255, 255);
-        $cDark = imagecolorallocate($img, 30, 41, 59);
-        $cMuted = imagecolorallocate($img, 100, 116, 139);
-        $cCardBorder = imagecolorallocate($img, 203, 213, 225);
-        $cPhotoBg = imagecolorallocate($img, 226, 232, 240);
-        $cRed = imagecolorallocate($img, 185, 28, 28);
-        $cGreen = imagecolorallocate($img, 22, 101, 52);
+        // Distinct graphic signatures per PDF theme; previews mirror each design family.
+        if ($style === 'tropical_pop') {
+            imagefilledellipse($img, 610, 24, 120, 120, $accent);
+            imagefilledellipse($img, 570, 12, 72, 72, $secondary);
+            imagefilledrectangle($img, 0, 0, $w, 58, $primary);
+        } elseif ($style === 'batik_nusantara') {
+            imagefilledrectangle($img, 0, 0, $w, 58, $primary);
+            for ($x = 8; $x < $w; $x += 24) {
+                imageline($img, $x, 60, $x + 20, 82, $accent);
+                imageline($img, $x + 20, 60, $x, 82, $accent);
+            }
+        } elseif ($style === 'comic_pop') {
+            imagefilledrectangle($img, 0, 0, $w, 62, $primary);
+            imagefilledellipse($img, 570, 30, 110, 110, $accent);
+            imagefilledellipse($img, 570, 30, 68, 68, $secondary);
+        } elseif ($style === 'scrapbook') {
+            imagefilledrectangle($img, 0, 0, $w, 58, $primary);
+            imagefilledrectangle($img, 480, 5, 630, 49, $accent);
+            imagerectangle($img, 12, 70, 310, 230, $accent);
+        } elseif ($style === 'memphis') {
+            imagefilledrectangle($img, 0, 0, $w, 58, $primary);
+            imagefilledrectangle($img, 585, 0, $w, 100, $accent);
+            imagefilledellipse($img, 580, 26, 62, 62, $secondary);
+            imageline($img, 0, 63, $w, 63, $accent);
+        } elseif ($style === 'festival') {
+            imagefilledrectangle($img, 0, 0, $w, 66, $primary);
+            imagefilledrectangle($img, 0, 58, $w, 66, $accent);
+            for ($x = 20; $x < $w; $x += 70) {
+                imagefilledellipse($img, $x, 82, 18, 18, $secondary);
+            }
+        } elseif ($style === 'retro_groovy') {
+            imagefilledrectangle($img, 0, 0, $w, 58, $primary);
+            imagefilledellipse($img, 560, 28, 120, 120, $accent);
+            imagefilledellipse($img, 560, 28, 80, 80, $secondary);
+            imagefilledellipse($img, 560, 28, 40, 40, $primary);
+        } elseif ($style === 'rainbow_infographic') {
+            imagefilledrectangle($img, 0, 0, $w, 58, $primary);
+            $colors = [$accent, $secondary, $primary, $muted, $pale];
+            foreach ($colors as $i => $color) {
+                imagefilledrectangle($img, $i * 128, 58, ($i + 1) * 128, 66, $color);
+            }
+        } elseif ($style === 'paper_cut') {
+            imagefilledrectangle($img, 0, 0, $w, 58, $primary);
+            imagefilledrectangle($img, 12, 70, 310, 230, $secondary);
+            imagefilledrectangle($img, 24, 82, 298, 218, $white);
+            imagefilledrectangle($img, 330, 70, 628, 230, $accent);
+        } else {
+            imagefilledrectangle($img, 0, 0, $w, 58, $primary);
+            imagefilledellipse($img, 615, 26, 90, 90, $accent);
+            imagefilledellipse($img, 585, 45, 56, 56, $secondary);
+        }
 
-        // 1. Fill entire background
-        imagefilledrectangle($img, 0, 0, $w, $h, $cBg);
+        imagestring($img, 2, 16, 10, 'BPSDM • LAPORAN PENGAWASAN LINGKUNGAN', $white);
+        $label = strtoupper($template['name']);
+        if (strlen($label) > 36) $label = substr($label, 0, 34) . '..';
+        imagestring($img, 4, 16, 31, $label, $white);
 
-        // 2. Full-bleed Top Header Banner
-        imagefilledrectangle($img, 0, 0, $w, 56, $cPrimary);
-        imagefilledrectangle($img, 0, 56, $w, 60, $cAccent);
+        // Photo and information blocks. Placement shifts by design family.
+        if (in_array($style, ['paper_cut', 'comic_pop', 'memphis'], true)) {
+            imagefilledrectangle($img, 18, 92, 405, 250, $white);
+            imagefilledrectangle($img, 28, 102, 395, 240, $pale);
+            imagefilledrectangle($img, 420, 92, 622, 250, $secondary);
+            imagefilledrectangle($img, 432, 104, 610, 238, $white);
+        } elseif (in_array($style, ['scrapbook', 'batik_nusantara'], true)) {
+            imagefilledrectangle($img, 18, 92, 315, 250, $white);
+            imagerectangle($img, 18, 92, 315, 250, $accent);
+            imagefilledrectangle($img, 326, 92, 622, 250, $white);
+            imagerectangle($img, 326, 92, 622, 250, $accent);
+        } else {
+            imagefilledrectangle($img, 18, 92, 315, 250, $white);
+            imagefilledrectangle($img, 326, 92, 622, 250, $white);
+            imagefilledrectangle($img, 26, 100, 307, 242, $pale);
+            imagefilledrectangle($img, 334, 100, 614, 242, $pale);
+        }
+        imagestring($img, 2, 88, 160, 'FOTO LOKASI 1', $muted);
+        imagestring($img, 2, 397, 160, 'FOTO LOKASI 2', $muted);
 
-        // Header Text
-        imagestring($img, 2, 16, 10, "BPSDM PROVINSI • PENGAWASAN LINGKUNGAN", $cAccent);
-        imagestring($img, 4, 16, 28, strtoupper($template['name']), $cWhite);
-        imagestring($img, 2, 500, 20, "16:9 WIDESCREEN", $cAccent);
+        // Full-width findings panel with colorful status and section accents.
+        imagefilledrectangle($img, 18, 260, 622, 324, $white);
+        imagefilledrectangle($img, 18, 260, 622, 278, $primary);
+        imagefilledrectangle($img, 28, 288, 210, 314, $pale);
+        imagefilledrectangle($img, 220, 288, 410, 314, $pale);
+        imagefilledrectangle($img, 420, 288, 612, 314, $pale);
+        imagestring($img, 2, 28, 264, 'STATUS • CATATAN • PERMASALAHAN • SOLUSI', $white);
+        imagefilledrectangle($img, 0, 336, $w, $h, $primary);
+        imagefilledrectangle($img, 0, 332, $w, 336, $accent);
+        imagestring($img, 2, 16, 344, 'PDF WIDESCREEN 16:9 • 6 HALAMAN', $white);
 
-        // 3. Left Section: 2 Photos (Filling width without gap)
-        // Photo 1
-        imagefilledrectangle($img, 16, 68, 310, 220, $cWhite);
-        imagerectangle($img, 16, 68, 310, 220, $cAccent);
-        imagefilledrectangle($img, 16, 68, 310, 84, $cPrimary);
-        imagestring($img, 2, 22, 70, "DOKUMENTASI 1: PERSPEKTIF", $cAccent);
-        imagefilledrectangle($img, 20, 88, 306, 216, $cPhotoBg);
-        imagestring($img, 2, 85, 145, "[ FOTO AREA UTAMA ]", $cMuted);
-
-        // Photo 2
-        imagefilledrectangle($img, 320, 68, 624, 220, $cWhite);
-        imagerectangle($img, 320, 68, 624, 220, $cAccent);
-        imagefilledrectangle($img, 320, 68, 624, 84, $cPrimary);
-        imagestring($img, 2, 326, 70, "DOKUMENTASI 2: DETAIL", $cAccent);
-        imagefilledrectangle($img, 324, 88, 620, 216, $cPhotoBg);
-        imagestring($img, 2, 395, 145, "[ FOTO TITIK DETAIL ]", $cMuted);
-
-        // 4. Bottom Section: 3-Column Structured Findings (No empty space)
-        // Card 1: Catatan
-        imagefilledrectangle($img, 16, 228, 212, 325, $cWhite);
-        imagerectangle($img, 16, 228, 212, 325, $cCardBorder);
-        imagefilledrectangle($img, 16, 228, 212, 244, $cPrimary);
-        imagestring($img, 2, 20, 230, "CATATAN PEMANTAUAN", $cWhite);
-        imagestring($img, 1, 22, 252, "Area bersih & terawat.", $cDark);
-        imagestring($img, 1, 22, 266, "5 Titik pantau lengkap.", $cDark);
-        imagestring($img, 1, 22, 280, "Status: Terverifikasi", $cGreen);
-
-        // Card 2: Permasalahan
-        imagefilledrectangle($img, 220, 228, 416, 325, $cWhite);
-        imagerectangle($img, 220, 228, 416, 325, $cCardBorder);
-        imagefilledrectangle($img, 220, 228, 416, 244, $cRed);
-        imagestring($img, 2, 226, 230, "IDENTIFIKASI MASALAH", $cWhite);
-        imagestring($img, 1, 226, 252, "Pengecekan saluran air,", $cDark);
-        imagestring($img, 1, 226, 266, "pemilahan sampah,", $cDark);
-        imagestring($img, 1, 226, 280, "ventilasi udara ruang.", $cDark);
-
-        // Card 3: Solusi
-        imagefilledrectangle($img, 424, 228, 624, 325, $cWhite);
-        imagerectangle($img, 424, 228, 624, 325, $cCardBorder);
-        imagefilledrectangle($img, 424, 228, 624, 244, $cGreen);
-        imagestring($img, 2, 430, 230, "SOLUSI & TINDAK LANJUT", $cWhite);
-        imagestring($img, 1, 430, 252, "Jadwal sanitasi rutin,", $cDark);
-        imagestring($img, 1, 430, 266, "peremajaan tempat sampah,", $cDark);
-        imagestring($img, 1, 430, 280, "tindak lanjut tim kebersihan.", $cDark);
-
-        // 5. Full-bleed Footer Ribbon
-        imagefilledrectangle($img, 0, 336, $w, $h, $cPrimary);
-        imagefilledrectangle($img, 0, 334, $w, 336, $cAccent);
-        imagestring($img, 2, 16, 342, "PowerPoint Widescreen 16:9 • 6 Halaman Slide • Sistem BPSDM", $cWhite);
-        imagestring($img, 2, 545, 342, "BPSDM PROV", $cAccent);
-
+        $directory = dirname($savePath);
+        if (!is_dir($directory)) {
+            mkdir($directory, 0755, true);
+        }
         imagepng($img, $savePath);
         imagedestroy($img);
     }
+
 }
