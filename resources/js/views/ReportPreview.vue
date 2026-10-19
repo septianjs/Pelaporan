@@ -656,8 +656,6 @@ const openPdf = () => {
 const downloadPdf = () => {
   window.open(`${baseUrl}/reports/${report.value.id}/pdf`, '_blank');
 };
-  window.open(`${baseUrl}/reports/${report.value.id}/pptx`, '_blank');
-};
 
 // ── Share (Capacitor native PDF File Share) ──
 const shareReport = async () => {
