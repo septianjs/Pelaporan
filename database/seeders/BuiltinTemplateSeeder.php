@@ -8,9 +8,7 @@ use Illuminate\Database\Seeder;
 
 class BuiltinTemplateSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
+    /** Seed built-in PDF themes and previews only. */
     public function run(): void
     {
         $generator = new BuiltinTemplateGeneratorService();
@@ -23,12 +21,14 @@ class BuiltinTemplateSeeder extends Seeder
                     'name' => $item['name'],
                     'description' => $item['description'],
                     'type' => 'builtin',
-                    'pptx_path' => $item['pptx_path'],
+                    'pptx_path' => null,
                     'preview_path' => $item['preview_path'],
                     'active' => true,
                 ]
             );
         }
+
+        // Legacy uploaded PPTX templates are no longer selectable in PDF-only mode.
+        Template::where('type', 'uploaded')->update(['active' => false]);
     }
 }
-
