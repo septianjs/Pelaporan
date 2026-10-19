@@ -9,7 +9,6 @@ use App\Models\ReportLocation;
 use App\Models\ReportPhoto;
 use App\Models\Template;
 use App\Services\ReportPdfService;
-use App\Services\ReportTemplateEngineService;
 use App\Mail\ReportSubmittedMail;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -87,11 +86,10 @@ class ReportController extends Controller
     }
 
     /**
-     * Store a newly created report in storage and automatically generate its PPTX and 16:9 PDF.
+     * Store a report and generate its 16:9 PDF.
      */
     public function store(
         Request $request,
-        ReportTemplateEngineService $engine,
         ReportPdfService $pdfService
     ): JsonResponse {
         $validated = $request->validate([
@@ -190,17 +188,7 @@ class ReportController extends Controller
             return $report;
         });
 
-        // 1. Generate PPTX presentation using Template Engine
-        try {
-            $engine->generatePresentation($report);
-            $report->refresh();
-        } catch (\Throwable $e) {
-            Log::error("Template Engine Error for Report #{$report->id}: " . $e->getMessage(), [
-                'trace' => $e->getTraceAsString(),
-            ]);
-        }
-
-        // 2. Generate 16:9 Widescreen PDF
+        // Generate 16:9 Widescreen PDF
         try {
             $pdfService->generatePdf($report);
             $report->refresh();
@@ -214,7 +202,7 @@ class ReportController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Laporan berhasil disimpan, PPTX dan PDF 16:9 siap digunakan.',
+            'message' => 'Laporan berhasil disimpan dan PDF 16:9 siap digunakan.',
             'data' => $report,
         ], 201);
     }
@@ -231,30 +219,6 @@ class ReportController extends Controller
             'status' => 'success',
             'data' => $report,
         ]);
-    }
-
-    /**
-     * Trigger manual generation / regeneration of PPTX for a report.
-     */
-    public function generatePptx(int $id, ReportTemplateEngineService $engine): JsonResponse
-    {
-        $report = Report::findOrFail($id);
-        try {
-            $engine->generatePresentation($report);
-            $report->refresh();
-            $report->load(['template', 'reportLocations.location', 'reportLocations.reportPhotos']);
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Presentasi PPTX berhasil digenerate.',
-                'data' => $report,
-            ]);
-        } catch (\Throwable $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Gagal membuat presentasi PPTX: ' . $e->getMessage(),
-            ], 500);
-        }
     }
 
     /**
@@ -279,35 +243,6 @@ class ReportController extends Controller
                 'message' => 'Gagal membuat dokumen PDF: ' . $e->getMessage(),
             ], 500);
         }
-    }
-
-    /**
-     * Download the generated PPTX presentation.
-     */
-    public function downloadPptx(int $id)
-    {
-        $report = Report::findOrFail($id);
-
-        if (!$report->pptx_path) {
-            $engine = app(ReportTemplateEngineService::class);
-            $engine->generatePresentation($report);
-            $report->refresh();
-        }
-
-        $fullPath = storage_path("app/public/{$report->pptx_path}");
-        if (!file_exists($fullPath)) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'File PPTX belum tersedia di server.',
-            ], 404);
-        }
-
-        $cleanReportNum = preg_replace('/[^A-Za-z0-9_\-]/', '_', $report->report_number);
-        $downloadName = "Laporan_{$cleanReportNum}.pptx";
-
-        return response()->download($fullPath, $downloadName, [
-            'Content-Type' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-        ]);
     }
 
     /**
@@ -451,7 +386,7 @@ class ReportController extends Controller
             }
         }
 
-        // Delete report files directory (PPTX, PDF, temp files)
+        // Delete report files directory (PDF and temporary files)
         $reportDir = storage_path("app/public/reports/{$report->id}");
         if (File::isDirectory($reportDir)) {
             File::deleteDirectory($reportDir);
