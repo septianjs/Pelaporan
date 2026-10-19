@@ -332,6 +332,20 @@
   .theme-botanical .cover-photo-frame { right: 28pt; top: 140pt; border: 3pt solid #{{ $theme['accent_color'] ?? '84CC16' }}; border-radius: 20pt 4pt 20pt 4pt; }
   .theme-botanical .loc-header { border-bottom-width: 5pt; }
   .theme-botanical .photo-box, .theme-botanical .info-box { border-radius: 16pt 4pt 16pt 4pt; border: 2pt solid #{{ $theme['secondary_color'] ?? '334155' }}; }
+  /* Alternate composition: stacked documentary photos on the left, findings panel on the right. */
+  .theme-paper_cut .photos-container, .theme-rainbow_infographic .photos-container { width: 330pt; margin-bottom: 0; }
+  .theme-paper_cut .photo-box, .theme-rainbow_infographic .photo-box { width: 315pt; float: left; padding: 5pt; }
+  .theme-paper_cut .photo-img, .theme-rainbow_infographic .photo-img { width: 300pt; height: 165pt; }
+  .theme-paper_cut .photo-placeholder, .theme-rainbow_infographic .photo-placeholder { width: 300pt; height: 165pt; line-height: 165pt; }
+  .theme-paper_cut .photo-box-right, .theme-rainbow_infographic .photo-box-right { clear: left; float: left; margin-top: 8pt; }
+  .theme-paper_cut .info-box, .theme-rainbow_infographic .info-box { position: absolute; top: 100pt; right: 28pt; width: 535pt; }
+  .theme-batik_nusantara .photos-container { padding-top: 4pt; }
+  .theme-batik_nusantara .photo-box:first-child { margin-left: 4pt; }
+  .theme-batik_nusantara .photo-box-right { margin-right: 4pt; }
+  .theme-festival .info-box { border-top-width: 7pt; }
+  .theme-memphis .info-box { border-right-width: 8pt; }
+  .theme-retro_groovy .loc-title { letter-spacing: 1pt; }
+  .theme-botanical .info-box { border-left-width: 8pt; }
 </style>
 </head>
 <body class="theme-{{ $theme['style_type'] ?? 'tropical_pop' }}">
