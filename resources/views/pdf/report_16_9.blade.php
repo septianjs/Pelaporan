@@ -104,8 +104,8 @@
     position: Absolute;
     top: 150pt;
     right: 20pt;
-    width: 560pt;
-    height: 320pt;
+    width: 580pt;
+    height: 344pt;
     background: #ffffff;
     border-radius: 10pt;
     padding: 8pt;
