@@ -301,7 +301,7 @@
           Pilih Format Tema Presentasi Widescreen 16:9
         </h3>
         <p class="text-xs text-stone-500 mb-4">
-          Laporan PowerPoint dan PDF 6 halaman akan dirender otomatis berdasarkan tata letak template terpilih.
+          PDF 6 halaman akan dibuat otomatis berdasarkan desain template terpilih.
         </p>
 
         <div class="space-y-3">
@@ -412,7 +412,7 @@
 
         <!-- Simpan & Selesai Banner -->
         <div class="p-3 rounded-xl bg-[#EDF4EF] border border-[#CFE1D5] text-xs text-[#173023]">
-          Setelah data diverifikasi dan disimpan, sistem akan langsung membuat dokumen slide presentasi PPTX & PDF 16:9.
+          Setelah data diverifikasi dan disimpan, sistem akan langsung membuat dokumen PDF 16:9.
         </div>
       </div>
     </div>
@@ -571,7 +571,7 @@ const stepDescriptions = [
   'Dokumentasi dan evaluasi kebersihan Ruang Kerja.',
   'Dokumentasi dan evaluasi kebersihan Toilet.',
   'Dokumentasi dan evaluasi kebersihan Area Parkir.',
-  'Pilih 1 dari 10 template presentasi widescreen 16:9.',
+  'Pilih 1 dari 10 desain PDF widescreen 16:9.',
   'Tinjau kembali data laporan sebelum penyimpanan final.',
 ];
 
