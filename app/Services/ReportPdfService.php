@@ -26,7 +26,7 @@ class ReportPdfService
     protected const LOC_PHOTO_H = 220;
 
     public function __construct(
-        protected ReportTemplateEngineService $imageCropper = new ReportTemplateEngineService()
+        protected ImageCropService $imageCropper = new ImageCropService()
     ) {
     }
 
@@ -151,6 +151,9 @@ class ReportPdfService
             'accent_color'  => '0284C7',    // Sky Blue
             'bg_color'      => '#F8FAFC',    // Slate 50
             'card_bg'       => '#FFFFFF',
+            'secondary_color' => '2563EB',
+            'card_alt' => '#DBEAFE',
+            'style_type' => 'royal_sapphire',
         ];
 
         if (!$template) {
@@ -165,6 +168,9 @@ class ReportPdfService
                     'accent_color'  => $def['accent_color'],
                     'bg_color'      => '#' . $def['bg_color'],
                     'card_bg'       => '#' . $def['card_bg'],
+                    'secondary_color' => $def['secondary_color'] ?? $def['primary_color'],
+                    'card_alt' => '#' . ($def['card_alt'] ?? $def['bg_color']),
+                    'style_type' => $def['style_type'] ?? 'royal_sapphire',
                 ];
             }
         }
