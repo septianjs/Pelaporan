@@ -1,6 +1,11 @@
 
 @import "tailwindcss";
 
+/* Desain slide laporan: basis web dulu, baru 10 desain template (file desain ini
+   juga di-inline ke PDF oleh resources/views/pdf/report_16_9.blade.php). */
+@import "./report-slide-base.css";
+@import "./report-templates.css";
+
 @source "../**/*.js";
 @source "../**/*.vue";
 @source "../../resources/views/**/*.blade.php";

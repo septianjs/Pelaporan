@@ -67,28 +67,13 @@
         :key="tpl.id"
         class="bg-[#FAF9F5] rounded-2xl p-4 border border-[#E3E0D6] hover:border-[#14251D]/30 transition overflow-hidden shadow-sm"
       >
-        <!-- 16:9 Preview Thumbnail -->
-        <div class="relative aspect-video w-full rounded-xl overflow-hidden bg-[#ECE8DD] border border-[#DCD7CA] mb-3 shadow-inner">
-          <img
-            v-if="tpl.preview_url"
-            :src="tpl.preview_url"
-            :alt="tpl.name"
-            class="w-full h-full object-cover"
-            loading="lazy"
-          />
-          <div v-else class="w-full h-full flex items-center justify-center text-xs text-[#808983]">
-            Pratinjau Belum Tersedia
-          </div>
+        <!-- Pratinjau desain asli (CSS yang sama dengan PDF): sampul + titik pemantauan -->
+        <div class="relative mb-3">
+          <TemplateThumb :theme="tpl.theme" :name="tpl.name" />
 
           <!-- Type badge -->
-          <div class="absolute top-2 left-2 px-2.5 py-0.5 rounded-md backdrop-blur-md text-[#FAF9F5] text-[10px] font-semibold tracking-wide border border-white/10"
-            :class="tpl.type === 'builtin' ? 'bg-[#14251D]/90 text-[#D8C79C]' : 'bg-[#6B5A2E]/90 text-white'">
+          <div class="absolute top-1.5 left-1.5 px-2.5 py-0.5 rounded-md backdrop-blur-md bg-[#14251D]/90 text-[#D8C79C] text-[10px] font-semibold tracking-wide border border-white/10">
             TEMA PDF
-          </div>
-
-          <!-- 16:9 tag -->
-          <div class="absolute bottom-2 right-2 px-2 py-0.5 rounded-md bg-[#0E1A14]/80 backdrop-blur-md text-[#D8C79C] text-[10px] font-bold font-mono">
-            16:9 Widescreen
           </div>
         </div>
 
@@ -225,6 +210,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
 import api from '../services/api.js';
+import TemplateThumb from '../components/TemplateThumb.vue';
 
 const templates = ref([]);
 const loading = ref(true);

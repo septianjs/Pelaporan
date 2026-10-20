@@ -316,21 +316,13 @@
                 : 'border-[#E7E5DE] hover:border-stone-300 bg-white'
             ]"
           >
-            <!-- 16:9 Thumbnail -->
-            <div class="relative aspect-video w-full rounded-xl overflow-hidden bg-stone-100 border border-stone-200">
-              <img
-                v-if="tpl.preview_url"
-                :src="tpl.preview_url"
-                :alt="tpl.name"
-                class="w-full h-full object-cover"
-              />
-              <div v-else class="w-full h-full flex items-center justify-center text-xs text-stone-400">
-                Pratinjau Template
-              </div>
+            <!-- Pratinjau desain asli (CSS yang sama dengan PDF) -->
+            <div class="relative">
+              <TemplateThumb :theme="tpl.theme" :name="tpl.name" />
 
               <div
                 v-if="form.template_id === tpl.id"
-                class="absolute top-2.5 right-2.5 px-2.5 py-1 rounded-full bg-[#14251D] text-[#D8C79C] text-[10px] font-bold shadow flex items-center gap-1"
+                class="absolute top-2 right-2 px-2.5 py-1 rounded-full bg-[#14251D] text-[#D8C79C] text-[10px] font-bold shadow flex items-center gap-1"
               >
                 <span>Aktif Terpilih</span>
                 <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -522,6 +514,7 @@ import { ref, reactive, computed, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import api from '../services/api';
 import PhotoUploader from '../components/PhotoUploader.vue';
+import TemplateThumb from '../components/TemplateThumb.vue';
 import {
   saveFormDraft,
   getFormDraft,
@@ -629,7 +622,7 @@ const formattedFullDate = computed(() => {
 
 const selectedTemplateName = computed(() => {
   const tpl = templates.value.find(t => t.id === form.template_id);
-  return tpl ? tpl.name : 'Corporate Blue';
+  return tpl ? tpl.name : '-';
 });
 
 // Fetch Initial Data

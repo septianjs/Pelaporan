@@ -1,0 +1,306 @@
+/*
+ * Versi WEB dari CSS dasar slide laporan (padanan blade pdf/report_16_9.blade.php).
+ * Nilai diturunkan dari blade; warna tema memakai CSS variable --rt-* yang diisi
+ * ReportSlide.vue dari atribut Template::theme (sumber yang sama dengan PDF).
+ * Desain per-template ada di report-templates.css (file yang sama dengan PDF).
+ * Urutan import di app.css: file ini DULU, lalu report-templates.css.
+ *
+ * Catatan kesetaraan dengan DomPDF:
+ *  - DomPDF mengabaikan box-sizing: border-box (padding/border ditambahkan di luar
+ *    width/height), jadi di sini dipaksa content-box agar tata letak sama.
+ *  - Satuan pt dipertahankan; slide dirender 960pt x 540pt lalu diskalakan (transform).
+ */
+
+.rt-scope {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background-color: var(--rt-bg);
+  color: #1e293b;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  line-height: normal;
+  text-align: left;
+  user-select: none;
+}
+.rt-scope *,
+.rt-scope *::before,
+.rt-scope *::after {
+  box-sizing: content-box;
+}
+.rt-scope .rt-stage {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 960pt;
+  height: 540pt;
+  transform-origin: 0 0;
+}
+.rt-scope img {
+  display: inline;
+  max-width: none;
+}
+.rt-scope .cover-photo-img,
+.rt-scope .cover-photo-placeholder,
+.rt-scope .photo-img {
+  object-fit: cover;
+}
+.rt-scope .cover-photo-img { object-position: 50% 20%; }
+.rt-scope h1 { margin: 0; }
+
+.rt-scope .slide {
+  width: 960pt;
+  height: 540pt;
+  page-break-after: always;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--rt-bg);
+}
+.rt-scope .slide-last {
+  page-break-after: avoid;
+}
+.rt-scope .cover-header {
+  background: var(--rt-primary);
+  height: 70pt;
+  padding: 24pt 50pt;
+  position: relative;
+  border-bottom: 5pt solid var(--rt-accent);
+}
+.rt-scope .cover-badge {
+  color: var(--rt-accent);
+  font-size: 10pt;
+  font-weight: bold;
+  letter-spacing: 2pt;
+  text-transform: uppercase;
+  margin-bottom: 6pt;
+}
+.rt-scope .cover-title {
+  color: #ffffff;
+  font-size: 26pt;
+  font-weight: bold;
+  letter-spacing: 0.5pt;
+  margin: 0;
+  line-height: 1.1;
+}
+.rt-scope .cover-body {
+  padding: 40pt 50pt;
+  height: 380pt;
+  position: relative;
+}
+.rt-scope .cover-card-left {
+  position: relative;
+  top: 50px;
+  left: 25px;
+  width: 280pt;
+  background: #ffffff;
+  border-radius: 14pt;
+  padding: 24pt;
+  border: 1.5pt solid #e2e8f0;
+  box-shadow: 0 4pt 12pt rgba(0,0,0,0.03);
+}
+.rt-scope .meta-group {
+  margin-bottom: 16pt;
+}
+.rt-scope .meta-label {
+  font-size: 9pt;
+  font-weight: bold;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5pt;
+  margin-bottom: 3pt;
+}
+.rt-scope .meta-value {
+  font-size: 16pt;
+  font-weight: bold;
+  color: var(--rt-primary);
+}
+.rt-scope .meta-value-sub {
+  font-size: 13pt;
+  font-weight: bold;
+  color: #334155;
+}
+.rt-scope .cover-photo-frame {
+  position: Absolute;
+  top: 150pt;
+  right: 20pt;
+  width: 580pt;
+  height: 344pt;
+  background: #ffffff;
+  border-radius: 10pt;
+  padding: 8pt;
+  border: 2pt solid var(--rt-accent);
+  text-align: center;
+  box-shadow: 0 6pt 16pt rgba(0,0,0,0.06);
+}
+.rt-scope .cover-photo-img {
+  width: 560pt;
+  height: 300pt;
+  border-radius: 12pt;
+  object-fit: cover;
+}
+.rt-scope .cover-photo-placeholder {
+  width: 560pt;
+  height: 300pt;
+  border-radius: 12pt;
+  background: #e2e8f0;
+  line-height: 260pt;
+  color: #94a3b8;
+  font-size: 12pt;
+  font-weight: bold;
+}
+.rt-scope .cover-footer {
+  position: absolute;
+  bottom: 14pt;
+  left: 50pt;
+  right: 50pt;
+  font-size: 9pt;
+  color: #94a3b8;
+  border-top: 1pt solid #e2e8f0;
+  padding-top: 8pt;
+}
+.rt-scope .loc-header {
+  background: var(--rt-primary);
+  padding: 10pt 45pt;
+  color: #ffffff;
+  height: 44pt;
+  border-bottom: 4pt solid var(--rt-accent);
+}
+.rt-scope .loc-counter {
+  color: var(--rt-accent);
+  font-size: 9pt;
+  font-weight: bold;
+  letter-spacing: 1.5pt;
+  text-transform: uppercase;
+}
+.rt-scope .loc-title {
+  font-size: 20pt;
+  font-weight: bold;
+  margin-top: 2pt;
+  color: #ffffff;
+}
+.rt-scope .loc-body {
+  padding: 20pt 45pt;
+}
+.rt-scope .photos-container {
+  width: 100%;
+  margin-bottom: 16pt;
+}
+.rt-scope .photo-box {
+  width: 415pt;
+  background: #ffffff;
+  border-radius: 12pt;
+  border: 1.5pt solid #e2e8f0;
+  padding: 6pt;
+  float: left;
+  box-shadow: 0 4pt 10pt rgba(0,0,0,0.03);
+}
+.rt-scope .photo-box-right {
+  float: right;
+}
+.rt-scope .photo-img {
+  width: 400pt;
+  height: 220pt;
+  border-radius: 8pt;
+  object-fit: cover;
+  display: block;
+}
+.rt-scope .photo-placeholder {
+  width: 400pt;
+  height: 220pt;
+  border-radius: 8pt;
+  background: #f1f5f9;
+  text-align: center;
+  line-height: 220pt;
+  color: #94a3b8;
+  font-size: 11pt;
+  font-weight: bold;
+}
+.rt-scope .photo-label {
+  font-size: 8.5pt;
+  font-weight: bold;
+  color: #64748b;
+  text-align: center;
+  padding-top: 5pt;
+  text-transform: uppercase;
+  letter-spacing: 0.5pt;
+}
+.rt-scope .info-box {
+  clear: both;
+  background: #ffffff;
+  border-radius: 12pt;
+  padding: 14pt 18pt;
+  border: 1.5pt solid #e2e8f0;
+  box-shadow: 0 4pt 10pt rgba(0,0,0,0.03);
+}
+.rt-scope .badge-clean {
+  display: inline-block;
+  background: #dcfce7;
+  color: #15803d;
+  border: 1pt solid #86efac;
+  padding: 3pt 10pt;
+  border-radius: 6pt;
+  font-size: 10pt;
+  font-weight: bold;
+}
+.rt-scope .badge-attention {
+  display: inline-block;
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1pt solid #fca5a5;
+  padding: 3pt 10pt;
+  border-radius: 6pt;
+  font-size: 10pt;
+  font-weight: bold;
+}
+.rt-scope .info-table {
+  width: 100%;
+  margin-top: 8pt;
+  border-collapse: collapse;
+}
+.rt-scope .info-table td {
+  vertical-align: top;
+  padding: 4pt 0;
+  font-size: 10pt;
+}
+.rt-scope .info-title {
+  width: 130pt;
+  font-weight: bold;
+  color: #475569;
+}
+.rt-scope .info-content {
+  color: #1e293b;
+  line-height: 1.35;
+}
+.rt-scope .loc-footer {
+  position: absolute;
+  bottom: 14pt;
+  left: 45pt;
+  width: 870pt;
+  height: 14pt;
+  font-size: 8pt;
+  color: #94a3b8;
+  border-top: 1pt solid #e2e8f0;
+  padding-top: 5pt;
+}
+.rt-scope .footer-left {
+  float: left;
+  text-align: left;
+}
+.rt-scope .footer-right {
+  float: right;
+  text-align: right;
+}
+
+/* Ornamen header (padanan blade; warna aksen dari tema) */
+.rt-scope .cover-header { position: relative; }
+.rt-scope .cover-header::after {
+  content: '✦  ✦  ✦';
+  position: absolute; right: 42pt; top: 15pt;
+  font-size: 24pt; color: var(--rt-accent);
+}
+.rt-scope .loc-header { position: relative; }
+.rt-scope .loc-header::after {
+  content: '◆  ◆  ◆'; float: right;
+  color: var(--rt-accent);
+  font-size: 12pt; margin-top: -4pt;
+}

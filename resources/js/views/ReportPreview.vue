@@ -97,155 +97,21 @@
           </div>
         </div>
 
-        <!-- 16:9 Slide Canvas — with touch swipe support -->
+        <!-- 16:9 Slide Canvas — desain template yang SAMA dengan PDF (touch swipe didukung) -->
         <div
-          ref="slideCanvas"
-          class="relative w-full aspect-video rounded-xl overflow-hidden border border-slate-200 shadow-inner select-none touch-pan-y"
-          :style="{ backgroundColor: themeColors.bg }"
+          class="relative w-full rounded-xl overflow-hidden border border-slate-200 shadow-inner select-none touch-pan-y"
           @touchstart="onTouchStart"
           @touchend="onTouchEnd"
         >
-          <!-- ── SLIDE 0: COVER ── -->
           <Transition name="slide-fade" mode="out-in">
-            <div
-              v-if="activeSlideIndex === 0"
-              key="cover"
-              class="w-full h-full flex flex-col justify-between p-3"
-            >
-              <!-- Header bar -->
-              <div class="rounded-lg px-3 py-2 text-white shadow-sm flex items-center justify-between"
-                :style="{ backgroundColor: themeColors.primary }">
-                <div>
-                  <p class="text-[7px] font-bold tracking-widest text-amber-300 uppercase">
-                    BPSDM PROVINSI • PENGAWASAN LINGKUNGAN KANTOR
-                  </p>
-                  <h4 class="text-[11px] font-black leading-tight mt-0.5">
-                    LAPORAN PENGAWASAN LINGKUNGAN KANTOR
-                  </h4>
-                </div>
-                <span class="text-[8px] font-mono font-bold bg-white/20 px-2 py-0.5 rounded shrink-0">16:9</span>
-              </div>
-
-              <!-- Body -->
-              <div class="grid grid-cols-12 gap-2 my-1 items-center">
-                <!-- Meta card -->
-                <div class="col-span-7 bg-white/95 rounded-lg p-2 border border-slate-200 space-y-1.5 shadow-sm">
-                  <div>
-                    <span class="text-[7px] font-bold uppercase text-slate-400 block">Nomor Laporan</span>
-                    <p class="font-mono font-bold text-blue-700 text-[10px]">{{ report.report_number }}</p>
-                  </div>
-                  <div>
-                    <span class="text-[7px] font-bold uppercase text-slate-400 block">Hari & Tanggal</span>
-                    <p class="font-semibold text-slate-800 text-[9px] leading-snug">{{ report.formatted_date }}</p>
-                  </div>
-                  <div>
-                    <span class="text-[7px] font-bold uppercase text-slate-400 block">Petugas Pengawas</span>
-                    <p class="font-bold text-slate-900 text-[10px]">{{ report.officer_name }}</p>
-                  </div>
-                </div>
-
-                <!-- Officer photo -->
-                <div class="col-span-5 flex flex-col items-center justify-center gap-1">
-                  <div class="w-16 h-16 rounded-xl overflow-hidden border-2 border-white shadow-md bg-slate-200">
-                    <img v-if="report.officer_photo_url" :src="report.officer_photo_url"
-                      alt="Petugas" class="w-full h-full object-cover"/>
-                    <div v-else class="w-full h-full flex items-center justify-center">
-                      <svg class="w-7 h-7 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                      </svg>
-                    </div>
-                  </div>
-                  <span class="text-[7px] font-bold text-slate-500 uppercase">Petugas Pengawas</span>
-                </div>
-              </div>
-
-              <!-- Footer -->
-              <div class="text-[7px] text-slate-400 border-t border-slate-200/60 pt-1 flex justify-between">
-                <span>Sistem Pelaporan Pengawasan Lingkungan BPSDM</span>
-                <span>Cover Laporan</span>
-              </div>
-            </div>
-
-            <!-- ── SLIDES 1-5: LOCATION SLIDES ── -->
-            <div
-              v-else-if="currentLocation"
-              :key="'loc-' + activeSlideIndex"
-              class="w-full h-full flex flex-col justify-between p-3"
-            >
-              <!-- Header -->
-              <div class="rounded-lg px-2.5 py-1.5 text-white shadow-sm flex items-center justify-between"
-                :style="{ backgroundColor: themeColors.primary }">
-                <div class="min-w-0 mr-2">
-                  <p class="text-[7px] font-bold tracking-widest text-amber-300 uppercase">
-                    TITIK PEMANTAUAN {{ activeSlideIndex }} DARI 5
-                  </p>
-                  <h4 class="text-[11px] font-bold leading-tight truncate">
-                    {{ currentLocation.display_name || currentLocation.location?.name || ("Lokasi " + activeSlideIndex) }}
-                  </h4>
-                </div>
-                <span :class="[
-                    'text-[8px] font-bold px-2 py-0.5 rounded-full shrink-0',
-                    currentLocation.condition === 'clean'
-                      ? 'bg-emerald-500 text-white'
-                      : 'bg-rose-500 text-white'
-                  ]">
-                  {{ currentLocation.condition === 'clean' ? '✓ Bersih' : '⚠ Perlu Penanganan' }}
-                </span>
-              </div>
-
-              <!-- 2 Photos -->
-              <div class="grid grid-cols-2 gap-1.5 my-1 flex-1 min-h-0">
-                <div class="flex flex-col gap-0.5 min-h-0">
-                  <div class="flex-1 rounded-lg overflow-hidden border border-slate-200 bg-slate-200 min-h-0">
-                    <img v-if="getLocationPhoto(currentLocation, 'photo_1')"
-                      :src="getLocationPhoto(currentLocation, 'photo_1')"
-                      alt="Dokumentasi 1" class="w-full h-full object-cover"/>
-                    <div v-else class="w-full h-full flex items-center justify-center text-[8px] text-slate-400 font-bold">
-                      [ DOKUMENTASI 1 ]
-                    </div>
-                  </div>
-                  <span class="text-[7px] font-bold text-slate-500 text-center uppercase">Dokumentasi 1</span>
-                </div>
-                <div class="flex flex-col gap-0.5 min-h-0">
-                  <div class="flex-1 rounded-lg overflow-hidden border border-slate-200 bg-slate-200 min-h-0">
-                    <img v-if="getLocationPhoto(currentLocation, 'photo_2')"
-                      :src="getLocationPhoto(currentLocation, 'photo_2')"
-                      alt="Dokumentasi 2" class="w-full h-full object-cover"/>
-                    <div v-else class="w-full h-full flex items-center justify-center text-[8px] text-slate-400 font-bold">
-                      [ DOKUMENTASI 2 ]
-                    </div>
-                  </div>
-                  <span class="text-[7px] font-bold text-slate-500 text-center uppercase">Dokumentasi 2</span>
-                </div>
-              </div>
-
-              <!-- Findings -->
-              <div class="bg-white/95 rounded-lg p-1.5 border border-slate-200 shadow-sm">
-                <template v-if="currentLocation.condition === 'clean'">
-                  <p class="text-[8px] leading-snug">
-                    <strong class="text-emerald-700">Catatan: </strong>
-                    <span class="text-slate-700">{{ currentLocation.notes || 'Area terpantau bersih dan terawat.' }}</span>
-                  </p>
-                </template>
-                <template v-else>
-                  <p class="text-[8px] leading-snug">
-                    <strong class="text-rose-700">Permasalahan: </strong>
-                    <span class="text-slate-800 font-semibold">{{ currentLocation.problem || '-' }}</span>
-                  </p>
-                  <p class="text-[8px] leading-snug mt-0.5">
-                    <strong class="text-blue-700">Solusi: </strong>
-                    <span class="text-slate-700">{{ currentLocation.solution || '-' }}</span>
-                  </p>
-                </template>
-              </div>
-
-              <!-- Footer -->
-              <div class="text-[7px] text-slate-400 border-t border-slate-200/60 pt-0.5 flex justify-between">
-                <span>{{ report.report_number }} • {{ report.officer_name }}</span>
-                <span>Slide {{ activeSlideIndex + 1 }}/{{ totalSlides }}</span>
-              </div>
-            </div>
+            <ReportSlide
+              :key="activeSlideIndex"
+              :theme="report.template?.theme"
+              :template-name="report.template?.name || ''"
+              :slide="activeSlideIndex"
+              :report="slideReport"
+              :locations="slideLocations"
+            />
           </Transition>
         </div>
 
@@ -526,6 +392,8 @@ import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import api from '../services/api.js';
 import { sharePdfDocument, openWhatsApp } from '../services/reportShare.js';
+import ReportSlide from '../components/ReportSlide.vue';
+import { normalizeReportLocations } from '../services/reportSlides.js';
 
 const route = useRoute();
 const reportId = route.params.id;
@@ -535,7 +403,7 @@ const loading = ref(true);
 const errorMessage = ref('');
 const report = ref(null);
 const activeSlideIndex = ref(0);
-const totalSlides = ref(6);
+const totalSlides = ref(6); // 1 sampul + 5 titik pemantauan, sama dengan PDF
 
 const generatingPdf = ref(false);
 
@@ -545,23 +413,14 @@ const generateError = ref('');
 // Touch swipe state
 let touchStartX = 0;
 
-// ── Theme palette ──
-const themeColors = computed(() => {
-  const key = report.value?.template?.template_key || '';
-  const palettes = {
-    'corporate-blue':       { primary: '#1E3A8A', bg: '#F8FAFC' },
-    'government-formal':    { primary: '#065F46', bg: '#FAFBF9' },
-    'modern-clean':         { primary: '#0F172A', bg: '#F1F5F9' },
-    'minimal-professional': { primary: '#18181B', bg: '#FFFFFF' },
-    'executive-report':     { primary: '#1E1B4B', bg: '#F8FAFC' },
-    'photo-focus':          { primary: '#27272A', bg: '#FAFAFA' },
-    'elegant-report':       { primary: '#312E81', bg: '#FDF4FF' },
-    'bpsdm-classic':        { primary: '#1D4ED8', bg: '#F0F9FF' },
-    'modern-government':    { primary: '#0E7490', bg: '#F8FAFC' },
-    'clean-documentation':  { primary: '#334155', bg: '#F8FAFC' },
-  };
-  return palettes[key] || { primary: '#1E3A8A', bg: '#F8FAFC' };
-});
+// ── Data slide: sama dengan yang dirender PDF (selalu 5 titik pemantauan) ──
+const slideLocations = computed(() => normalizeReportLocations(report.value));
+const slideReport = computed(() => ({
+  report_number: report.value?.report_number,
+  formatted_date: report.value?.formatted_date || report.value?.inspection_date,
+  officer_name: report.value?.officer_name,
+  officer_photo_url: report.value?.officer_photo_url || null,
+}));
 
 // ── Computed ──
 const hasPdf  = computed(() => !!report.value?.pdf_path);
@@ -569,12 +428,7 @@ const hasPdf  = computed(() => !!report.value?.pdf_path);
 
 const activeSlideTitle = computed(() => {
   if (activeSlideIndex.value === 0) return 'Cover Laporan';
-  return currentLocation.value?.display_name || currentLocation.value?.location?.name || `Lokasi ${activeSlideIndex.value}`;
-});
-
-const currentLocation = computed(() => {
-  if (activeSlideIndex.value === 0) return null;
-  return report.value?.report_locations?.[activeSlideIndex.value - 1] || null;
+  return slideLocations.value[activeSlideIndex.value - 1]?.name || `Lokasi ${activeSlideIndex.value}`;
 });
 
 // ── Slide navigation ──
@@ -595,12 +449,6 @@ const onTouchEnd = (e) => {
     if (diff > 0) nextSlide();
     else prevSlide();
   }
-};
-
-// ── Helper: get photo URL ──
-const getLocationPhoto = (loc, type) => {
-  const photo = loc?.report_photos?.find(p => p.photo_type === type);
-  return photo?.photo_url || null;
 };
 
 // ── Base URL for API ──
@@ -626,7 +474,6 @@ const fetchReport = async () => {
     const res = await api.get(`/reports/${id}`);
     if (res.data?.data) {
       report.value = res.data.data;
-      totalSlides.value = 1 + (report.value.report_locations?.length || 5);
     }
   } catch (err) {
     errorMessage.value = err.response?.data?.message || 'Gagal memuat pratinjau laporan.';

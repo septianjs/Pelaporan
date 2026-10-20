@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Services\BuiltinTemplateGeneratorService;
 use Illuminate\Support\Facades\Storage;
 
 class Template extends Model
@@ -29,6 +30,7 @@ class Template extends Model
 
     protected $appends = [
         'preview_url',
+        'theme',
     ];
 
     public function reports(): HasMany
@@ -43,5 +45,14 @@ class Template extends Model
         }
         return null;
     }
-}
 
+    /**
+     * Desain template (warna, style_type, ukuran foto) yang dikirim ke aplikasi.
+     * Berasal dari definisi yang SAMA dengan yang dipakai generator PDF, sehingga
+     * pemilih template, pratinjau, dan PDF tidak bisa berbeda desain.
+     */
+    public function getThemeAttribute(): array
+    {
+        return BuiltinTemplateGeneratorService::resolveTheme($this->template_key);
+    }
+}

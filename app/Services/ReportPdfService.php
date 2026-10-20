@@ -13,17 +13,12 @@ use Illuminate\Support\Facades\Storage;
 
 class ReportPdfService
 {
-    // Dimensi box foto di PDF (lihat resources/views/pdf/report_16_9.blade.php),
-    // dipakai untuk crop server-side agar tidak gepeng/distorsi (DomPDF tidak
-    // mendukung CSS object-fit sama sekali, jadi crop harus dilakukan manual
-    // sebelum gambar dikirim ke template).
-    // Harus sama dengan .cover-photo-img di report_16_9.blade.php (560pt x 300pt),
-    // kalau tidak foto akan tampak melar/gepeng karena DomPDF tidak mendukung object-fit.
-    protected const OFFICER_PHOTO_W = 560;
-    protected const OFFICER_PHOTO_H = 300;
+    // Ukuran foto TIDAK lagi ditulis di sini. Ukuran per tema berasal dari
+    // BuiltinTemplateGeneratorService::photoSpecs() dan dipakai untuk (a) crop
+    // server-side di bawah, (b) style inline <img> di blade, dan (c) pratinjau di
+    // aplikasi. DomPDF tidak mendukung object-fit, jadi crop harus persis sama
+    // dengan ukuran tampil, kalau tidak foto tampak gepeng/melar.
     protected const OFFICER_PHOTO_FOCUS_Y = 0.2; // kepala biasanya di bagian atas foto potret
-    protected const LOC_PHOTO_W = 400;
-    protected const LOC_PHOTO_H = 220;
 
     public function __construct(
         protected ImageCropService $imageCropper = new ImageCropService()
@@ -59,17 +54,15 @@ class ReportPdfService
         // karena DomPDF mengabaikan CSS object-fit sepenuhnya.
         $officerPhotoBase64 = $this->croppedPhotoBase64(
             $report->officer_photo,
-            self::OFFICER_PHOTO_W,
-            self::OFFICER_PHOTO_H,
+            $theme['photo']['officer'][0],
+            $theme['photo']['officer'][1],
             $outputDir,
             'officer',
             self::OFFICER_PHOTO_FOCUS_Y
         );
 
         $locationsData = [];
-        $compactPhotoLayout = in_array($theme['style_type'] ?? '', ['paper_cut', 'rainbow_infographic'], true);
-        $locationPhotoWidth = $compactPhotoLayout ? 300 : self::LOC_PHOTO_W;
-        $locationPhotoHeight = $compactPhotoLayout ? 165 : self::LOC_PHOTO_H;
+        [$locationPhotoWidth, $locationPhotoHeight] = $theme['photo']['location'];
         $reportLocationsByOrder = $report->reportLocations->values();
 
         // Selalu hasilkan tepat 5 entri lokasi (sesuai 5 titik pemantauan tetap),
@@ -219,40 +212,25 @@ class ReportPdfService
     }
 
     /**
-     * Resolve Color Palette and Theme based on Report Template
+     * Resolve palet warna, kelas desain (style_type) dan ukuran foto dari template.
+     * Memakai BuiltinTemplateGeneratorService::resolveTheme() — sumber yang sama
+     * dengan yang dikirim ke aplikasi — supaya PDF = pratinjau = pilihan pengguna.
+     * Format warna mengikuti blade: primary/accent tanpa '#', sisanya dengan '#'.
      */
     protected function resolveTheme(?Template $template): array
     {
-        $defaultTheme = [
-            'primary_color' => '1E3A8A',    // Deep Navy
-            'accent_color'  => '0284C7',    // Sky Blue
-            'bg_color'      => '#F8FAFC',    // Slate 50
-            'card_bg'       => '#FFFFFF',
-            'secondary_color' => '2563EB',
-            'card_alt' => '#DBEAFE',
-            'style_type' => 'royal_sapphire',
+        $theme = BuiltinTemplateGeneratorService::resolveTheme($template?->template_key);
+
+        return [
+            'style_type'      => $theme['style_type'],
+            'primary_color'   => $theme['primary_color'],
+            'accent_color'    => $theme['accent_color'],
+            'secondary_color' => $theme['secondary_color'],
+            'bg_color'        => '#' . $theme['bg_color'],
+            'card_bg'         => '#' . $theme['card_bg'],
+            'card_alt'        => '#' . $theme['card_alt'],
+            'photo'           => $theme['photo'],
         ];
-
-        if (!$template) {
-            return $defaultTheme;
-        }
-
-        $definitions = BuiltinTemplateGeneratorService::getTemplateDefinitions();
-        foreach ($definitions as $def) {
-            if ($def['key'] === $template->template_key) {
-                return [
-                    'primary_color' => $def['primary_color'],
-                    'accent_color'  => $def['accent_color'],
-                    'bg_color'      => '#' . $def['bg_color'],
-                    'card_bg'       => '#' . $def['card_bg'],
-                    'secondary_color' => $def['secondary_color'] ?? $def['primary_color'],
-                    'card_alt' => '#' . ($def['card_alt'] ?? $def['bg_color']),
-                    'style_type' => $def['style_type'] ?? 'royal_sapphire',
-                ];
-            }
-        }
-
-        return $defaultTheme;
     }
 
     /**

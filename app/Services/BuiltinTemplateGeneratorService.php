@@ -137,6 +137,71 @@ class BuiltinTemplateGeneratorService
     }
 
     /**
+     * Ukuran foto (lebar, tinggi dalam pt) per tema. SATU-SATUNYA sumber untuk:
+     *  - crop server-side (ReportPdfService), dan
+     *  - ukuran <img> di PDF (blade, inline), dan
+     *  - ukuran foto di pratinjau/pemilih template di aplikasi (ReportSlide.vue).
+     * Dengan begitu foto tidak pernah gepeng/melar karena ukuran crop != ukuran tampil.
+     * Tema yang tidak terdaftar memakai ukuran default.
+     */
+    protected const PHOTO_SPECS_DEFAULT = [
+        'officer'  => [560, 300],
+        'location' => [400, 220],
+    ];
+
+    protected const PHOTO_SPECS = [
+        'tropical_pop'        => ['officer' => [550, 300], 'location' => [400, 205]],
+        'memphis'             => ['officer' => [550, 205]],
+        'rainbow_infographic' => ['officer' => [580, 300], 'location' => [300, 158]],
+        'paper_cut'           => ['location' => [300, 158]],
+    ];
+
+    public static function photoSpecs(string $styleType): array
+    {
+        return array_replace(self::PHOTO_SPECS_DEFAULT, self::PHOTO_SPECS[$styleType] ?? []);
+    }
+
+    /**
+     * Ambil definisi tema berdasarkan template_key. Key yang tidak dikenal
+     * jatuh ke template pertama (bukan ke tema "tanpa desain") sehingga PDF
+     * dan aplikasi selalu memakai desain yang sama untuk key yang sama.
+     */
+    public static function findDefinition(?string $key): array
+    {
+        $definitions = self::getTemplateDefinitions();
+        foreach ($definitions as $definition) {
+            if ($definition['key'] === $key) {
+                return $definition;
+            }
+        }
+
+        return $definitions[0];
+    }
+
+    /**
+     * Tema lengkap untuk satu template: warna (tanpa '#'), style_type, dan
+     * ukuran foto. Dipakai oleh PDF (ReportPdfService) DAN dikirim ke aplikasi
+     * lewat atribut Template::theme, jadi pilihan -> pratinjau -> PDF identik.
+     */
+    public static function resolveTheme(?string $key): array
+    {
+        $definition = self::findDefinition($key);
+        $styleType = $definition['style_type'];
+
+        return [
+            'key'             => $definition['key'],
+            'style_type'      => $styleType,
+            'primary_color'   => $definition['primary_color'],
+            'secondary_color' => $definition['secondary_color'],
+            'accent_color'    => $definition['accent_color'],
+            'bg_color'        => $definition['bg_color'],
+            'card_bg'         => $definition['card_bg'],
+            'card_alt'        => $definition['card_alt'],
+            'photo'           => self::photoSpecs($styleType),
+        ];
+    }
+
+    /**
      * Generate preview thumbnails for all ten PDF themes.
      */
     /**
