@@ -1,0 +1,337 @@
+
+/* =========================================================
+   BASE PDF REPORT — BPSDM
+   Ukuran halaman: 960pt × 540pt (16:9)
+   File ini berisi struktur dasar yang dipakai semua template.
+========================================================= */
+
+/* ---------- PAGE ---------- */
+
+@page {
+    size: 960pt 540pt;
+    margin: 0;
+}
+
+* {
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: #1e293b;
+}
+
+body {
+    background-color: var(--theme-bg, #f8fafc);
+}
+
+/* ---------- SLIDE ---------- */
+
+.slide {
+    position: relative;
+    width: 960pt;
+    height: 540pt;
+    overflow: hidden;
+    page-break-after: always;
+    background-color: var(--theme-bg, #f8fafc);
+}
+
+.slide-last {
+    page-break-after: avoid;
+}
+
+/* ---------- COVER HEADER ---------- */
+
+.cover-header {
+    position: relative;
+    height: 70pt;
+    padding: 24pt 50pt;
+    background: var(--theme-primary, #1e3a8a);
+    border-bottom: 5pt solid var(--theme-accent, #0284c7);
+}
+
+.cover-badge {
+    margin-bottom: 6pt;
+    color: var(--theme-accent, #38bdf8);
+    font-size: 10pt;
+    font-weight: bold;
+    letter-spacing: 2pt;
+    text-transform: uppercase;
+}
+
+.cover-title {
+    margin: 0;
+    color: #ffffff;
+    font-size: 26pt;
+    font-weight: bold;
+    letter-spacing: 0.5pt;
+    line-height: 1.1;
+}
+
+.cover-body {
+    position: relative;
+    height: 380pt;
+    padding: 40pt 50pt;
+}
+
+/* ---------- COVER INFORMATION ---------- */
+
+.cover-card-left {
+    position: relative;
+    top: 50px;
+    left: 25px;
+    width: 280pt;
+    padding: 24pt;
+    background: #ffffff;
+    border: 1.5pt solid #e2e8f0;
+    border-radius: 14pt;
+    box-shadow: 0 4pt 12pt rgba(0, 0, 0, 0.03);
+}
+
+.meta-group {
+    margin-bottom: 16pt;
+}
+
+.meta-label {
+    margin-bottom: 3pt;
+    color: #64748b;
+    font-size: 9pt;
+    font-weight: bold;
+    letter-spacing: 0.5pt;
+    text-transform: uppercase;
+}
+
+.meta-value {
+    color: var(--theme-primary, #1e3a8a);
+    font-size: 16pt;
+    font-weight: bold;
+}
+
+.meta-value-sub {
+    color: #334155;
+    font-size: 13pt;
+    font-weight: bold;
+}
+
+/* ---------- OFFICER PHOTO ---------- */
+
+/*
+ * Penting:
+ * Ukuran gambar 560pt × 300pt harus tetap sesuai dengan
+ * OFFICER_PHOTO_W dan OFFICER_PHOTO_H pada ReportPdfService.
+ */
+
+.cover-photo-frame {
+    position: absolute;
+    top: 150pt;
+    right: 20pt;
+    width: 580pt;
+    height: 344pt;
+    padding: 8pt;
+    background: #ffffff;
+    border: 2pt solid var(--theme-accent, #0284c7);
+    border-radius: 10pt;
+    text-align: center;
+    box-shadow: 0 6pt 16pt rgba(0, 0, 0, 0.06);
+}
+
+.cover-photo-img {
+    width: 560pt;
+    height: 300pt;
+    border-radius: 12pt;
+    object-fit: cover;
+}
+
+.cover-photo-placeholder {
+    width: 560pt;
+    height: 300pt;
+    border-radius: 12pt;
+    background: #e2e8f0;
+    line-height: 260pt;
+    color: #94a3b8;
+    font-size: 12pt;
+    font-weight: bold;
+}
+
+/* ---------- COVER FOOTER ---------- */
+
+.cover-footer {
+    position: absolute;
+    right: 50pt;
+    bottom: 14pt;
+    left: 50pt;
+    padding-top: 8pt;
+    border-top: 1pt solid #e2e8f0;
+    color: #94a3b8;
+    font-size: 9pt;
+}
+
+/* ---------- LOCATION HEADER ---------- */
+
+.loc-header {
+    height: 44pt;
+    padding: 10pt 45pt;
+    background: var(--theme-primary, #1e3a8a);
+    border-bottom: 4pt solid var(--theme-accent, #0284c7);
+    color: #ffffff;
+}
+
+.loc-counter {
+    color: var(--theme-accent, #38bdf8);
+    font-size: 9pt;
+    font-weight: bold;
+    letter-spacing: 1.5pt;
+    text-transform: uppercase;
+}
+
+.loc-title {
+    margin-top: 2pt;
+    color: #ffffff;
+    font-size: 20pt;
+    font-weight: bold;
+}
+
+/* ---------- LOCATION BODY ---------- */
+
+.loc-body {
+    padding: 20pt 45pt;
+}
+
+/* ---------- PHOTO CONTAINER ---------- */
+
+.photos-container {
+    width: 100%;
+    margin-bottom: 16pt;
+}
+
+.photo-box {
+    float: left;
+    width: 415pt;
+    padding: 6pt;
+    background: #ffffff;
+    border: 1.5pt solid #e2e8f0;
+    border-radius: 12pt;
+    box-shadow: 0 4pt 10pt rgba(0, 0, 0, 0.03);
+}
+
+.photo-box-right {
+    float: right;
+}
+
+.photo-img {
+    display: block;
+    width: 400pt;
+    height: 220pt;
+    border-radius: 8pt;
+    object-fit: cover;
+}
+
+.photo-placeholder {
+    width: 400pt;
+    height: 220pt;
+    border-radius: 8pt;
+    background: #f1f5f9;
+    text-align: center;
+    line-height: 220pt;
+    color: #94a3b8;
+    font-size: 11pt;
+    font-weight: bold;
+}
+
+.photo-label {
+    padding-top: 5pt;
+    color: #64748b;
+    font-size: 8.5pt;
+    font-weight: bold;
+    letter-spacing: 0.5pt;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+/* ---------- INSPECTION INFORMATION ---------- */
+
+.info-box {
+    clear: both;
+    padding: 14pt 18pt;
+    background: #ffffff;
+    border: 1.5pt solid #e2e8f0;
+    border-radius: 12pt;
+    box-shadow: 0 4pt 10pt rgba(0, 0, 0, 0.03);
+}
+
+/* ---------- CONDITION BADGES ---------- */
+
+.badge-clean {
+    display: inline-block;
+    padding: 3pt 10pt;
+    background: #dcfce7;
+    border: 1pt solid #86efac;
+    border-radius: 6pt;
+    color: #15803d;
+    font-size: 10pt;
+    font-weight: bold;
+}
+
+.badge-attention {
+    display: inline-block;
+    padding: 3pt 10pt;
+    background: #fee2e2;
+    border: 1pt solid #fca5a5;
+    border-radius: 6pt;
+    color: #b91c1c;
+    font-size: 10pt;
+    font-weight: bold;
+}
+
+/* ---------- INFORMATION TABLE ---------- */
+
+.info-table {
+    width: 100%;
+    margin-top: 8pt;
+    border-collapse: collapse;
+}
+
+.info-table td {
+    padding: 4pt 0;
+    vertical-align: top;
+    font-size: 10pt;
+}
+
+.info-title {
+    width: 130pt;
+    color: #475569;
+    font-weight: bold;
+}
+
+.info-content {
+    color: #1e293b;
+    line-height: 1.35;
+}
+
+/* ---------- LOCATION FOOTER ---------- */
+
+.loc-footer {
+    position: absolute;
+    bottom: 14pt;
+    left: 45pt;
+    width: 870pt;
+    height: 14pt;
+    padding-top: 5pt;
+    border-top: 1pt solid #e2e8f0;
+    color: #94a3b8;
+    font-size: 8pt;
+}
+
+.footer-left {
+    float: left;
+    text-align: left;
+}
+
+.footer-right {
+    float: right;
+    text-align: right;
+}
