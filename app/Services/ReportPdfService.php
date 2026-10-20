@@ -114,11 +114,85 @@ class ReportPdfService
                 ];
             }
         }
+            // Muat CSS dasar PDF.
+        $baseCssPath = resource_path('css/pdf/base.css');
+
+        $pdfCss = file_exists($baseCssPath)
+            ? file_get_contents($baseCssPath)
+            : '';
+
+        // Pilih CSS berdasarkan template yang digunakan laporan.
+        $definitions = BuiltinTemplateGeneratorService::getTemplateDefinitions();
+
+        $templateIndex = 0;
+
+        if ($report->template) {
+            foreach ($definitions as $index => $definition) {
+                if ($definition['key'] === $report->template->template_key) {
+                    $templateIndex = $index + 1;
+                    break;
+                }
+            }
+        }
+
+        $templateCssPath = resource_path(
+            'css/pdf/template-' . str_pad((string) $templateIndex, 2, '0', STR_PAD_LEFT) . '.css'
+        );
+
+        if (file_exists($templateCssPath)) {
+            $pdfCss .= "\n" . file_get_contents($templateCssPath);
+        }
+            \Log::info('PDF TEMPLATE CSS DEBUG', [
+        'template_key' => $report->template?->template_key,
+        'template_index' => $templateIndex,
+        'base_css_loaded' => file_exists($baseCssPath),
+        'template_css_path' => $templateCssPath,
+        'template_css_loaded' => file_exists($templateCssPath),
+        'template_css_size' => file_exists($templateCssPath)
+            ? filesize($templateCssPath)
+            : 0,
+        'total_css_size' => strlen($pdfCss),
+    ]);
+    
+        // Kompatibilitas variabel CSS dengan DomPDF.
+        // Ambil definisi variabel seperti --theme-primary: #172554;
+        $cssVariables = [];
+
+        preg_match_all(
+            '/(--[\w-]+)\s*:\s*([^;{}]+)\s*;/',
+            $pdfCss,
+            $variableMatches,
+            PREG_SET_ORDER
+        );
+
+        foreach ($variableMatches as $variableMatch) {
+            $cssVariables[$variableMatch[1]] = trim($variableMatch[2]);
+        }
+
+        // Ganti var(--nama-variabel) dengan nilai CSS konkret.
+        $pdfCss = preg_replace_callback(
+            '/var\(\s*(--[\w-]+)\s*(?:,\s*([^()]+))?\)/',
+            function ($matches) use ($cssVariables) {
+                if (isset($cssVariables[$matches[1]])) {
+                    return $cssVariables[$matches[1]];
+                }
+
+                // Gunakan nilai fallback jika variabel tidak ditemukan.
+                if (isset($matches[2])) {
+                    return trim($matches[2]);
+                }
+
+                // Pertahankan ekspresi jika variabel tidak ditemukan.
+                return $matches[0];
+            },
+            $pdfCss
+        );
 
         // 4. Render HTML View
         $html = view('pdf.report_16_9', [
             'report' => $report,
             'theme' => $theme,
+            'pdfCss' => $pdfCss,
             'locations' => $locationsData,
             'officerPhotoBase64' => $officerPhotoBase64,
         ])->render();

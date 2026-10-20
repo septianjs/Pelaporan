@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <title>{{ $report->report_number }} - Laporan Pengawasan Lingkungan BPSDM</title>
 <style>
+{!! $pdfCss ?? '' !!}
 </style>
 </head>
 <body class="theme-{{ $theme['style_type'] ?? 'tropical_pop' }}">
