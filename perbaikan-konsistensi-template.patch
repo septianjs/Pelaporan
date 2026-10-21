@@ -1,0 +1,1662 @@
+From 6b6d4a88d8b2f06a8f4299515e21be3cf5ed55cf Mon Sep 17 00:00:00 2001
+From: Claude <claude@example.com>
+Date: Tue, 20 Oct 2026 08:36:18 +0000
+Subject: [PATCH] Samakan desain template di pilihan, pratinjau, dan PDF
+
+- Satu sumber definisi tema (BuiltinTemplateGeneratorService::resolveTheme):
+  warna, style_type, dan ukuran foto per tema.
+- Template::theme dikirim lewat API; ReportPdfService memakai sumber yang sama.
+- CSS desain 10 template dipindah ke resources/css/report-templates.css dan dipakai
+  blade PDF (inline) serta aplikasi (import app.css).
+- Komponen ReportSlide.vue merender desain asli (bukan PNG GD / layout generik)
+  untuk pratinjau laporan dan miniatur di pemilih template.
+- Perbaiki foto gepeng: ukuran crop server = ukuran tampil di PDF.
+- Tambah test konsistensi tema.
+---
+ app/Models/Template.php                       |  13 +-
+ .../BuiltinTemplateGeneratorService.php       |  65 ++++
+ app/Services/ReportPdfService.php             |  68 ++--
+ resources/css/app.css                         |   5 +
+ resources/css/report-slide-base.css           | 306 ++++++++++++++++++
+ resources/css/report-templates.css            | 127 ++++++++
+ resources/js/components/ReportSlide.vue       | 203 ++++++++++++
+ resources/js/components/TemplateThumb.vue     |  21 ++
+ resources/js/services/reportSlides.js         |  86 +++++
+ resources/js/views/CreateReport.vue           |  19 +-
+ resources/js/views/ReportPreview.vue          | 197 ++---------
+ resources/js/views/TemplateList.vue           |  24 +-
+ resources/views/pdf/report_16_9.blade.php     | 138 +-------
+ tests/Unit/TemplateThemeConsistencyTest.php   |  81 +++++
+ 14 files changed, 976 insertions(+), 377 deletions(-)
+ create mode 100644 resources/css/report-slide-base.css
+ create mode 100644 resources/css/report-templates.css
+ create mode 100644 resources/js/components/ReportSlide.vue
+ create mode 100644 resources/js/components/TemplateThumb.vue
+ create mode 100644 resources/js/services/reportSlides.js
+ create mode 100644 tests/Unit/TemplateThemeConsistencyTest.php
+
+diff --git a/app/Models/Template.php b/app/Models/Template.php
+index f7bbc1e..a479b53 100644
+--- a/app/Models/Template.php
++++ b/app/Models/Template.php
+@@ -5,6 +5,7 @@
+ use Illuminate\Database\Eloquent\Factories\HasFactory;
+ use Illuminate\Database\Eloquent\Model;
+ use Illuminate\Database\Eloquent\Relations\HasMany;
++use App\Services\BuiltinTemplateGeneratorService;
+ use Illuminate\Support\Facades\Storage;
+ 
+ class Template extends Model
+@@ -29,6 +30,7 @@ class Template extends Model
+ 
+     protected $appends = [
+         'preview_url',
++        'theme',
+     ];
+ 
+     public function reports(): HasMany
+@@ -43,5 +45,14 @@ public function getPreviewUrlAttribute(): ?string
+         }
+         return null;
+     }
+-}
+ 
++    /**
++     * Desain template (warna, style_type, ukuran foto) yang dikirim ke aplikasi.
++     * Berasal dari definisi yang SAMA dengan yang dipakai generator PDF, sehingga
++     * pemilih template, pratinjau, dan PDF tidak bisa berbeda desain.
++     */
++    public function getThemeAttribute(): array
++    {
++        return BuiltinTemplateGeneratorService::resolveTheme($this->template_key);
++    }
++}
+diff --git a/app/Services/BuiltinTemplateGeneratorService.php b/app/Services/BuiltinTemplateGeneratorService.php
+index 3772a24..665ffa4 100644
+--- a/app/Services/BuiltinTemplateGeneratorService.php
++++ b/app/Services/BuiltinTemplateGeneratorService.php
+@@ -136,6 +136,71 @@ public static function getTemplateDefinitions(): array
+         ];
+     }
+ 
++    /**
++     * Ukuran foto (lebar, tinggi dalam pt) per tema. SATU-SATUNYA sumber untuk:
++     *  - crop server-side (ReportPdfService), dan
++     *  - ukuran <img> di PDF (blade, inline), dan
++     *  - ukuran foto di pratinjau/pemilih template di aplikasi (ReportSlide.vue).
++     * Dengan begitu foto tidak pernah gepeng/melar karena ukuran crop != ukuran tampil.
++     * Tema yang tidak terdaftar memakai ukuran default.
++     */
++    protected const PHOTO_SPECS_DEFAULT = [
++        'officer'  => [560, 300],
++        'location' => [400, 220],
++    ];
++
++    protected const PHOTO_SPECS = [
++        'tropical_pop'        => ['officer' => [550, 300], 'location' => [400, 205]],
++        'memphis'             => ['officer' => [550, 205]],
++        'rainbow_infographic' => ['officer' => [580, 300], 'location' => [300, 158]],
++        'paper_cut'           => ['location' => [300, 158]],
++    ];
++
++    public static function photoSpecs(string $styleType): array
++    {
++        return array_replace(self::PHOTO_SPECS_DEFAULT, self::PHOTO_SPECS[$styleType] ?? []);
++    }
++
++    /**
++     * Ambil definisi tema berdasarkan template_key. Key yang tidak dikenal
++     * jatuh ke template pertama (bukan ke tema "tanpa desain") sehingga PDF
++     * dan aplikasi selalu memakai desain yang sama untuk key yang sama.
++     */
++    public static function findDefinition(?string $key): array
++    {
++        $definitions = self::getTemplateDefinitions();
++        foreach ($definitions as $definition) {
++            if ($definition['key'] === $key) {
++                return $definition;
++            }
++        }
++
++        return $definitions[0];
++    }
++
++    /**
++     * Tema lengkap untuk satu template: warna (tanpa '#'), style_type, dan
++     * ukuran foto. Dipakai oleh PDF (ReportPdfService) DAN dikirim ke aplikasi
++     * lewat atribut Template::theme, jadi pilihan -> pratinjau -> PDF identik.
++     */
++    public static function resolveTheme(?string $key): array
++    {
++        $definition = self::findDefinition($key);
++        $styleType = $definition['style_type'];
++
++        return [
++            'key'             => $definition['key'],
++            'style_type'      => $styleType,
++            'primary_color'   => $definition['primary_color'],
++            'secondary_color' => $definition['secondary_color'],
++            'accent_color'    => $definition['accent_color'],
++            'bg_color'        => $definition['bg_color'],
++            'card_bg'         => $definition['card_bg'],
++            'card_alt'        => $definition['card_alt'],
++            'photo'           => self::photoSpecs($styleType),
++        ];
++    }
++
+     /**
+      * Generate preview thumbnails for all ten PDF themes.
+      */
+diff --git a/app/Services/ReportPdfService.php b/app/Services/ReportPdfService.php
+index 09b0c5b..61fb49f 100644
+--- a/app/Services/ReportPdfService.php
++++ b/app/Services/ReportPdfService.php
+@@ -13,17 +13,12 @@
+ 
+ class ReportPdfService
+ {
+-    // Dimensi box foto di PDF (lihat resources/views/pdf/report_16_9.blade.php),
+-    // dipakai untuk crop server-side agar tidak gepeng/distorsi (DomPDF tidak
+-    // mendukung CSS object-fit sama sekali, jadi crop harus dilakukan manual
+-    // sebelum gambar dikirim ke template).
+-    // Harus sama dengan .cover-photo-img di report_16_9.blade.php (560pt x 300pt),
+-    // kalau tidak foto akan tampak melar/gepeng karena DomPDF tidak mendukung object-fit.
+-    protected const OFFICER_PHOTO_W = 560;
+-    protected const OFFICER_PHOTO_H = 300;
++    // Ukuran foto TIDAK lagi ditulis di sini. Ukuran per tema berasal dari
++    // BuiltinTemplateGeneratorService::photoSpecs() dan dipakai untuk (a) crop
++    // server-side di bawah, (b) style inline <img> di blade, dan (c) pratinjau di
++    // aplikasi. DomPDF tidak mendukung object-fit, jadi crop harus persis sama
++    // dengan ukuran tampil, kalau tidak foto tampak gepeng/melar.
+     protected const OFFICER_PHOTO_FOCUS_Y = 0.2; // kepala biasanya di bagian atas foto potret
+-    protected const LOC_PHOTO_W = 400;
+-    protected const LOC_PHOTO_H = 220;
+ 
+     public function __construct(
+         protected ImageCropService $imageCropper = new ImageCropService()
+@@ -59,17 +54,15 @@ public function generatePdf(Report $report): string
+         // karena DomPDF mengabaikan CSS object-fit sepenuhnya.
+         $officerPhotoBase64 = $this->croppedPhotoBase64(
+             $report->officer_photo,
+-            self::OFFICER_PHOTO_W,
+-            self::OFFICER_PHOTO_H,
++            $theme['photo']['officer'][0],
++            $theme['photo']['officer'][1],
+             $outputDir,
+             'officer',
+             self::OFFICER_PHOTO_FOCUS_Y
+         );
+ 
+         $locationsData = [];
+-        $compactPhotoLayout = in_array($theme['style_type'] ?? '', ['paper_cut', 'rainbow_infographic'], true);
+-        $locationPhotoWidth = $compactPhotoLayout ? 300 : self::LOC_PHOTO_W;
+-        $locationPhotoHeight = $compactPhotoLayout ? 165 : self::LOC_PHOTO_H;
++        [$locationPhotoWidth, $locationPhotoHeight] = $theme['photo']['location'];
+         $reportLocationsByOrder = $report->reportLocations->values();
+ 
+         // Selalu hasilkan tepat 5 entri lokasi (sesuai 5 titik pemantauan tetap),
+@@ -145,40 +138,25 @@ public function generatePdf(Report $report): string
+     }
+ 
+     /**
+-     * Resolve Color Palette and Theme based on Report Template
++     * Resolve palet warna, kelas desain (style_type) dan ukuran foto dari template.
++     * Memakai BuiltinTemplateGeneratorService::resolveTheme() — sumber yang sama
++     * dengan yang dikirim ke aplikasi — supaya PDF = pratinjau = pilihan pengguna.
++     * Format warna mengikuti blade: primary/accent tanpa '#', sisanya dengan '#'.
+      */
+     protected function resolveTheme(?Template $template): array
+     {
+-        $defaultTheme = [
+-            'primary_color' => '1E3A8A',    // Deep Navy
+-            'accent_color'  => '0284C7',    // Sky Blue
+-            'bg_color'      => '#F8FAFC',    // Slate 50
+-            'card_bg'       => '#FFFFFF',
+-            'secondary_color' => '2563EB',
+-            'card_alt' => '#DBEAFE',
+-            'style_type' => 'royal_sapphire',
++        $theme = BuiltinTemplateGeneratorService::resolveTheme($template?->template_key);
++
++        return [
++            'style_type'      => $theme['style_type'],
++            'primary_color'   => $theme['primary_color'],
++            'accent_color'    => $theme['accent_color'],
++            'secondary_color' => $theme['secondary_color'],
++            'bg_color'        => '#' . $theme['bg_color'],
++            'card_bg'         => '#' . $theme['card_bg'],
++            'card_alt'        => '#' . $theme['card_alt'],
++            'photo'           => $theme['photo'],
+         ];
+-
+-        if (!$template) {
+-            return $defaultTheme;
+-        }
+-
+-        $definitions = BuiltinTemplateGeneratorService::getTemplateDefinitions();
+-        foreach ($definitions as $def) {
+-            if ($def['key'] === $template->template_key) {
+-                return [
+-                    'primary_color' => $def['primary_color'],
+-                    'accent_color'  => $def['accent_color'],
+-                    'bg_color'      => '#' . $def['bg_color'],
+-                    'card_bg'       => '#' . $def['card_bg'],
+-                    'secondary_color' => $def['secondary_color'] ?? $def['primary_color'],
+-                    'card_alt' => '#' . ($def['card_alt'] ?? $def['bg_color']),
+-                    'style_type' => $def['style_type'] ?? 'royal_sapphire',
+-                ];
+-            }
+-        }
+-
+-        return $defaultTheme;
+     }
+ 
+     /**
+diff --git a/resources/css/app.css b/resources/css/app.css
+index 0a96d1b..356d3d8 100644
+--- a/resources/css/app.css
++++ b/resources/css/app.css
+@@ -1,6 +1,11 @@
+ 
+ @import "tailwindcss";
+ 
++/* Desain slide laporan: basis web dulu, baru 10 desain template (file desain ini
++   juga di-inline ke PDF oleh resources/views/pdf/report_16_9.blade.php). */
++@import "./report-slide-base.css";
++@import "./report-templates.css";
++
+ @source "../**/*.js";
+ @source "../**/*.vue";
+ @source "../../resources/views/**/*.blade.php";
+diff --git a/resources/css/report-slide-base.css b/resources/css/report-slide-base.css
+new file mode 100644
+index 0000000..9bb4da0
+--- /dev/null
++++ b/resources/css/report-slide-base.css
+@@ -0,0 +1,306 @@
++/*
++ * Versi WEB dari CSS dasar slide laporan (padanan blade pdf/report_16_9.blade.php).
++ * Nilai diturunkan dari blade; warna tema memakai CSS variable --rt-* yang diisi
++ * ReportSlide.vue dari atribut Template::theme (sumber yang sama dengan PDF).
++ * Desain per-template ada di report-templates.css (file yang sama dengan PDF).
++ * Urutan import di app.css: file ini DULU, lalu report-templates.css.
++ *
++ * Catatan kesetaraan dengan DomPDF:
++ *  - DomPDF mengabaikan box-sizing: border-box (padding/border ditambahkan di luar
++ *    width/height), jadi di sini dipaksa content-box agar tata letak sama.
++ *  - Satuan pt dipertahankan; slide dirender 960pt x 540pt lalu diskalakan (transform).
++ */
++
++.rt-scope {
++  position: relative;
++  width: 100%;
++  aspect-ratio: 16 / 9;
++  overflow: hidden;
++  background-color: var(--rt-bg);
++  color: #1e293b;
++  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
++  line-height: normal;
++  text-align: left;
++  user-select: none;
++}
++.rt-scope *,
++.rt-scope *::before,
++.rt-scope *::after {
++  box-sizing: content-box;
++}
++.rt-scope .rt-stage {
++  position: absolute;
++  left: 0;
++  top: 0;
++  width: 960pt;
++  height: 540pt;
++  transform-origin: 0 0;
++}
++.rt-scope img {
++  display: inline;
++  max-width: none;
++}
++.rt-scope .cover-photo-img,
++.rt-scope .cover-photo-placeholder,
++.rt-scope .photo-img {
++  object-fit: cover;
++}
++.rt-scope .cover-photo-img { object-position: 50% 20%; }
++.rt-scope h1 { margin: 0; }
++
++.rt-scope .slide {
++  width: 960pt;
++  height: 540pt;
++  page-break-after: always;
++  position: relative;
++  overflow: hidden;
++  background-color: var(--rt-bg);
++}
++.rt-scope .slide-last {
++  page-break-after: avoid;
++}
++.rt-scope .cover-header {
++  background: var(--rt-primary);
++  height: 70pt;
++  padding: 24pt 50pt;
++  position: relative;
++  border-bottom: 5pt solid var(--rt-accent);
++}
++.rt-scope .cover-badge {
++  color: var(--rt-accent);
++  font-size: 10pt;
++  font-weight: bold;
++  letter-spacing: 2pt;
++  text-transform: uppercase;
++  margin-bottom: 6pt;
++}
++.rt-scope .cover-title {
++  color: #ffffff;
++  font-size: 26pt;
++  font-weight: bold;
++  letter-spacing: 0.5pt;
++  margin: 0;
++  line-height: 1.1;
++}
++.rt-scope .cover-body {
++  padding: 40pt 50pt;
++  height: 380pt;
++  position: relative;
++}
++.rt-scope .cover-card-left {
++  position: relative;
++  top: 50px;
++  left: 25px;
++  width: 280pt;
++  background: #ffffff;
++  border-radius: 14pt;
++  padding: 24pt;
++  border: 1.5pt solid #e2e8f0;
++  box-shadow: 0 4pt 12pt rgba(0,0,0,0.03);
++}
++.rt-scope .meta-group {
++  margin-bottom: 16pt;
++}
++.rt-scope .meta-label {
++  font-size: 9pt;
++  font-weight: bold;
++  color: #64748b;
++  text-transform: uppercase;
++  letter-spacing: 0.5pt;
++  margin-bottom: 3pt;
++}
++.rt-scope .meta-value {
++  font-size: 16pt;
++  font-weight: bold;
++  color: var(--rt-primary);
++}
++.rt-scope .meta-value-sub {
++  font-size: 13pt;
++  font-weight: bold;
++  color: #334155;
++}
++.rt-scope .cover-photo-frame {
++  position: Absolute;
++  top: 150pt;
++  right: 20pt;
++  width: 580pt;
++  height: 344pt;
++  background: #ffffff;
++  border-radius: 10pt;
++  padding: 8pt;
++  border: 2pt solid var(--rt-accent);
++  text-align: center;
++  box-shadow: 0 6pt 16pt rgba(0,0,0,0.06);
++}
++.rt-scope .cover-photo-img {
++  width: 560pt;
++  height: 300pt;
++  border-radius: 12pt;
++  object-fit: cover;
++}
++.rt-scope .cover-photo-placeholder {
++  width: 560pt;
++  height: 300pt;
++  border-radius: 12pt;
++  background: #e2e8f0;
++  line-height: 260pt;
++  color: #94a3b8;
++  font-size: 12pt;
++  font-weight: bold;
++}
++.rt-scope .cover-footer {
++  position: absolute;
++  bottom: 14pt;
++  left: 50pt;
++  right: 50pt;
++  font-size: 9pt;
++  color: #94a3b8;
++  border-top: 1pt solid #e2e8f0;
++  padding-top: 8pt;
++}
++.rt-scope .loc-header {
++  background: var(--rt-primary);
++  padding: 10pt 45pt;
++  color: #ffffff;
++  height: 44pt;
++  border-bottom: 4pt solid var(--rt-accent);
++}
++.rt-scope .loc-counter {
++  color: var(--rt-accent);
++  font-size: 9pt;
++  font-weight: bold;
++  letter-spacing: 1.5pt;
++  text-transform: uppercase;
++}
++.rt-scope .loc-title {
++  font-size: 20pt;
++  font-weight: bold;
++  margin-top: 2pt;
++  color: #ffffff;
++}
++.rt-scope .loc-body {
++  padding: 20pt 45pt;
++}
++.rt-scope .photos-container {
++  width: 100%;
++  margin-bottom: 16pt;
++}
++.rt-scope .photo-box {
++  width: 415pt;
++  background: #ffffff;
++  border-radius: 12pt;
++  border: 1.5pt solid #e2e8f0;
++  padding: 6pt;
++  float: left;
++  box-shadow: 0 4pt 10pt rgba(0,0,0,0.03);
++}
++.rt-scope .photo-box-right {
++  float: right;
++}
++.rt-scope .photo-img {
++  width: 400pt;
++  height: 220pt;
++  border-radius: 8pt;
++  object-fit: cover;
++  display: block;
++}
++.rt-scope .photo-placeholder {
++  width: 400pt;
++  height: 220pt;
++  border-radius: 8pt;
++  background: #f1f5f9;
++  text-align: center;
++  line-height: 220pt;
++  color: #94a3b8;
++  font-size: 11pt;
++  font-weight: bold;
++}
++.rt-scope .photo-label {
++  font-size: 8.5pt;
++  font-weight: bold;
++  color: #64748b;
++  text-align: center;
++  padding-top: 5pt;
++  text-transform: uppercase;
++  letter-spacing: 0.5pt;
++}
++.rt-scope .info-box {
++  clear: both;
++  background: #ffffff;
++  border-radius: 12pt;
++  padding: 14pt 18pt;
++  border: 1.5pt solid #e2e8f0;
++  box-shadow: 0 4pt 10pt rgba(0,0,0,0.03);
++}
++.rt-scope .badge-clean {
++  display: inline-block;
++  background: #dcfce7;
++  color: #15803d;
++  border: 1pt solid #86efac;
++  padding: 3pt 10pt;
++  border-radius: 6pt;
++  font-size: 10pt;
++  font-weight: bold;
++}
++.rt-scope .badge-attention {
++  display: inline-block;
++  background: #fee2e2;
++  color: #b91c1c;
++  border: 1pt solid #fca5a5;
++  padding: 3pt 10pt;
++  border-radius: 6pt;
++  font-size: 10pt;
++  font-weight: bold;
++}
++.rt-scope .info-table {
++  width: 100%;
++  margin-top: 8pt;
++  border-collapse: collapse;
++}
++.rt-scope .info-table td {
++  vertical-align: top;
++  padding: 4pt 0;
++  font-size: 10pt;
++}
++.rt-scope .info-title {
++  width: 130pt;
++  font-weight: bold;
++  color: #475569;
++}
++.rt-scope .info-content {
++  color: #1e293b;
++  line-height: 1.35;
++}
++.rt-scope .loc-footer {
++  position: absolute;
++  bottom: 14pt;
++  left: 45pt;
++  width: 870pt;
++  height: 14pt;
++  font-size: 8pt;
++  color: #94a3b8;
++  border-top: 1pt solid #e2e8f0;
++  padding-top: 5pt;
++}
++.rt-scope .footer-left {
++  float: left;
++  text-align: left;
++}
++.rt-scope .footer-right {
++  float: right;
++  text-align: right;
++}
++
++/* Ornamen header (padanan blade; warna aksen dari tema) */
++.rt-scope .cover-header { position: relative; }
++.rt-scope .cover-header::after {
++  content: '✦  ✦  ✦';
++  position: absolute; right: 42pt; top: 15pt;
++  font-size: 24pt; color: var(--rt-accent);
++}
++.rt-scope .loc-header { position: relative; }
++.rt-scope .loc-header::after {
++  content: '◆  ◆  ◆'; float: right;
++  color: var(--rt-accent);
++  font-size: 12pt; margin-top: -4pt;
++}
+diff --git a/resources/css/report-templates.css b/resources/css/report-templates.css
+new file mode 100644
+index 0000000..bf36544
+--- /dev/null
++++ b/resources/css/report-templates.css
+@@ -0,0 +1,127 @@
++/*
++ * DESAIN 10 TEMPLATE LAPORAN (satu-satunya sumber desain per-template).
++ *
++ * File ini dipakai oleh DUA konsumen supaya desain selalu identik:
++ *   1. PDF  : di-inline ke resources/views/pdf/report_16_9.blade.php (DomPDF)
++ *   2. App  : di-import oleh resources/css/app.css (pratinjau + pemilih template)
++ *
++ * Kelas tema = ".theme-{style_type}" dan harus sesuai dengan 'style_type' di
++ * BuiltinTemplateGeneratorService::getTemplateDefinitions(). Test
++ * tests/Unit/TemplateThemeConsistencyTest.php menjaga agar keduanya sinkron.
++ *
++ * Aturan: hanya properti yang aman untuk DomPDF. Ukuran foto TIDAK diatur di sini;
++ * ukuran foto per tema ada di BuiltinTemplateGeneratorService::photoSpecs() dan
++ * dipasang inline (agar crop server-side selalu sama dengan ukuran tampil).
++ */
++/* =========================================================
++   KOMPOSISI 10 TEMPLATE. Warna dasar (primary/accent/bg) dipasang oleh
++   konsumen: blade (PHP) untuk PDF, CSS variable --rt-* untuk aplikasi.
++========================================================= */
++/* 1. Tropis Nusantara: botanical palette, generous hero photo, rounded frames. */
++.theme-tropical_pop .cover-header { height: 88pt; padding: 17pt 38pt; border-bottom: 9pt solid #F59E0B; }
++.theme-tropical_pop .cover-title { font-size: 25pt; }
++.theme-tropical_pop .cover-card-left { left: 15pt; top: 28pt; width: 300pt; border: 3pt solid #15803D; border-radius: 18pt; }
++.theme-tropical_pop .cover-photo-frame { right: 24pt; top: 132pt; width: 570pt; height: 344pt; border: 5pt solid #D97706; border-radius: 20pt; }
++.theme-tropical_pop .cover-photo-img, .theme-tropical_pop .cover-photo-placeholder { border-radius: 12pt; }
++.theme-tropical_pop .loc-header { border-bottom: 8pt solid #D97706; }
++.theme-tropical_pop .photo-box, .theme-tropical_pop .info-box { border: 3pt solid #15803D; border-radius: 14pt; }
++
++/* 2. Batik Nusantara: double-line frame and traditional gold accents. */
++.theme-batik_nusantara .slide { border: 3pt double #A16207; }
++.theme-batik_nusantara .cover-header { height: 82pt; padding: 18pt 42pt; border-bottom: 8pt double #F59E0B; }
++.theme-batik_nusantara .cover-card-left { left: 10pt; top: 30pt; border: 3pt double #A16207; border-radius: 2pt; }
++.theme-batik_nusantara .cover-photo-frame { right: 28pt; top: 140pt; border: 5pt double #A16207; border-radius: 2pt; }
++.theme-batik_nusantara .loc-header { border-bottom: 7pt double #F59E0B; }
++.theme-batik_nusantara .photo-box, .theme-batik_nusantara .info-box { border: 2pt double #A16207; border-radius: 2pt; }
++.theme-batik_nusantara .photo-label { color: #854D0E; }
++
++/* 3. Infografis Geometris: bold blocks, asymmetry and oversized location counter. */
++.theme-comic_pop .cover-header { height: 100pt; padding: 20pt 35pt; border-bottom: 12pt solid #F97316; }
++.theme-comic_pop .cover-title { font-size: 28pt; }
++.theme-comic_pop .cover-card-left { left: 0; top: 18pt; width: 285pt; border: 4pt solid #0F766E; border-radius: 0; }
++.theme-comic_pop .cover-photo-frame { right: 30pt; top: 145pt; width: 545pt; height: 330pt; border: 4pt solid #0F766E; border-radius: 0; }
++.theme-comic_pop .loc-header { height: 58pt; padding: 8pt 40pt; border-bottom: 10pt solid #F97316; }
++.theme-comic_pop .loc-counter { font-size: 11pt; color: #FDE047; }
++.theme-comic_pop .loc-title { font-size: 22pt; }
++.theme-comic_pop .photo-box, .theme-comic_pop .info-box { border: 3pt solid #0F766E; border-radius: 0; box-shadow: 4pt 4pt 0 #F97316; }
++
++/* 4. Jurnal Dokumentasi: taped-paper feel and dashed photo frames. */
++.theme-scrapbook .cover-header { height: 76pt; padding: 16pt 46pt; border-bottom: 3pt dashed #BE123C; }
++.theme-scrapbook .cover-card-left { left: 30pt; top: 34pt; border: 2pt dashed #BE123C; border-radius: 4pt; }
++.theme-scrapbook .cover-photo-frame { right: 35pt; top: 138pt; border: 4pt dashed #BE123C; border-radius: 4pt; }
++.theme-scrapbook .loc-header { border-bottom: 4pt dashed #FBBF24; }
++.theme-scrapbook .photo-box { border: 3pt dashed #BE123C; border-radius: 3pt; box-shadow: 3pt 3pt 0 #FBBF24; }
++.theme-scrapbook .info-box { border: 2pt dashed #BE123C; border-radius: 3pt; background: #FFFBEB; }
++.theme-scrapbook .photo-label { background: #FEF3C7; padding: 5pt; }
++
++/* 5. Merah Putih Institusional: symmetric official cover and formal red bars. */
++.theme-memphis .cover-header { height: 88pt; padding: 18pt 50pt; text-align: center; border-bottom: 10pt solid #DC2626; }
++.theme-memphis .cover-title { font-size: 24pt; letter-spacing: 0.2pt; }
++.theme-memphis .cover-badge { color: #FCA5A5; }
++.theme-memphis .cover-card-left { position: absolute; left: 145pt; top: 105pt; width: 670pt; text-align: center; border: 2pt solid #DC2626; border-radius: 0; }
++.theme-memphis .cover-photo-frame { right: 195pt; top: 250pt; width: 570pt; height: 260pt; border: 4pt solid #DC2626; border-radius: 0; }
++.theme-memphis .cover-photo-img, .theme-memphis .cover-photo-placeholder { border-radius: 0; }
++.theme-memphis .loc-header { text-align: center; border-bottom: 9pt solid #DC2626; }
++.theme-memphis .photo-box, .theme-memphis .info-box { border: 2pt solid #B91C1C; border-radius: 0; box-shadow: none; }
++
++/* 6. Eco Green Report: clean environmental green with strong condition panel. */
++.theme-festival .cover-header { height: 88pt; padding: 18pt 45pt; border-bottom: 7pt solid #84CC16; }
++.theme-festival .cover-card-left { left: 24pt; top: 25pt; border-left: 9pt solid #16A34A; border-radius: 4pt 14pt 14pt 4pt; }
++.theme-festival .cover-photo-frame { right: 22pt; top: 135pt; border: 5pt solid #16A34A; border-radius: 16pt; }
++.theme-festival .loc-header { border-bottom: 7pt solid #84CC16; }
++.theme-festival .photo-box, .theme-festival .info-box { border: 2pt solid #16A34A; border-radius: 12pt; }
++.theme-festival .info-box { border-top: 7pt solid #84CC16; }
++.theme-festival .badge-clean { background: #DCFCE7; color: #166534; border-color: #86EFAC; }
++
++/* 7. Arsip Klasik: archival paper, serif-inspired framing and double borders. */
++.theme-retro_groovy .slide { background: #FFFBEB; }
++.theme-retro_groovy .cover-header { height: 84pt; padding: 18pt 42pt; border-bottom: 6pt double #92400E; }
++.theme-retro_groovy .cover-title { font-size: 24pt; letter-spacing: 0.4pt; }
++.theme-retro_groovy .cover-card-left { left: 18pt; top: 28pt; border: 3pt double #92400E; border-radius: 0; background: #FFFBEB; }
++.theme-retro_groovy .cover-photo-frame { right: 30pt; top: 143pt; border: 5pt double #92400E; border-radius: 0; background: #FFFBEB; }
++.theme-retro_groovy .loc-header { background: #78350F; border-bottom: 6pt double #D6A756; }
++.theme-retro_groovy .photo-box, .theme-retro_groovy .info-box { border: 3pt double #92400E; border-radius: 0; background: #FFFBEB; }
++
++/* 8. Majalah Editorial: dominant hero image on cover and editorial location grid. */
++.theme-rainbow_infographic .cover-header { height: 74pt; padding: 16pt 40pt; border-bottom: 5pt solid #0F172A; }
++.theme-rainbow_infographic .cover-title { font-size: 24pt; }
++.theme-rainbow_infographic .cover-card-left { left: 35pt; top: 26pt; width: 290pt; border-top: 7pt solid #0F172A; border-radius: 0; }
++.theme-rainbow_infographic .cover-photo-frame { right: 20pt; top: 130pt; width: 600pt; height: 350pt; border: 0; border-bottom: 8pt solid #0EA5E9; border-radius: 0; }
++.theme-rainbow_infographic .cover-photo-img, .theme-rainbow_infographic .cover-photo-placeholder { border-radius: 0; }
++.theme-rainbow_infographic .loc-header { background: #0F172A; border-bottom: 6pt solid #0EA5E9; }
++.theme-rainbow_infographic .photo-box { border: 0; border-bottom: 5pt solid #0EA5E9; border-radius: 0; box-shadow: none; }
++.theme-rainbow_infographic .info-box { border: 0; border-top: 3pt solid #0F172A; border-radius: 0; box-shadow: none; }
++
++/* 9. Blueprint Inspeksi: technical blue grid impression and annotation borders. */
++.theme-paper_cut .slide { background: #EFF6FF; }
++.theme-paper_cut .cover-header { height: 94pt; padding: 20pt 40pt; border-bottom: 8pt solid #38BDF8; }
++.theme-paper_cut .cover-card-left { left: 30pt; top: 20pt; border: 2pt solid #1D4ED8; border-radius: 0; box-shadow: 5pt 5pt 0 #BFDBFE; }
++.theme-paper_cut .cover-photo-frame { right: 22pt; top: 140pt; border: 3pt solid #1D4ED8; border-radius: 0; box-shadow: 5pt 5pt 0 #38BDF8; }
++.theme-paper_cut .loc-header { background: #1E40AF; border-bottom: 6pt solid #38BDF8; }
++.theme-paper_cut .photo-box, .theme-paper_cut .info-box { border: 2pt solid #1D4ED8; border-radius: 0; box-shadow: 3pt 3pt 0 #BFDBFE; }
++.theme-paper_cut .photo-label { color: #1D4ED8; }
++
++/* 10. Emerald Gold Ornamental: layered gold frame and symmetrical accents. */
++.theme-botanical .slide { background: #ECFDF5; }
++.theme-botanical .cover-header { height: 84pt; padding: 18pt 44pt; border-bottom: 5pt double #B8860B; }
++.theme-botanical .cover-card-left { left: 18pt; top: 26pt; border: 3pt double #B8860B; border-radius: 18pt 3pt 18pt 3pt; }
++.theme-botanical .cover-photo-frame { right: 28pt; top: 138pt; border: 5pt double #B8860B; border-radius: 18pt 3pt 18pt 3pt; }
++.theme-botanical .loc-header { background: #064E3B; border-bottom: 5pt double #D4AF37; }
++.theme-botanical .photo-box, .theme-botanical .info-box { border: 3pt double #B8860B; border-radius: 12pt 2pt 12pt 2pt; }
++.theme-botanical .info-box { border-left-width: 7pt; }
++
++/* Alternate asymmetric layouts for editorial and blueprint designs.
++   Keep the two evidence photos and findings visible on the same page. */
++.theme-paper_cut .photos-container,
++.theme-rainbow_infographic .photos-container { width: 330pt; margin-bottom: 0; }
++.theme-paper_cut .photo-box,
++.theme-rainbow_infographic .photo-box { width: 315pt; float: left; padding: 5pt; margin-bottom: 8pt; }
++.theme-paper_cut .photo-box-right,
++.theme-rainbow_infographic .photo-box-right { clear: left; float: left; }
++.theme-paper_cut .info-box,
++.theme-rainbow_infographic .info-box { position: absolute; top: 104pt; right: 28pt; width: 535pt; }
++.theme-paper_cut .loc-body,
++.theme-rainbow_infographic .loc-body { padding-top: 12pt; }
++.theme-paper_cut .photo-label,
++.theme-rainbow_infographic .photo-label { font-size: 8pt; }
++
+diff --git a/resources/js/components/ReportSlide.vue b/resources/js/components/ReportSlide.vue
+new file mode 100644
+index 0000000..978a47d
+--- /dev/null
++++ b/resources/js/components/ReportSlide.vue
+@@ -0,0 +1,203 @@
++<template>
++  <!--
++    Satu slide laporan (cover atau titik pemantauan) dengan desain template yang
++    SAMA dengan PDF: struktur HTML mengikuti resources/views/pdf/report_16_9.blade.php
++    dan CSS desainnya adalah resources/css/report-templates.css (file yang sama
++    di-inline ke blade). Slide dirender 960pt x 540pt lalu diskalakan ke lebar wadah.
++  -->
++  <div
++    ref="host"
++    class="rt-scope"
++    :class="'theme-' + resolvedTheme.style_type"
++    :style="hostStyle"
++    role="img"
++    :aria-label="ariaLabel"
++  >
++    <div class="rt-stage" :style="stageStyle">
++      <!-- ═══ COVER ═══ -->
++      <div v-if="slide === 0" class="slide">
++        <div class="cover-header">
++          <div class="cover-badge">BPSDM PROVINSI • PENGAWASAN LINGKUNGAN KANTOR</div>
++          <h1 class="cover-title">LAPORAN PENGAWASAN LINGKUNGAN KANTOR</h1>
++        </div>
++
++        <div class="cover-card-left">
++          <div class="meta-group">
++            <div class="meta-label">Nomor Laporan Resmi</div>
++            <div class="meta-value">{{ report.report_number }}</div>
++          </div>
++          <div class="meta-group">
++            <div class="meta-label">Hari &amp; Tanggal Inspeksi</div>
++            <div class="meta-value-sub">{{ report.formatted_date }}</div>
++          </div>
++          <div class="meta-group">
++            <div class="meta-label">Petugas Pengawas Lapangan</div>
++            <div class="meta-value-sub" :style="{ color: '#' + resolvedTheme.primary_color, fontSize: '14pt' }">
++              {{ report.officer_name }}
++            </div>
++          </div>
++          <div class="meta-group" style="margin-bottom: 0;">
++            <div class="meta-label">Tema Desain PDF</div>
++            <div style="font-size: 10pt; color: #64748b;">
++              {{ templateName || 'Default' }} • 16:9 PDF Widescreen 16:9
++            </div>
++          </div>
++        </div>
++
++        <div class="cover-photo-frame">
++          <img v-if="report.officer_photo_url" :src="report.officer_photo_url"
++            class="cover-photo-img" :style="officerSize" alt="Foto Petugas" />
++          <div v-else class="cover-photo-placeholder"
++            :style="{ ...officerSize, lineHeight: (officerH - 40) + 'pt' }">[ FOTO PETUGAS ]</div>
++          <div style="font-size: 8.5pt; font-weight: bold; color: #64748b; margin-top: 5pt; text-transform: uppercase;">
++            Foto Petugas Pengawas
++          </div>
++        </div>
++
++        <div class="cover-footer">
++          <span>Sistem Informasi Pelaporan Pengawasan Lingkungan Kantor BPSDM • PDF Widescreen 16:9</span>
++        </div>
++      </div>
++
++      <!-- ═══ TITIK PEMANTAUAN ═══ -->
++      <div v-else-if="location" class="slide">
++        <div class="loc-header">
++          <div class="loc-counter">TITIK PEMANTAUAN {{ slide }} DARI 5</div>
++          <div class="loc-title">{{ location.name }}</div>
++        </div>
++
++        <div class="loc-body">
++          <div class="photos-container">
++            <div class="photo-box">
++              <img v-if="location.photo_1" :src="location.photo_1" class="photo-img" :style="locSize" alt="Dokumentasi 1" />
++              <div v-else class="photo-placeholder" :style="{ ...locSize, lineHeight: locH + 'pt' }">[ DOKUMENTASI 1 ]</div>
++              <div class="photo-label">Dokumentasi 1</div>
++            </div>
++            <div class="photo-box photo-box-right">
++              <img v-if="location.photo_2" :src="location.photo_2" class="photo-img" :style="locSize" alt="Dokumentasi 2" />
++              <div v-else class="photo-placeholder" :style="{ ...locSize, lineHeight: locH + 'pt' }">[ DOKUMENTASI 2 ]</div>
++              <div class="photo-label">Dokumentasi 2</div>
++            </div>
++          </div>
++
++          <div class="info-box">
++            <div style="margin-bottom: 6pt;">
++              <span style="font-size: 9pt; font-weight: bold; color: #64748b; margin-right: 8pt; text-transform: uppercase;">
++                Status Kebersihan:
++              </span>
++              <span v-if="location.condition === 'clean'" class="badge-clean">✓ {{ location.condition_label }}</span>
++              <span v-else class="badge-attention">! {{ location.condition_label }}</span>
++            </div>
++
++            <table class="info-table">
++              <tbody v-if="location.condition === 'clean'">
++                <tr>
++                  <td class="info-title">Catatan Pemantauan:</td>
++                  <td class="info-content">{{ location.notes || 'Area terpantau bersih, rapi, dan terawat dengan baik.' }}</td>
++                </tr>
++              </tbody>
++              <tbody v-else>
++                <tr>
++                  <td class="info-title" style="color: #b91c1c;">Permasalahan:</td>
++                  <td class="info-content" style="color: #991b1b; font-weight: bold;">
++                    {{ location.problem || 'Perlu penanganan kebersihan lebih lanjut pada titik ini.' }}
++                  </td>
++                </tr>
++                <tr>
++                  <td class="info-title" style="color: #0284c7;">Solusi Penanganan:</td>
++                  <td class="info-content">
++                    {{ location.solution || 'Telah dikoordinasikan dengan tim kebersihan untuk penanganan segera.' }}
++                  </td>
++                </tr>
++              </tbody>
++            </table>
++          </div>
++        </div>
++
++        <div class="loc-footer">
++          <div class="footer-left">
++            {{ report.report_number }} • {{ report.formatted_date }} • Petugas: {{ report.officer_name }}
++          </div>
++          <div class="footer-right">Slide {{ slide + 1 }} dari 6</div>
++        </div>
++      </div>
++    </div>
++  </div>
++</template>
++
++<script setup>
++import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
++import { FALLBACK_THEME, SAMPLE_LOCATIONS, SAMPLE_REPORT } from '../services/reportSlides.js';
++
++const props = defineProps({
++  /** Template::theme dari API (style_type, warna, ukuran foto). */
++  theme: { type: Object, default: null },
++  /** Nama template, untuk baris "Tema Desain PDF" di sampul. */
++  templateName: { type: String, default: '' },
++  /** 0 = sampul, 1..5 = titik pemantauan. */
++  slide: { type: Number, default: 0 },
++  /** Data laporan: report_number, formatted_date, officer_name, officer_photo_url. */
++  report: { type: Object, default: () => SAMPLE_REPORT },
++  /** Hasil normalizeReportLocations(); index 0 = titik 1. Default: data contoh. */
++  locations: { type: Array, default: () => SAMPLE_LOCATIONS },
++});
++
++// ── Skala: 960pt = 1280px → lebar wadah ──
++const STAGE_PX = 1280;
++const host = ref(null);
++const scale = ref(0);
++
++const resolvedTheme = computed(() => ({
++  ...FALLBACK_THEME,
++  ...(props.theme || {}),
++  photo: { ...FALLBACK_THEME.photo, ...(props.theme?.photo || {}) },
++}));
++
++// Ukuran foto dari tema (sama dengan crop server-side & style inline di blade).
++const officerW = computed(() => resolvedTheme.value.photo.officer[0]);
++const officerH = computed(() => resolvedTheme.value.photo.officer[1]);
++const locW = computed(() => resolvedTheme.value.photo.location[0]);
++const locH = computed(() => resolvedTheme.value.photo.location[1]);
++const officerSize = computed(() => ({ width: officerW.value + 'pt', height: officerH.value + 'pt' }));
++const locSize = computed(() => ({ width: locW.value + 'pt', height: locH.value + 'pt' }));
++
++// Sampel hanya punya 1 lokasi; slide > jumlah data memakai lokasi pertama.
++const location = computed(() => {
++  if (props.slide < 1) return null;
++  return props.locations[props.slide - 1] || props.locations[0] || null;
++});
++
++const hostStyle = computed(() => ({
++  '--rt-bg': '#' + resolvedTheme.value.bg_color,
++  '--rt-primary': '#' + resolvedTheme.value.primary_color,
++  '--rt-accent': '#' + resolvedTheme.value.accent_color,
++  visibility: scale.value > 0 ? 'visible' : 'hidden',
++}));
++
++const ariaLabel = computed(() =>
++  props.slide === 0 ? `Sampul laporan, desain ${props.templateName}` : `Titik pemantauan ${props.slide}, desain ${props.templateName}`
++);
++
++let observer = null;
++
++const measure = () => {
++  if (host.value && host.value.clientWidth > 0) {
++    scale.value = host.value.clientWidth / STAGE_PX;
++  }
++};
++const stageStyle = computed(() => ({ transform: `scale(${scale.value})` }));
++
++onMounted(() => {
++  measure();
++  if (typeof ResizeObserver !== 'undefined') {
++    observer = new ResizeObserver(measure);
++    observer.observe(host.value);
++  } else {
++    window.addEventListener('resize', measure);
++  }
++});
++onBeforeUnmount(() => {
++  observer?.disconnect();
++  window.removeEventListener('resize', measure);
++});
++</script>
+diff --git a/resources/js/components/TemplateThumb.vue b/resources/js/components/TemplateThumb.vue
+new file mode 100644
+index 0000000..f8e4841
+--- /dev/null
++++ b/resources/js/components/TemplateThumb.vue
+@@ -0,0 +1,21 @@
++<template>
++  <!-- Miniatur desain template: sampul + salah satu titik pemantauan.
++       Dirender dari CSS desain yang sama dengan PDF (bukan gambar statis). -->
++  <div class="grid grid-cols-2 gap-1.5">
++    <div class="rounded-lg overflow-hidden border border-stone-200 shadow-inner">
++      <ReportSlide :theme="theme" :template-name="name" :slide="0" />
++    </div>
++    <div class="rounded-lg overflow-hidden border border-stone-200 shadow-inner">
++      <ReportSlide :theme="theme" :template-name="name" :slide="1" />
++    </div>
++  </div>
++</template>
++
++<script setup>
++import ReportSlide from './ReportSlide.vue';
++
++defineProps({
++  theme: { type: Object, default: null },
++  name: { type: String, default: '' },
++});
++</script>
+diff --git a/resources/js/services/reportSlides.js b/resources/js/services/reportSlides.js
+new file mode 100644
+index 0000000..6e084aa
+--- /dev/null
++++ b/resources/js/services/reportSlides.js
+@@ -0,0 +1,86 @@
++/**
++ * Util data untuk ReportSlide.vue.
++ *
++ * Tujuannya: pratinjau di aplikasi menampilkan data PERSIS seperti yang akan
++ * dirender PDF (ReportPdfService::generatePdf), termasuk aturan "selalu 5 lokasi".
++ */
++
++// Dipakai hanya bila API belum mengirim `template.theme` (mis. cache offline lama).
++// Nilai sama dengan template pertama di BuiltinTemplateGeneratorService.
++export const FALLBACK_THEME = {
++  style_type: 'tropical_pop',
++  primary_color: '166534',
++  secondary_color: '15803D',
++  accent_color: 'D97706',
++  bg_color: 'F0FDF4',
++  card_bg: 'FFFFFF',
++  card_alt: 'DCFCE7',
++  photo: { officer: [550, 300], location: [400, 205] },
++};
++
++export const TOTAL_LOCATIONS = 5;
++
++const CONDITION_LABELS = {
++  clean: 'Kondisi Sudah Bersih dan Rapi',
++  needs_attention: 'Kondisi Masih Perlu Penanganan Khusus',
++};
++
++const photoUrl = (loc, type) =>
++  loc?.report_photos?.find((p) => p.photo_type === type)?.photo_url || null;
++
++/**
++ * Ubah report dari API menjadi tepat 5 entri lokasi, sama seperti PDF:
++ * titik tanpa data tetap tampil sebagai halaman placeholder.
++ */
++export function normalizeReportLocations(report) {
++  const source = report?.report_locations || [];
++  const result = [];
++  for (let i = 0; i < TOTAL_LOCATIONS; i++) {
++    const loc = source[i];
++    if (loc) {
++      result.push({
++        name: loc.display_name || loc.location?.name || `Lokasi ${i + 1}`,
++        condition: loc.condition,
++        condition_label: loc.condition_label || CONDITION_LABELS[loc.condition] || '',
++        notes: loc.notes,
++        problem: loc.problem,
++        solution: loc.solution,
++        photo_1: photoUrl(loc, 'photo_1'),
++        photo_2: photoUrl(loc, 'photo_2'),
++      });
++    } else {
++      result.push({
++        name: `Lokasi ${i + 1}`,
++        condition: 'clean',
++        condition_label: 'Data belum diisi',
++        notes: 'Data pemantauan untuk titik ini belum diisi.',
++        problem: null,
++        solution: null,
++        photo_1: null,
++        photo_2: null,
++      });
++    }
++  }
++  return result;
++}
++
++// ── Data contoh untuk miniatur di pemilih template ──────────────────────────
++export const SAMPLE_REPORT = {
++  report_number: '001/LKL/BPSDM/2026',
++  formatted_date: 'Selasa, 20 Oktober 2026',
++  officer_name: 'Nama Petugas Pengawas',
++  officer_photo_url: null,
++};
++
++export const SAMPLE_LOCATIONS = [
++  {
++    name: 'Lobi Utama',
++    condition: 'clean',
++    condition_label: CONDITION_LABELS.clean,
++    notes: 'Area terpantau bersih, rapi, dan terawat dengan baik.',
++    problem: null,
++    solution: null,
++    photo_1: null,
++    photo_2: null,
++  },
++];
+diff --git a/resources/js/views/CreateReport.vue b/resources/js/views/CreateReport.vue
+index 883cc02..7389ef6 100644
+--- a/resources/js/views/CreateReport.vue
++++ b/resources/js/views/CreateReport.vue
+@@ -316,21 +316,13 @@
+                 : 'border-[#E7E5DE] hover:border-stone-300 bg-white'
+             ]"
+           >
+-            <!-- 16:9 Thumbnail -->
+-            <div class="relative aspect-video w-full rounded-xl overflow-hidden bg-stone-100 border border-stone-200">
+-              <img
+-                v-if="tpl.preview_url"
+-                :src="tpl.preview_url"
+-                :alt="tpl.name"
+-                class="w-full h-full object-cover"
+-              />
+-              <div v-else class="w-full h-full flex items-center justify-center text-xs text-stone-400">
+-                Pratinjau Template
+-              </div>
++            <!-- Pratinjau desain asli (CSS yang sama dengan PDF) -->
++            <div class="relative">
++              <TemplateThumb :theme="tpl.theme" :name="tpl.name" />
+ 
+               <div
+                 v-if="form.template_id === tpl.id"
+-                class="absolute top-2.5 right-2.5 px-2.5 py-1 rounded-full bg-[#14251D] text-[#D8C79C] text-[10px] font-bold shadow flex items-center gap-1"
++                class="absolute top-2 right-2 px-2.5 py-1 rounded-full bg-[#14251D] text-[#D8C79C] text-[10px] font-bold shadow flex items-center gap-1"
+               >
+                 <span>Aktif Terpilih</span>
+                 <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+@@ -522,6 +514,7 @@ import { ref, reactive, computed, onMounted } from 'vue';
+ import { useRouter, useRoute } from 'vue-router';
+ import api from '../services/api';
+ import PhotoUploader from '../components/PhotoUploader.vue';
++import TemplateThumb from '../components/TemplateThumb.vue';
+ import {
+   saveFormDraft,
+   getFormDraft,
+@@ -629,7 +622,7 @@ const formattedFullDate = computed(() => {
+ 
+ const selectedTemplateName = computed(() => {
+   const tpl = templates.value.find(t => t.id === form.template_id);
+-  return tpl ? tpl.name : 'Corporate Blue';
++  return tpl ? tpl.name : '-';
+ });
+ 
+ // Fetch Initial Data
+diff --git a/resources/js/views/ReportPreview.vue b/resources/js/views/ReportPreview.vue
+index ce45717..55a7515 100644
+--- a/resources/js/views/ReportPreview.vue
++++ b/resources/js/views/ReportPreview.vue
+@@ -97,155 +97,21 @@
+           </div>
+         </div>
+ 
+-        <!-- 16:9 Slide Canvas — with touch swipe support -->
++        <!-- 16:9 Slide Canvas — desain template yang SAMA dengan PDF (touch swipe didukung) -->
+         <div
+-          ref="slideCanvas"
+-          class="relative w-full aspect-video rounded-xl overflow-hidden border border-slate-200 shadow-inner select-none touch-pan-y"
+-          :style="{ backgroundColor: themeColors.bg }"
++          class="relative w-full rounded-xl overflow-hidden border border-slate-200 shadow-inner select-none touch-pan-y"
+           @touchstart="onTouchStart"
+           @touchend="onTouchEnd"
+         >
+-          <!-- ── SLIDE 0: COVER ── -->
+           <Transition name="slide-fade" mode="out-in">
+-            <div
+-              v-if="activeSlideIndex === 0"
+-              key="cover"
+-              class="w-full h-full flex flex-col justify-between p-3"
+-            >
+-              <!-- Header bar -->
+-              <div class="rounded-lg px-3 py-2 text-white shadow-sm flex items-center justify-between"
+-                :style="{ backgroundColor: themeColors.primary }">
+-                <div>
+-                  <p class="text-[7px] font-bold tracking-widest text-amber-300 uppercase">
+-                    BPSDM PROVINSI • PENGAWASAN LINGKUNGAN KANTOR
+-                  </p>
+-                  <h4 class="text-[11px] font-black leading-tight mt-0.5">
+-                    LAPORAN PENGAWASAN LINGKUNGAN KANTOR
+-                  </h4>
+-                </div>
+-                <span class="text-[8px] font-mono font-bold bg-white/20 px-2 py-0.5 rounded shrink-0">16:9</span>
+-              </div>
+-
+-              <!-- Body -->
+-              <div class="grid grid-cols-12 gap-2 my-1 items-center">
+-                <!-- Meta card -->
+-                <div class="col-span-7 bg-white/95 rounded-lg p-2 border border-slate-200 space-y-1.5 shadow-sm">
+-                  <div>
+-                    <span class="text-[7px] font-bold uppercase text-slate-400 block">Nomor Laporan</span>
+-                    <p class="font-mono font-bold text-blue-700 text-[10px]">{{ report.report_number }}</p>
+-                  </div>
+-                  <div>
+-                    <span class="text-[7px] font-bold uppercase text-slate-400 block">Hari & Tanggal</span>
+-                    <p class="font-semibold text-slate-800 text-[9px] leading-snug">{{ report.formatted_date }}</p>
+-                  </div>
+-                  <div>
+-                    <span class="text-[7px] font-bold uppercase text-slate-400 block">Petugas Pengawas</span>
+-                    <p class="font-bold text-slate-900 text-[10px]">{{ report.officer_name }}</p>
+-                  </div>
+-                </div>
+-
+-                <!-- Officer photo -->
+-                <div class="col-span-5 flex flex-col items-center justify-center gap-1">
+-                  <div class="w-16 h-16 rounded-xl overflow-hidden border-2 border-white shadow-md bg-slate-200">
+-                    <img v-if="report.officer_photo_url" :src="report.officer_photo_url"
+-                      alt="Petugas" class="w-full h-full object-cover"/>
+-                    <div v-else class="w-full h-full flex items-center justify-center">
+-                      <svg class="w-7 h-7 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+-                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+-                      </svg>
+-                    </div>
+-                  </div>
+-                  <span class="text-[7px] font-bold text-slate-500 uppercase">Petugas Pengawas</span>
+-                </div>
+-              </div>
+-
+-              <!-- Footer -->
+-              <div class="text-[7px] text-slate-400 border-t border-slate-200/60 pt-1 flex justify-between">
+-                <span>Sistem Pelaporan Pengawasan Lingkungan BPSDM</span>
+-                <span>Cover Laporan</span>
+-              </div>
+-            </div>
+-
+-            <!-- ── SLIDES 1-5: LOCATION SLIDES ── -->
+-            <div
+-              v-else-if="currentLocation"
+-              :key="'loc-' + activeSlideIndex"
+-              class="w-full h-full flex flex-col justify-between p-3"
+-            >
+-              <!-- Header -->
+-              <div class="rounded-lg px-2.5 py-1.5 text-white shadow-sm flex items-center justify-between"
+-                :style="{ backgroundColor: themeColors.primary }">
+-                <div class="min-w-0 mr-2">
+-                  <p class="text-[7px] font-bold tracking-widest text-amber-300 uppercase">
+-                    TITIK PEMANTAUAN {{ activeSlideIndex }} DARI 5
+-                  </p>
+-                  <h4 class="text-[11px] font-bold leading-tight truncate">
+-                    {{ currentLocation.display_name || currentLocation.location?.name || ("Lokasi " + activeSlideIndex) }}
+-                  </h4>
+-                </div>
+-                <span :class="[
+-                    'text-[8px] font-bold px-2 py-0.5 rounded-full shrink-0',
+-                    currentLocation.condition === 'clean'
+-                      ? 'bg-emerald-500 text-white'
+-                      : 'bg-rose-500 text-white'
+-                  ]">
+-                  {{ currentLocation.condition === 'clean' ? '✓ Bersih' : '⚠ Perlu Penanganan' }}
+-                </span>
+-              </div>
+-
+-              <!-- 2 Photos -->
+-              <div class="grid grid-cols-2 gap-1.5 my-1 flex-1 min-h-0">
+-                <div class="flex flex-col gap-0.5 min-h-0">
+-                  <div class="flex-1 rounded-lg overflow-hidden border border-slate-200 bg-slate-200 min-h-0">
+-                    <img v-if="getLocationPhoto(currentLocation, 'photo_1')"
+-                      :src="getLocationPhoto(currentLocation, 'photo_1')"
+-                      alt="Dokumentasi 1" class="w-full h-full object-cover"/>
+-                    <div v-else class="w-full h-full flex items-center justify-center text-[8px] text-slate-400 font-bold">
+-                      [ DOKUMENTASI 1 ]
+-                    </div>
+-                  </div>
+-                  <span class="text-[7px] font-bold text-slate-500 text-center uppercase">Dokumentasi 1</span>
+-                </div>
+-                <div class="flex flex-col gap-0.5 min-h-0">
+-                  <div class="flex-1 rounded-lg overflow-hidden border border-slate-200 bg-slate-200 min-h-0">
+-                    <img v-if="getLocationPhoto(currentLocation, 'photo_2')"
+-                      :src="getLocationPhoto(currentLocation, 'photo_2')"
+-                      alt="Dokumentasi 2" class="w-full h-full object-cover"/>
+-                    <div v-else class="w-full h-full flex items-center justify-center text-[8px] text-slate-400 font-bold">
+-                      [ DOKUMENTASI 2 ]
+-                    </div>
+-                  </div>
+-                  <span class="text-[7px] font-bold text-slate-500 text-center uppercase">Dokumentasi 2</span>
+-                </div>
+-              </div>
+-
+-              <!-- Findings -->
+-              <div class="bg-white/95 rounded-lg p-1.5 border border-slate-200 shadow-sm">
+-                <template v-if="currentLocation.condition === 'clean'">
+-                  <p class="text-[8px] leading-snug">
+-                    <strong class="text-emerald-700">Catatan: </strong>
+-                    <span class="text-slate-700">{{ currentLocation.notes || 'Area terpantau bersih dan terawat.' }}</span>
+-                  </p>
+-                </template>
+-                <template v-else>
+-                  <p class="text-[8px] leading-snug">
+-                    <strong class="text-rose-700">Permasalahan: </strong>
+-                    <span class="text-slate-800 font-semibold">{{ currentLocation.problem || '-' }}</span>
+-                  </p>
+-                  <p class="text-[8px] leading-snug mt-0.5">
+-                    <strong class="text-blue-700">Solusi: </strong>
+-                    <span class="text-slate-700">{{ currentLocation.solution || '-' }}</span>
+-                  </p>
+-                </template>
+-              </div>
+-
+-              <!-- Footer -->
+-              <div class="text-[7px] text-slate-400 border-t border-slate-200/60 pt-0.5 flex justify-between">
+-                <span>{{ report.report_number }} • {{ report.officer_name }}</span>
+-                <span>Slide {{ activeSlideIndex + 1 }}/{{ totalSlides }}</span>
+-              </div>
+-            </div>
++            <ReportSlide
++              :key="activeSlideIndex"
++              :theme="report.template?.theme"
++              :template-name="report.template?.name || ''"
++              :slide="activeSlideIndex"
++              :report="slideReport"
++              :locations="slideLocations"
++            />
+           </Transition>
+         </div>
+ 
+@@ -526,6 +392,8 @@ import { ref, computed, onMounted } from 'vue';
+ import { useRoute } from 'vue-router';
+ import api from '../services/api.js';
+ import { sharePdfDocument, openWhatsApp } from '../services/reportShare.js';
++import ReportSlide from '../components/ReportSlide.vue';
++import { normalizeReportLocations } from '../services/reportSlides.js';
+ 
+ const route = useRoute();
+ const reportId = route.params.id;
+@@ -535,7 +403,7 @@ const loading = ref(true);
+ const errorMessage = ref('');
+ const report = ref(null);
+ const activeSlideIndex = ref(0);
+-const totalSlides = ref(6);
++const totalSlides = ref(6); // 1 sampul + 5 titik pemantauan, sama dengan PDF
+ 
+ const generatingPdf = ref(false);
+ 
+@@ -545,23 +413,14 @@ const generateError = ref('');
+ // Touch swipe state
+ let touchStartX = 0;
+ 
+-// ── Theme palette ──
+-const themeColors = computed(() => {
+-  const key = report.value?.template?.template_key || '';
+-  const palettes = {
+-    'corporate-blue':       { primary: '#1E3A8A', bg: '#F8FAFC' },
+-    'government-formal':    { primary: '#065F46', bg: '#FAFBF9' },
+-    'modern-clean':         { primary: '#0F172A', bg: '#F1F5F9' },
+-    'minimal-professional': { primary: '#18181B', bg: '#FFFFFF' },
+-    'executive-report':     { primary: '#1E1B4B', bg: '#F8FAFC' },
+-    'photo-focus':          { primary: '#27272A', bg: '#FAFAFA' },
+-    'elegant-report':       { primary: '#312E81', bg: '#FDF4FF' },
+-    'bpsdm-classic':        { primary: '#1D4ED8', bg: '#F0F9FF' },
+-    'modern-government':    { primary: '#0E7490', bg: '#F8FAFC' },
+-    'clean-documentation':  { primary: '#334155', bg: '#F8FAFC' },
+-  };
+-  return palettes[key] || { primary: '#1E3A8A', bg: '#F8FAFC' };
+-});
++// ── Data slide: sama dengan yang dirender PDF (selalu 5 titik pemantauan) ──
++const slideLocations = computed(() => normalizeReportLocations(report.value));
++const slideReport = computed(() => ({
++  report_number: report.value?.report_number,
++  formatted_date: report.value?.formatted_date || report.value?.inspection_date,
++  officer_name: report.value?.officer_name,
++  officer_photo_url: report.value?.officer_photo_url || null,
++}));
+ 
+ // ── Computed ──
+ const hasPdf  = computed(() => !!report.value?.pdf_path);
+@@ -569,12 +428,7 @@ const hasPdf  = computed(() => !!report.value?.pdf_path);
+ 
+ const activeSlideTitle = computed(() => {
+   if (activeSlideIndex.value === 0) return 'Cover Laporan';
+-  return currentLocation.value?.display_name || currentLocation.value?.location?.name || `Lokasi ${activeSlideIndex.value}`;
+-});
+-
+-const currentLocation = computed(() => {
+-  if (activeSlideIndex.value === 0) return null;
+-  return report.value?.report_locations?.[activeSlideIndex.value - 1] || null;
++  return slideLocations.value[activeSlideIndex.value - 1]?.name || `Lokasi ${activeSlideIndex.value}`;
+ });
+ 
+ // ── Slide navigation ──
+@@ -597,12 +451,6 @@ const onTouchEnd = (e) => {
+   }
+ };
+ 
+-// ── Helper: get photo URL ──
+-const getLocationPhoto = (loc, type) => {
+-  const photo = loc?.report_photos?.find(p => p.photo_type === type);
+-  return photo?.photo_url || null;
+-};
+-
+ // ── Base URL for API ──
+ const baseUrl = api.defaults.baseURL;
+ 
+@@ -626,7 +474,6 @@ const fetchReport = async () => {
+     const res = await api.get(`/reports/${id}`);
+     if (res.data?.data) {
+       report.value = res.data.data;
+-      totalSlides.value = 1 + (report.value.report_locations?.length || 5);
+     }
+   } catch (err) {
+     errorMessage.value = err.response?.data?.message || 'Gagal memuat pratinjau laporan.';
+diff --git a/resources/js/views/TemplateList.vue b/resources/js/views/TemplateList.vue
+index 3212777..87ee914 100644
+--- a/resources/js/views/TemplateList.vue
++++ b/resources/js/views/TemplateList.vue
+@@ -67,29 +67,14 @@
+         :key="tpl.id"
+         class="bg-[#FAF9F5] rounded-2xl p-4 border border-[#E3E0D6] hover:border-[#14251D]/30 transition overflow-hidden shadow-sm"
+       >
+-        <!-- 16:9 Preview Thumbnail -->
+-        <div class="relative aspect-video w-full rounded-xl overflow-hidden bg-[#ECE8DD] border border-[#DCD7CA] mb-3 shadow-inner">
+-          <img
+-            v-if="tpl.preview_url"
+-            :src="tpl.preview_url"
+-            :alt="tpl.name"
+-            class="w-full h-full object-cover"
+-            loading="lazy"
+-          />
+-          <div v-else class="w-full h-full flex items-center justify-center text-xs text-[#808983]">
+-            Pratinjau Belum Tersedia
+-          </div>
++        <!-- Pratinjau desain asli (CSS yang sama dengan PDF): sampul + titik pemantauan -->
++        <div class="relative mb-3">
++          <TemplateThumb :theme="tpl.theme" :name="tpl.name" />
+ 
+           <!-- Type badge -->
+-          <div class="absolute top-2 left-2 px-2.5 py-0.5 rounded-md backdrop-blur-md text-[#FAF9F5] text-[10px] font-semibold tracking-wide border border-white/10"
+-            :class="tpl.type === 'builtin' ? 'bg-[#14251D]/90 text-[#D8C79C]' : 'bg-[#6B5A2E]/90 text-white'">
++          <div class="absolute top-1.5 left-1.5 px-2.5 py-0.5 rounded-md backdrop-blur-md bg-[#14251D]/90 text-[#D8C79C] text-[10px] font-semibold tracking-wide border border-white/10">
+             TEMA PDF
+           </div>
+-
+-          <!-- 16:9 tag -->
+-          <div class="absolute bottom-2 right-2 px-2 py-0.5 rounded-md bg-[#0E1A14]/80 backdrop-blur-md text-[#D8C79C] text-[10px] font-bold font-mono">
+-            16:9 Widescreen
+-          </div>
+         </div>
+ 
+         <!-- Template meta -->
+@@ -225,6 +210,7 @@
+ <script setup>
+ import { ref, reactive, onMounted } from 'vue';
+ import api from '../services/api.js';
++import TemplateThumb from '../components/TemplateThumb.vue';
+ 
+ const templates = ref([]);
+ const loading = ref(true);
+diff --git a/resources/views/pdf/report_16_9.blade.php b/resources/views/pdf/report_16_9.blade.php
+index edbcfdd..24b3a06 100644
+--- a/resources/views/pdf/report_16_9.blade.php
++++ b/resources/views/pdf/report_16_9.blade.php
+@@ -273,10 +273,7 @@
+     float: right;
+     text-align: right;
+   }
+-  /* =========================================================
+-     DISTINCT PDF TEMPLATE COMPOSITIONS
+-     DomPDF-safe properties only; preserve existing Blade data.
+-  ========================================================= */
++  /* Ornamen header (warna aksen dari tema). Versi aplikasi: resources/css/report-slide-base.css */
+   .cover-header { position: relative; }
+   .cover-header:after {
+     content: '✦  ✦  ✦';
+@@ -290,122 +287,15 @@
+     font-size: 12pt; margin-top: -4pt;
+   }
+ 
+-  /* 1. Tropis Nusantara: botanical palette, generous hero photo, rounded frames. */
+-  .theme-tropical_pop .cover-header { height: 88pt; padding: 17pt 38pt; border-bottom: 9pt solid #F59E0B; }
+-  .theme-tropical_pop .cover-title { font-size: 25pt; }
+-  .theme-tropical_pop .cover-card-left { left: 15pt; top: 28pt; width: 300pt; border: 3pt solid #15803D; border-radius: 18pt; }
+-  .theme-tropical_pop .cover-photo-frame { right: 24pt; top: 132pt; width: 570pt; height: 344pt; border: 5pt solid #D97706; border-radius: 20pt; }
+-  .theme-tropical_pop .cover-photo-img, .theme-tropical_pop .cover-photo-placeholder { width: 550pt; height: 300pt; border-radius: 12pt; }
+-  .theme-tropical_pop .loc-header { border-bottom: 8pt solid #D97706; }
+-  .theme-tropical_pop .photo-box, .theme-tropical_pop .info-box { border: 3pt solid #15803D; border-radius: 14pt; }
+-  .theme-tropical_pop .photo-img, .theme-tropical_pop .photo-placeholder { height: 205pt; }
+-
+-  /* 2. Batik Nusantara: double-line frame and traditional gold accents. */
+-  .theme-batik_nusantara .slide { border: 3pt double #A16207; }
+-  .theme-batik_nusantara .cover-header { height: 82pt; padding: 18pt 42pt; border-bottom: 8pt double #F59E0B; }
+-  .theme-batik_nusantara .cover-card-left { left: 10pt; top: 30pt; border: 3pt double #A16207; border-radius: 2pt; }
+-  .theme-batik_nusantara .cover-photo-frame { right: 28pt; top: 140pt; border: 5pt double #A16207; border-radius: 2pt; }
+-  .theme-batik_nusantara .loc-header { border-bottom: 7pt double #F59E0B; }
+-  .theme-batik_nusantara .photo-box, .theme-batik_nusantara .info-box { border: 2pt double #A16207; border-radius: 2pt; }
+-  .theme-batik_nusantara .photo-label { color: #854D0E; }
+-
+-  /* 3. Infografis Geometris: bold blocks, asymmetry and oversized location counter. */
+-  .theme-comic_pop .cover-header { height: 100pt; padding: 20pt 35pt; border-bottom: 12pt solid #F97316; }
+-  .theme-comic_pop .cover-title { font-size: 28pt; }
+-  .theme-comic_pop .cover-card-left { left: 0; top: 18pt; width: 285pt; border: 4pt solid #0F766E; border-radius: 0; }
+-  .theme-comic_pop .cover-photo-frame { right: 30pt; top: 145pt; width: 545pt; height: 330pt; border: 4pt solid #0F766E; border-radius: 0; }
+-  .theme-comic_pop .loc-header { height: 58pt; padding: 8pt 40pt; border-bottom: 10pt solid #F97316; }
+-  .theme-comic_pop .loc-counter { font-size: 11pt; color: #FDE047; }
+-  .theme-comic_pop .loc-title { font-size: 22pt; }
+-  .theme-comic_pop .photo-box, .theme-comic_pop .info-box { border: 3pt solid #0F766E; border-radius: 0; box-shadow: 4pt 4pt 0 #F97316; }
+-
+-  /* 4. Jurnal Dokumentasi: taped-paper feel and dashed photo frames. */
+-  .theme-scrapbook .cover-header { height: 76pt; padding: 16pt 46pt; border-bottom: 3pt dashed #BE123C; }
+-  .theme-scrapbook .cover-card-left { left: 30pt; top: 34pt; border: 2pt dashed #BE123C; border-radius: 4pt; }
+-  .theme-scrapbook .cover-photo-frame { right: 35pt; top: 138pt; border: 4pt dashed #BE123C; border-radius: 4pt; }
+-  .theme-scrapbook .loc-header { border-bottom: 4pt dashed #FBBF24; }
+-  .theme-scrapbook .photo-box { border: 3pt dashed #BE123C; border-radius: 3pt; box-shadow: 3pt 3pt 0 #FBBF24; }
+-  .theme-scrapbook .info-box { border: 2pt dashed #BE123C; border-radius: 3pt; background: #FFFBEB; }
+-  .theme-scrapbook .photo-label { background: #FEF3C7; padding: 5pt; }
+-
+-  /* 5. Merah Putih Institusional: symmetric official cover and formal red bars. */
+-  .theme-memphis .cover-header { height: 88pt; padding: 18pt 50pt; text-align: center; border-bottom: 10pt solid #DC2626; }
+-  .theme-memphis .cover-title { font-size: 24pt; letter-spacing: 0.2pt; }
+-  .theme-memphis .cover-badge { color: #FCA5A5; }
+-  .theme-memphis .cover-card-left { position: absolute; left: 145pt; top: 105pt; width: 670pt; text-align: center; border: 2pt solid #DC2626; border-radius: 0; }
+-  .theme-memphis .cover-photo-frame { right: 195pt; top: 250pt; width: 570pt; height: 260pt; border: 4pt solid #DC2626; border-radius: 0; }
+-  .theme-memphis .cover-photo-img, .theme-memphis .cover-photo-placeholder { width: 550pt; height: 205pt; border-radius: 0; }
+-  .theme-memphis .loc-header { text-align: center; border-bottom: 9pt solid #DC2626; }
+-  .theme-memphis .photo-box, .theme-memphis .info-box { border: 2pt solid #B91C1C; border-radius: 0; box-shadow: none; }
+-
+-  /* 6. Eco Green Report: clean environmental green with strong condition panel. */
+-  .theme-festival .cover-header { height: 88pt; padding: 18pt 45pt; border-bottom: 7pt solid #84CC16; }
+-  .theme-festival .cover-card-left { left: 24pt; top: 25pt; border-left: 9pt solid #16A34A; border-radius: 4pt 14pt 14pt 4pt; }
+-  .theme-festival .cover-photo-frame { right: 22pt; top: 135pt; border: 5pt solid #16A34A; border-radius: 16pt; }
+-  .theme-festival .loc-header { border-bottom: 7pt solid #84CC16; }
+-  .theme-festival .photo-box, .theme-festival .info-box { border: 2pt solid #16A34A; border-radius: 12pt; }
+-  .theme-festival .info-box { border-top: 7pt solid #84CC16; }
+-  .theme-festival .badge-clean { background: #DCFCE7; color: #166534; border-color: #86EFAC; }
+-
+-  /* 7. Arsip Klasik: archival paper, serif-inspired framing and double borders. */
+-  .theme-retro_groovy .slide { background: #FFFBEB; }
+-  .theme-retro_groovy .cover-header { height: 84pt; padding: 18pt 42pt; border-bottom: 6pt double #92400E; }
+-  .theme-retro_groovy .cover-title { font-size: 24pt; letter-spacing: 0.4pt; }
+-  .theme-retro_groovy .cover-card-left { left: 18pt; top: 28pt; border: 3pt double #92400E; border-radius: 0; background: #FFFBEB; }
+-  .theme-retro_groovy .cover-photo-frame { right: 30pt; top: 143pt; border: 5pt double #92400E; border-radius: 0; background: #FFFBEB; }
+-  .theme-retro_groovy .loc-header { background: #78350F; border-bottom: 6pt double #D6A756; }
+-  .theme-retro_groovy .photo-box, .theme-retro_groovy .info-box { border: 3pt double #92400E; border-radius: 0; background: #FFFBEB; }
+-
+-  /* 8. Majalah Editorial: dominant hero image on cover and editorial location grid. */
+-  .theme-rainbow_infographic .cover-header { height: 74pt; padding: 16pt 40pt; border-bottom: 5pt solid #0F172A; }
+-  .theme-rainbow_infographic .cover-title { font-size: 24pt; }
+-  .theme-rainbow_infographic .cover-card-left { left: 35pt; top: 26pt; width: 290pt; border-top: 7pt solid #0F172A; border-radius: 0; }
+-  .theme-rainbow_infographic .cover-photo-frame { right: 20pt; top: 130pt; width: 600pt; height: 350pt; border: 0; border-bottom: 8pt solid #0EA5E9; border-radius: 0; }
+-  .theme-rainbow_infographic .cover-photo-img, .theme-rainbow_infographic .cover-photo-placeholder { width: 580pt; height: 300pt; border-radius: 0; }
+-  .theme-rainbow_infographic .loc-header { background: #0F172A; border-bottom: 6pt solid #0EA5E9; }
+-  .theme-rainbow_infographic .photo-box { border: 0; border-bottom: 5pt solid #0EA5E9; border-radius: 0; box-shadow: none; }
+-  .theme-rainbow_infographic .info-box { border: 0; border-top: 3pt solid #0F172A; border-radius: 0; box-shadow: none; }
+-
+-  /* 9. Blueprint Inspeksi: technical blue grid impression and annotation borders. */
+-  .theme-paper_cut .slide { background: #EFF6FF; }
+-  .theme-paper_cut .cover-header { height: 94pt; padding: 20pt 40pt; border-bottom: 8pt solid #38BDF8; }
+-  .theme-paper_cut .cover-card-left { left: 30pt; top: 20pt; border: 2pt solid #1D4ED8; border-radius: 0; box-shadow: 5pt 5pt 0 #BFDBFE; }
+-  .theme-paper_cut .cover-photo-frame { right: 22pt; top: 140pt; border: 3pt solid #1D4ED8; border-radius: 0; box-shadow: 5pt 5pt 0 #38BDF8; }
+-  .theme-paper_cut .loc-header { background: #1E40AF; border-bottom: 6pt solid #38BDF8; }
+-  .theme-paper_cut .photo-box, .theme-paper_cut .info-box { border: 2pt solid #1D4ED8; border-radius: 0; box-shadow: 3pt 3pt 0 #BFDBFE; }
+-  .theme-paper_cut .photo-label { color: #1D4ED8; }
+-
+-  /* 10. Emerald Gold Ornamental: layered gold frame and symmetrical accents. */
+-  .theme-botanical .slide { background: #ECFDF5; }
+-  .theme-botanical .cover-header { height: 84pt; padding: 18pt 44pt; border-bottom: 5pt double #B8860B; }
+-  .theme-botanical .cover-card-left { left: 18pt; top: 26pt; border: 3pt double #B8860B; border-radius: 18pt 3pt 18pt 3pt; }
+-  .theme-botanical .cover-photo-frame { right: 28pt; top: 138pt; border: 5pt double #B8860B; border-radius: 18pt 3pt 18pt 3pt; }
+-  .theme-botanical .loc-header { background: #064E3B; border-bottom: 5pt double #D4AF37; }
+-  .theme-botanical .photo-box, .theme-botanical .info-box { border: 3pt double #B8860B; border-radius: 12pt 2pt 12pt 2pt; }
+-  .theme-botanical .info-box { border-left-width: 7pt; }
+-
+-  /* Alternate asymmetric layouts for editorial and blueprint designs.
+-     Keep the two evidence photos and findings visible on the same page. */
+-  .theme-paper_cut .photos-container,
+-  .theme-rainbow_infographic .photos-container { width: 330pt; margin-bottom: 0; }
+-  .theme-paper_cut .photo-box,
+-  .theme-rainbow_infographic .photo-box { width: 315pt; float: left; padding: 5pt; margin-bottom: 8pt; }
+-  .theme-paper_cut .photo-img,
+-  .theme-rainbow_infographic .photo-img,
+-  .theme-paper_cut .photo-placeholder,
+-  .theme-rainbow_infographic .photo-placeholder { width: 300pt; height: 158pt; }
+-  .theme-paper_cut .photo-box-right,
+-  .theme-rainbow_infographic .photo-box-right { clear: left; float: left; }
+-  .theme-paper_cut .info-box,
+-  .theme-rainbow_infographic .info-box { position: absolute; top: 104pt; right: 28pt; width: 535pt; }
+-  .theme-paper_cut .loc-body,
+-  .theme-rainbow_infographic .loc-body { padding-top: 12pt; }
+-  .theme-paper_cut .photo-label,
+-  .theme-rainbow_infographic .photo-label { font-size: 8pt; }
+-
++  /* Desain 10 template: file CSS yang sama dipakai juga oleh pratinjau & pemilih template di aplikasi. */
++{!! file_get_contents(resource_path('css/report-templates.css')) !!}
+ </style>
+ </head>
+-<body class="theme-{{ $theme['style_type'] ?? 'tropical_pop' }}">
++@php
++  $officerW = $theme['photo']['officer'][0]; $officerH = $theme['photo']['officer'][1];
++  $locW = $theme['photo']['location'][0];    $locH = $theme['photo']['location'][1];
++@endphp
++<body class="theme-{{ $theme['style_type'] }}">
+ 
+   <!-- ======================================================================= -->
+   <!-- SLIDE 1: COVER                                                          -->
+@@ -446,9 +336,9 @@
+       <!-- Right Officer Photo Frame -->
+       <div class="cover-photo-frame">
+         @if (!empty($officerPhotoBase64))
+-          <img src="{{ $officerPhotoBase64 }}" class="cover-photo-img" alt="Foto Petugas" />
++          <img src="{{ $officerPhotoBase64 }}" class="cover-photo-img" style="width: {{ $officerW }}pt; height: {{ $officerH }}pt;" alt="Foto Petugas" />
+         @else
+-          <div class="cover-photo-placeholder">[ FOTO PETUGAS ]</div>
++          <div class="cover-photo-placeholder" style="width: {{ $officerW }}pt; height: {{ $officerH }}pt; line-height: {{ $officerH - 40 }}pt;">[ FOTO PETUGAS ]</div>
+         @endif
+         <div style="font-size: 8.5pt; font-weight: bold; color: #64748b; margin-top: 5pt; text-transform: uppercase;">
+           Foto Petugas Pengawas
+@@ -482,9 +372,9 @@
+           <!-- Photo 1 -->
+           <div class="photo-box">
+             @if (!empty($loc['photo_1_base64']))
+-              <img src="{{ $loc['photo_1_base64'] }}" class="photo-img" alt="Dokumentasi 1" />
++              <img src="{{ $loc['photo_1_base64'] }}" class="photo-img" style="width: {{ $locW }}pt; height: {{ $locH }}pt;" alt="Dokumentasi 1" />
+             @else
+-              <div class="photo-placeholder">[ DOKUMENTASI 1 ]</div>
++              <div class="photo-placeholder" style="width: {{ $locW }}pt; height: {{ $locH }}pt; line-height: {{ $locH }}pt;">[ DOKUMENTASI 1 ]</div>
+             @endif
+             <div class="photo-label">Dokumentasi 1</div>
+           </div>
+@@ -492,9 +382,9 @@
+           <!-- Photo 2 -->
+           <div class="photo-box photo-box-right">
+             @if (!empty($loc['photo_2_base64']))
+-              <img src="{{ $loc['photo_2_base64'] }}" class="photo-img" alt="Dokumentasi 2" />
++              <img src="{{ $loc['photo_2_base64'] }}" class="photo-img" style="width: {{ $locW }}pt; height: {{ $locH }}pt;" alt="Dokumentasi 2" />
+             @else
+-              <div class="photo-placeholder">[ DOKUMENTASI 2 ]</div>
++              <div class="photo-placeholder" style="width: {{ $locW }}pt; height: {{ $locH }}pt; line-height: {{ $locH }}pt;">[ DOKUMENTASI 2 ]</div>
+             @endif
+             <div class="photo-label">Dokumentasi 2</div>
+           </div>
+diff --git a/tests/Unit/TemplateThemeConsistencyTest.php b/tests/Unit/TemplateThemeConsistencyTest.php
+new file mode 100644
+index 0000000..157ea4e
+--- /dev/null
++++ b/tests/Unit/TemplateThemeConsistencyTest.php
+@@ -0,0 +1,81 @@
++<?php
++
++namespace Tests\Unit;
++
++use App\Services\BuiltinTemplateGeneratorService;
++use PHPUnit\Framework\TestCase;
++
++/**
++ * Menjaga agar pilihan template -> pratinjau -> PDF memakai desain yang sama.
++ * Desain tiap template adalah kelas ".theme-{style_type}" di
++ * resources/css/report-templates.css (dipakai blade PDF dan aplikasi).
++ */
++class TemplateThemeConsistencyTest extends TestCase
++{
++    private function css(): string
++    {
++        return file_get_contents(dirname(__DIR__, 2) . '/resources/css/report-templates.css');
++    }
++
++    public function test_ada_sepuluh_template_dengan_key_dan_style_type_unik(): void
++    {
++        $definitions = BuiltinTemplateGeneratorService::getTemplateDefinitions();
++
++        $this->assertCount(10, $definitions);
++        $this->assertCount(10, array_unique(array_column($definitions, 'key')));
++        $this->assertCount(10, array_unique(array_column($definitions, 'style_type')));
++    }
++
++    public function test_setiap_style_type_punya_desain_css(): void
++    {
++        $css = $this->css();
++
++        foreach (BuiltinTemplateGeneratorService::getTemplateDefinitions() as $definition) {
++            $this->assertStringContainsString(
++                '.theme-' . $definition['style_type'] . ' ',
++                $css,
++                "Template '{$definition['key']}' memakai style_type '{$definition['style_type']}' tetapi tidak ada desain CSS-nya."
++            );
++        }
++    }
++
++    public function test_css_tidak_punya_desain_yatim(): void
++    {
++        preg_match_all('/\.theme-([a-z_]+)\s/', $this->css(), $matches);
++        $styleTypes = array_column(BuiltinTemplateGeneratorService::getTemplateDefinitions(), 'style_type');
++
++        foreach (array_unique($matches[1]) as $name) {
++            $this->assertContains($name, $styleTypes, "CSS .theme-{$name} tidak dipakai template mana pun.");
++        }
++    }
++
++    public function test_resolve_theme_mengembalikan_data_yang_sama_untuk_key_yang_sama(): void
++    {
++        foreach (BuiltinTemplateGeneratorService::getTemplateDefinitions() as $definition) {
++            $theme = BuiltinTemplateGeneratorService::resolveTheme($definition['key']);
++
++            $this->assertSame($definition['key'], $theme['key']);
++            $this->assertSame($definition['style_type'], $theme['style_type']);
++            $this->assertSame($definition['primary_color'], $theme['primary_color']);
++            $this->assertSame($definition['accent_color'], $theme['accent_color']);
++            $this->assertCount(2, $theme['photo']['officer']);
++            $this->assertCount(2, $theme['photo']['location']);
++        }
++    }
++
++    public function test_key_tidak_dikenal_jatuh_ke_template_pertama_bukan_tema_tanpa_desain(): void
++    {
++        $first = BuiltinTemplateGeneratorService::getTemplateDefinitions()[0];
++
++        $this->assertSame($first['style_type'], BuiltinTemplateGeneratorService::resolveTheme('tidak-ada')['style_type']);
++        $this->assertSame($first['style_type'], BuiltinTemplateGeneratorService::resolveTheme(null)['style_type']);
++    }
++
++    public function test_ukuran_foto_tema_sesuai_dengan_yang_dipakai_desain(): void
++    {
++        $this->assertSame([550, 205], BuiltinTemplateGeneratorService::photoSpecs('memphis')['officer']);
++        $this->assertSame([300, 158], BuiltinTemplateGeneratorService::photoSpecs('paper_cut')['location']);
++        $this->assertSame([560, 300], BuiltinTemplateGeneratorService::photoSpecs('botanical')['officer']);
++        $this->assertSame([400, 220], BuiltinTemplateGeneratorService::photoSpecs('botanical')['location']);
++    }
++}
+-- 
+2.43.0
+

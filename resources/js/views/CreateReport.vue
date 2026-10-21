@@ -292,14 +292,10 @@
       </div>
     </div>
 
-    <!-- =============================================================== -->
-    <!-- STEP 7: PILIH TEMPLATE                                          -->
-    <!-- =============================================================== -->
+        <!-- STEP 7: PILIH TEMPLATE -->
     <div v-show="currentStep === 7" class="space-y-4">
       <div class="bg-white rounded-2xl p-5 border border-[#E7E5DE] shadow-[0_2px_8px_rgba(28,25,23,0.03)]">
-        <h3 class="text-sm font-bold text-stone-900 mb-1">
-          Pilih Desain PDF Widescreen 16:9
-        </h3>
+        <h3 class="text-sm font-bold text-stone-900 mb-1">Pilih Desain PDF Widescreen 16:9</h3>
         <p class="text-xs text-stone-500 mb-4">
           PDF 6 halaman akan dibuat otomatis berdasarkan desain template terpilih.
         </p>
@@ -316,10 +312,13 @@
                 : 'border-[#E7E5DE] hover:border-stone-300 bg-white'
             ]"
           >
-            <!-- Pratinjau desain asli (CSS yang sama dengan PDF) -->
             <div class="relative">
-              <TemplateThumb :theme="tpl.theme" :name="tpl.name" />
-
+              <img
+                :src="tpl.preview_url"
+                :alt="tpl.name"
+                loading="lazy"
+                class="w-full aspect-video object-cover rounded-xl border border-[#E7E5DE]"
+              />
               <div
                 v-if="form.template_id === tpl.id"
                 class="absolute top-2 right-2 px-2.5 py-1 rounded-full bg-[#14251D] text-[#D8C79C] text-[10px] font-bold shadow flex items-center gap-1"
@@ -331,16 +330,16 @@
               </div>
             </div>
 
-            <div class="flex items-center justify-between">
-              <div>
-                <h4 class="text-xs font-bold text-stone-900">{{ tpl.name }}</h4>
-                <p class="text-[11px] text-stone-500">{{ tpl.description }}</p>
-              </div>
+            <div>
+              <h4 class="text-xs font-bold text-stone-900">{{ tpl.name }}</h4>
+              <p class="text-[11px] text-stone-500">{{ tpl.description }}</p>
             </div>
           </div>
         </div>
       </div>
     </div>
+
+
 
     <!-- =============================================================== -->
     <!-- STEP 8: PREVIEW & REVIEW SEBELUM SUBMIT                         -->

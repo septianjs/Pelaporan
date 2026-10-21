@@ -3,17 +3,14 @@
 use App\Http\Controllers\Api\LocationController;
 use App\Http\Controllers\Api\ReportController;
 use App\Models\Report;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
 | API Routes
 |--------------------------------------------------------------------------
-|
 | Pelaporan Pengawasan Lingkungan Kantor BPSDM API
 | No authentication required.
-|
 */
 
 Route::get('/ping', function () {
@@ -28,8 +25,20 @@ Route::get('/ping', function () {
 // Master Lokasi Pengawasan
 Route::get('/locations', [LocationController::class, 'index']);
 
-// PDF template catalog is served by the existing templates endpoint.
-Route::get('/templates', [\App\Http\Controllers\Api\TemplateController::class, 'index']);
+// Katalog template PDF: hanya baris database yang punya file PPTX di config
+Route::get('/templates', function () {
+    $cfg = config('report_templates.templates');
+
+    return ['data' => \App\Models\Template::whereIn('template_key', array_keys($cfg))
+        ->orderBy('id')
+        ->get()
+        ->map(fn ($t) => [
+            'id'          => $t->id,
+            'name'        => $cfg[$t->template_key]['name'],
+            'description' => $cfg[$t->template_key]['description'] ?? 'Desain dari file PPTX',
+            'preview_url' => asset("storage/template-previews/{$t->template_key}.png"),
+        ])->values()];
+});
 
 // Helper Nomor Laporan Otomatis
 Route::get('/reports/next-number', function () {
