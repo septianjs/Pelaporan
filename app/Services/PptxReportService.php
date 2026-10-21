@@ -119,6 +119,15 @@ class PptxReportService
             $norm($file),
         ]);
         $p->setTimeout(180);
+        $p->setEnv(array_filter([
+            'SystemRoot'   => getenv('SystemRoot') ?: 'C:\\Windows',
+            'USERPROFILE'  => getenv('USERPROFILE') ?: 'C:\\Users\\ACER',
+            'APPDATA'      => getenv('APPDATA') ?: 'C:\\Users\\ACER\\AppData\\Roaming',
+            'LOCALAPPDATA' => getenv('LOCALAPPDATA') ?: 'C:\\Users\\ACER\\AppData\\Local',
+            'TEMP'         => sys_get_temp_dir(),
+            'TMP'          => sys_get_temp_dir(),
+        ]));
+        $p->run();
         $p->run();
         File::deleteDirectory($profile);
 

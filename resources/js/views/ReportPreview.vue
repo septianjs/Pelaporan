@@ -104,14 +104,25 @@
           @touchend="onTouchEnd"
         >
           <Transition name="slide-fade" mode="out-in">
-            <ReportSlide
+            <img
+              v-if="pageImages[activeSlideIndex]"
               :key="activeSlideIndex"
-              :theme="report.template?.theme"
-              :template-name="report.template?.name || ''"
-              :slide="activeSlideIndex"
-              :report="slideReport"
-              :locations="slideLocations"
+              :src="pageImages[activeSlideIndex]"
+              :alt="'Halaman ' + (activeSlideIndex + 1)"
+              draggable="false"
+              class="w-full block bg-white"
+              style="aspect-ratio: 16 / 9; object-fit: contain;"
             />
+            <div v-else :key="'ph'" class="w-full aspect-video bg-[#ECE8DD] flex items-center justify-center p-4 text-center">
+              <div v-if="pagesError" class="space-y-2">
+                <p class="text-xs font-semibold text-[#A6382C]">{{ pagesError }}</p>
+                <button type="button" @click="renderPdfPages"
+                  class="px-3 py-1.5 rounded-lg bg-[#14251D] text-[#FAF9F5] text-[11px] font-bold">Coba lagi</button>
+              </div>
+              <p v-else class="text-xs font-semibold text-[#6F7771] animate-pulse">
+                Menyiapkan pratinjau dari template… (bisa sampai 40 detik)
+              </p>
+            </div>
           </Transition>
         </div>
 
@@ -392,7 +403,10 @@ import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import api from '../services/api.js';
 import { sharePdfDocument, openWhatsApp } from '../services/reportShare.js';
-import ReportSlide from '../components/ReportSlide.vue';
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.js';
+import pdfWorkerUrl from 'pdfjs-dist/legacy/build/pdf.worker.min.js?url';
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
 import { normalizeReportLocations } from '../services/reportSlides.js';
 
 const route = useRoute();
@@ -482,6 +496,44 @@ const fetchReport = async () => {
   }
 };
 
+// ── Pratinjau = halaman PDF hasil template PPTX ──
+const pageImages = ref([]);
+const pagesError = ref('');
+
+const renderPdfPages = async () => {
+  if (!report.value) return;
+  pagesError.value = '';
+  pageImages.value = [];
+  try {
+    // PDF belum ada -> buat dulu (memakai template yang dipilih)
+    if (!report.value.pdf_path) {
+      const g = await api.post(`/reports/${report.value.id}/generate-pdf`);
+      if (g.data?.data) report.value = g.data.data;
+    }
+    const res = await api.get(`/reports/${report.value.id}/pdf`, {
+      params: { inline: 1, t: Date.now() },
+      responseType: 'arraybuffer',
+    });
+    const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(res.data) }).promise;
+    const imgs = [];
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const base = page.getViewport({ scale: 1 });
+      const vp = page.getViewport({ scale: Math.min(2, 1280 / base.width) });
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.floor(vp.width);
+      canvas.height = Math.floor(vp.height);
+      await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
+      imgs.push(canvas.toDataURL('image/jpeg', 0.88));
+    }
+    pageImages.value = imgs;
+    totalSlides.value = imgs.length;
+    if (activeSlideIndex.value >= imgs.length) activeSlideIndex.value = 0;
+  } catch (err) {
+    pagesError.value = 'Gagal memuat pratinjau PDF: ' + (err.message || 'kesalahan tidak diketahui');
+  }
+};
+
 // ── Generate PDF ──
 const doGeneratePdf = async () => {
   generatingPdf.value = true;
@@ -489,6 +541,7 @@ const doGeneratePdf = async () => {
   try {
     const res = await api.post(`/reports/${report.value.id}/generate-pdf`);
     if (res.data?.data) report.value = res.data.data;
+    await renderPdfPages();
   } catch (err) {
     generateError.value = err.response?.data?.message || 'Gagal membuat PDF.';
   } finally {
@@ -594,8 +647,9 @@ const sendEmailReport = async () => {
   }
 };
 
-onMounted(() => {
-  fetchReport();
+onMounted(async () => {
+  await fetchReport();
+  renderPdfPages();
 });
 </script>
 
