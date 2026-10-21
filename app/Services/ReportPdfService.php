@@ -13,15 +13,16 @@ use Illuminate\Support\Facades\Storage;
 
 class ReportPdfService
 {
-    // Ukuran foto TIDAK lagi ditulis di sini. Ukuran per tema berasal dari
-    // BuiltinTemplateGeneratorService::photoSpecs() dan dipakai untuk (a) crop
-    // server-side di bawah, (b) style inline <img> di blade, dan (c) pratinjau di
-    // aplikasi. DomPDF tidak mendukung object-fit, jadi crop harus persis sama
-    // dengan ukuran tampil, kalau tidak foto tampak gepeng/melar.
+    // Ukuran foto TIDAK ditulis di sini. Ukuran dibaca dari CSS template
+    // (resources/css/pdf/base.css + template-NN.css) lewat PdfTemplateCssService,
+    // lalu dipakai untuk crop server-side. DomPDF tidak mendukung object-fit, jadi
+    // crop harus persis sama dengan ukuran tampil di CSS, kalau tidak foto
+    // tampak gepeng/melar.
     protected const OFFICER_PHOTO_FOCUS_Y = 0.2; // kepala biasanya di bagian atas foto potret
 
     public function __construct(
-        protected ImageCropService $imageCropper = new ImageCropService()
+        protected ImageCropService $imageCropper = new ImageCropService(),
+        protected PdfTemplateCssService $templateCss = new PdfTemplateCssService()
     ) {
     }
 
@@ -107,79 +108,9 @@ class ReportPdfService
                 ];
             }
         }
-            // Muat CSS dasar PDF.
-        $baseCssPath = resource_path('css/pdf/base.css');
-
-        $pdfCss = file_exists($baseCssPath)
-            ? file_get_contents($baseCssPath)
-            : '';
-
-        // Pilih CSS berdasarkan template yang digunakan laporan.
-        $definitions = BuiltinTemplateGeneratorService::getTemplateDefinitions();
-
-        $templateIndex = 0;
-
-        if ($report->template) {
-            foreach ($definitions as $index => $definition) {
-                if ($definition['key'] === $report->template->template_key) {
-                    $templateIndex = $index + 1;
-                    break;
-                }
-            }
-        }
-
-        $templateCssPath = resource_path(
-            'css/pdf/template-' . str_pad((string) $templateIndex, 2, '0', STR_PAD_LEFT) . '.css'
-        );
-
-        if (file_exists($templateCssPath)) {
-            $pdfCss .= "\n" . file_get_contents($templateCssPath);
-        }
-            \Log::info('PDF TEMPLATE CSS DEBUG', [
-        'template_key' => $report->template?->template_key,
-        'template_index' => $templateIndex,
-        'base_css_loaded' => file_exists($baseCssPath),
-        'template_css_path' => $templateCssPath,
-        'template_css_loaded' => file_exists($templateCssPath),
-        'template_css_size' => file_exists($templateCssPath)
-            ? filesize($templateCssPath)
-            : 0,
-        'total_css_size' => strlen($pdfCss),
-    ]);
-    
-        // Kompatibilitas variabel CSS dengan DomPDF.
-        // Ambil definisi variabel seperti --theme-primary: #172554;
-        $cssVariables = [];
-
-        preg_match_all(
-            '/(--[\w-]+)\s*:\s*([^;{}]+)\s*;/',
-            $pdfCss,
-            $variableMatches,
-            PREG_SET_ORDER
-        );
-
-        foreach ($variableMatches as $variableMatch) {
-            $cssVariables[$variableMatch[1]] = trim($variableMatch[2]);
-        }
-
-        // Ganti var(--nama-variabel) dengan nilai CSS konkret.
-        $pdfCss = preg_replace_callback(
-            '/var\(\s*(--[\w-]+)\s*(?:,\s*([^()]+))?\)/',
-            function ($matches) use ($cssVariables) {
-                if (isset($cssVariables[$matches[1]])) {
-                    return $cssVariables[$matches[1]];
-                }
-
-                // Gunakan nilai fallback jika variabel tidak ditemukan.
-                if (isset($matches[2])) {
-                    return trim($matches[2]);
-                }
-
-                // Pertahankan ekspresi jika variabel tidak ditemukan.
-                return $matches[0];
-            },
-            $pdfCss
-        );
+        // CSS desain final: base.css + template-NN.css milik template laporan ini,
+        // dengan var(--x) sudah diganti nilai konkret (DomPDF tak mendukung var()).
+        $pdfCss = $this->templateCss->css($report->template?->template_key);
 
         // 4. Render HTML View
         $html = view('pdf.report_16_9', [
@@ -212,24 +143,21 @@ class ReportPdfService
     }
 
     /**
-     * Resolve palet warna, kelas desain (style_type) dan ukuran foto dari template.
-     * Memakai BuiltinTemplateGeneratorService::resolveTheme() — sumber yang sama
-     * dengan yang dikirim ke aplikasi — supaya PDF = pratinjau = pilihan pengguna.
-     * Format warna mengikuti blade: primary/accent tanpa '#', sisanya dengan '#'.
+     * Data tema untuk blade. SEMUA nilai berasal dari CSS template (bukan dari
+     * palet di PHP): warna utama dari .cover-header, ukuran foto dari
+     * .cover-photo-img / .photo-img. Dengan begitu crop dan warna aksen selalu
+     * sama dengan desain yang dirender.
      */
     protected function resolveTheme(?Template $template): array
     {
-        $theme = BuiltinTemplateGeneratorService::resolveTheme($template?->template_key);
+        $key = $template?->template_key;
+        $definition = BuiltinTemplateGeneratorService::findDefinition($key);
 
         return [
-            'style_type'      => $theme['style_type'],
-            'primary_color'   => $theme['primary_color'],
-            'accent_color'    => $theme['accent_color'],
-            'secondary_color' => $theme['secondary_color'],
-            'bg_color'        => '#' . $theme['bg_color'],
-            'card_bg'         => '#' . $theme['card_bg'],
-            'card_alt'        => '#' . $theme['card_alt'],
-            'photo'           => $theme['photo'],
+            'number'        => $this->templateCss->templateNumber($key),
+            'style_type'    => $definition['style_type'],
+            'primary_color' => $this->templateCss->primaryColor($key) ?? $definition['primary_color'],
+            'photo'         => $this->templateCss->photoSizes($key),
         ];
     }
 

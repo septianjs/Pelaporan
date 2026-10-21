@@ -1,5 +1,11 @@
 /*
- * DESAIN 10 TEMPLATE LAPORAN (satu-satunya sumber desain per-template).
+ * [USANG - akan diganti pada Langkah 2]
+ * Desain lama berbasis kelas .theme-*. Sumber desain yang berlaku untuk PDF sekarang
+ * adalah resources/css/pdf/base.css + template-NN.css (lihat PdfTemplateCssService).
+ * File ini hanya dipertahankan sementara agar pratinjau aplikasi tidak rusak
+ * sebelum ReportSlide.vue dipindah ke CSS yang sama dengan PDF.
+ *
+ * DESAIN LAMA 10 TEMPLATE LAPORAN.
  *
  * File ini dipakai oleh DUA konsumen supaya desain selalu identik:
  *   1. PDF  : di-inline ke resources/views/pdf/report_16_9.blade.php (DomPDF)
@@ -10,7 +16,7 @@
  * tests/Unit/TemplateThemeConsistencyTest.php menjaga agar keduanya sinkron.
  *
  * Aturan: hanya properti yang aman untuk DomPDF. Ukuran foto TIDAK diatur di sini;
- * ukuran foto per tema ada di BuiltinTemplateGeneratorService::photoSpecs() dan
+ * ukuran foto per template dibaca dari CSS PDF oleh PdfTemplateCssService dan
  * dipasang inline (agar crop server-side selalu sama dengan ukuran tampil).
  */
 /* =========================================================

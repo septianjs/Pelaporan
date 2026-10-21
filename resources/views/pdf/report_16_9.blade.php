@@ -7,11 +7,7 @@
 {!! $pdfCss ?? '' !!}
 </style>
 </head>
-@php
-  $officerW = $theme['photo']['officer'][0]; $officerH = $theme['photo']['officer'][1];
-  $locW = $theme['photo']['location'][0];    $locH = $theme['photo']['location'][1];
-@endphp
-<body class="theme-{{ $theme['style_type'] }}">
+<body class="template-{{ str_pad((string) $theme['number'], 2, '0', STR_PAD_LEFT) }}">
 
   <!-- ======================================================================= -->
   <!-- SLIDE 1: COVER                                                          -->
@@ -36,7 +32,7 @@
 
         <div class="meta-group">
           <div class="meta-label">Petugas Pengawas Lapangan</div>
-          <div class="meta-value-sub" style="color: #{{ $theme['primary_color'] ?? '1E3A8A' }}; font-size: 14pt;">
+          <div class="meta-value-sub" style="color: #{{ $theme['primary_color'] }}; font-size: 14pt;">
             {{ $report->officer_name }}
           </div>
         </div>
@@ -52,9 +48,9 @@
       <!-- Right Officer Photo Frame -->
       <div class="cover-photo-frame">
         @if (!empty($officerPhotoBase64))
-          <img src="{{ $officerPhotoBase64 }}" class="cover-photo-img" style="width: {{ $officerW }}pt; height: {{ $officerH }}pt;" alt="Foto Petugas" />
+          <img src="{{ $officerPhotoBase64 }}" class="cover-photo-img" alt="Foto Petugas" />
         @else
-          <div class="cover-photo-placeholder" style="width: {{ $officerW }}pt; height: {{ $officerH }}pt; line-height: {{ $officerH - 40 }}pt;">[ FOTO PETUGAS ]</div>
+          <div class="cover-photo-placeholder">[ FOTO PETUGAS ]</div>
         @endif
         <div style="font-size: 8.5pt; font-weight: bold; color: #64748b; margin-top: 5pt; text-transform: uppercase;">
           Foto Petugas Pengawas
@@ -88,9 +84,9 @@
           <!-- Photo 1 -->
           <div class="photo-box">
             @if (!empty($loc['photo_1_base64']))
-              <img src="{{ $loc['photo_1_base64'] }}" class="photo-img" style="width: {{ $locW }}pt; height: {{ $locH }}pt;" alt="Dokumentasi 1" />
+              <img src="{{ $loc['photo_1_base64'] }}" class="photo-img" alt="Dokumentasi 1" />
             @else
-              <div class="photo-placeholder" style="width: {{ $locW }}pt; height: {{ $locH }}pt; line-height: {{ $locH }}pt;">[ DOKUMENTASI 1 ]</div>
+              <div class="photo-placeholder">[ DOKUMENTASI 1 ]</div>
             @endif
             <div class="photo-label">Dokumentasi 1</div>
           </div>
@@ -98,9 +94,9 @@
           <!-- Photo 2 -->
           <div class="photo-box photo-box-right">
             @if (!empty($loc['photo_2_base64']))
-              <img src="{{ $loc['photo_2_base64'] }}" class="photo-img" style="width: {{ $locW }}pt; height: {{ $locH }}pt;" alt="Dokumentasi 2" />
+              <img src="{{ $loc['photo_2_base64'] }}" class="photo-img" alt="Dokumentasi 2" />
             @else
-              <div class="photo-placeholder" style="width: {{ $locW }}pt; height: {{ $locH }}pt; line-height: {{ $locH }}pt;">[ DOKUMENTASI 2 ]</div>
+              <div class="photo-placeholder">[ DOKUMENTASI 2 ]</div>
             @endif
             <div class="photo-label">Dokumentasi 2</div>
           </div>

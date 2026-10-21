@@ -137,31 +137,6 @@ class BuiltinTemplateGeneratorService
     }
 
     /**
-     * Ukuran foto (lebar, tinggi dalam pt) per tema. SATU-SATUNYA sumber untuk:
-     *  - crop server-side (ReportPdfService), dan
-     *  - ukuran <img> di PDF (blade, inline), dan
-     *  - ukuran foto di pratinjau/pemilih template di aplikasi (ReportSlide.vue).
-     * Dengan begitu foto tidak pernah gepeng/melar karena ukuran crop != ukuran tampil.
-     * Tema yang tidak terdaftar memakai ukuran default.
-     */
-    protected const PHOTO_SPECS_DEFAULT = [
-        'officer'  => [560, 300],
-        'location' => [400, 220],
-    ];
-
-    protected const PHOTO_SPECS = [
-        'tropical_pop'        => ['officer' => [550, 300], 'location' => [400, 205]],
-        'memphis'             => ['officer' => [550, 205]],
-        'rainbow_infographic' => ['officer' => [580, 300], 'location' => [300, 158]],
-        'paper_cut'           => ['location' => [300, 158]],
-    ];
-
-    public static function photoSpecs(string $styleType): array
-    {
-        return array_replace(self::PHOTO_SPECS_DEFAULT, self::PHOTO_SPECS[$styleType] ?? []);
-    }
-
-    /**
      * Ambil definisi tema berdasarkan template_key. Key yang tidak dikenal
      * jatuh ke template pertama (bukan ke tema "tanpa desain") sehingga PDF
      * dan aplikasi selalu memakai desain yang sama untuk key yang sama.
@@ -187,6 +162,7 @@ class BuiltinTemplateGeneratorService
     {
         $definition = self::findDefinition($key);
         $styleType = $definition['style_type'];
+        $css = new PdfTemplateCssService();
 
         return [
             'key'             => $definition['key'],
@@ -197,7 +173,8 @@ class BuiltinTemplateGeneratorService
             'bg_color'        => $definition['bg_color'],
             'card_bg'         => $definition['card_bg'],
             'card_alt'        => $definition['card_alt'],
-            'photo'           => self::photoSpecs($styleType),
+            'number'          => $css->templateNumber($key),
+            'photo'           => $css->photoSizes($key),
         ];
     }
 
