@@ -37,6 +37,7 @@ class PptxReportService
     private const R  = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships';
     private const PR = 'http://schemas.openxmlformats.org/package/2006/relationships';
     private const CT = 'http://schemas.openxmlformats.org/package/2006/content-types';
+    private const PHOTO_FIT = 'cover';
 
     private int $imgCounter = 0;
 
@@ -302,7 +303,7 @@ class PptxReportService
         $rels->save($relsFile);
     }
 
-    private function putImage(DOMDocument $slide, DOMXPath $sx, DOMElement $sp, DOMElement $txBody, ?string $img, DOMDocument $rels, string $work, float $focusY = 0.5): void
+        private function putImage(DOMDocument $slide, DOMXPath $sx, DOMElement $sp, DOMElement $txBody, ?string $img, DOMDocument $rels, string $work, float $focusY = 0.5): void
     {
         $spPr = $sx->query('p:spPr', $sp)->item(0);
         $ext  = $sx->query('a:xfrm/a:ext', $spPr)->item(0);
@@ -310,11 +311,12 @@ class PptxReportService
         $bh = (int) $ext->getAttribute('cy');
 
         $sp->removeChild($txBody); // hapus teks "<<Image:...>>"
-        if (!$img || !is_file($img)) return; // tanpa foto: biarkan bingkai kosong
+        if (!$img || !is_file($img) || $bw <= 0 || $bh <= 0) return; // tanpa foto: biarkan bingkai kosong
 
         $name = 'fill_' . (++$this->imgCounter) . '_' . uniqid() . '.jpg';
         File::ensureDirectoryExists("$work/ppt/media");
-        [$iw, $ih] = $this->prepareImage($img, "$work/ppt/media/$name");
+        // foto sudah dipotong/diratakan ke rasio bingkai, jadi tidak perlu srcRect
+        $this->prepareImage($img, "$work/ppt/media/$name", $bw / $bh, $focusY);
 
         $rid = 'rIdImg' . $this->imgCounter . substr(uniqid(), -4);
         $rel = $rels->createElementNS(self::PR, 'Relationship');
@@ -322,13 +324,6 @@ class PptxReportService
         $rel->setAttribute('Type', self::R . '/image');
         $rel->setAttribute('Target', "../media/$name");
         $rels->documentElement->appendChild($rel);
-
-        // crop ala "cover" supaya foto memenuhi bingkai tanpa gepeng
-        $l = $t = $r = $b = 0;
-        $ba = $bw / $bh;
-        $ia = $iw / $ih;
-        if ($ia > $ba) { $l = $r = (int) round((1 - $ba / $ia) / 2 * 100000); }
-        else           { $tot = 1 - $ia / $ba; $t = (int) round($tot * $focusY * 100000); $b = (int) round($tot * (1 - $focusY) * 100000); }
 
         foreach (['solidFill', 'noFill', 'gradFill', 'blipFill'] as $tag) {
             foreach (iterator_to_array($sx->query("a:$tag", $spPr)) as $old) $spPr->removeChild($old);
@@ -338,7 +333,6 @@ class PptxReportService
         $frag->appendXML(
             '<a:blipFill xmlns:a="' . self::A . '" xmlns:r="' . self::R . '" rotWithShape="1">'
             . '<a:blip r:embed="' . $rid . '"/>'
-            . "<a:srcRect l=\"$l\" t=\"$t\" r=\"$r\" b=\"$b\"/>"
             . '<a:stretch><a:fillRect/></a:stretch></a:blipFill>'
         );
 
@@ -390,7 +384,8 @@ class PptxReportService
     }
 
     /** Putar sesuai EXIF, kecilkan (maks 1600px), simpan JPEG. Kembalikan [lebar, tinggi]. */
-    private function prepareImage(string $src, string $dest): array
+    /** Putar sesuai EXIF, kecilkan (maks 1600px), sesuaikan ke rasio bingkai, simpan JPEG. */
+    private function prepareImage(string $src, string $dest, ?float $ratio = null, float $focusY = 0.5): array
     {
         $info = getimagesize($src);
         if (!$info) throw new RuntimeException("Bukan gambar valid: $src");
@@ -412,6 +407,28 @@ class PptxReportService
             $im = imagescale($im, (int) round($w * $s), (int) round($h * $s));
             $w = imagesx($im); $h = imagesy($im);
         }
+
+        if ($ratio) {
+            $ia = $w / $h;
+            if (self::PHOTO_FIT === 'contain') {
+                if ($ia > $ratio) { $cw = $w; $ch = (int) round($w / $ratio); }
+                else              { $ch = $h; $cw = (int) round($h * $ratio); }
+                $canvas = imagecreatetruecolor($cw, $ch);
+                imagefill($canvas, 0, 0, imagecolorallocate($canvas, 245, 243, 236));
+                imagecopy($canvas, $im, (int) (($cw - $w) / 2), (int) (($ch - $h) / 2), 0, 0, $w, $h);
+                imagedestroy($im);
+                $im = $canvas; $w = $cw; $h = $ch;
+            } else {
+                if ($ia > $ratio) { $nw = (int) round($h * $ratio); $nh = $h; $x = (int) round(($w - $nw) / 2); $y = 0; }
+                else              { $nw = $w; $nh = (int) round($w / $ratio); $x = 0; $y = (int) round(($h - $nh) * $focusY); }
+                $crop = imagecrop($im, ['x' => $x, 'y' => $y, 'width' => max(1, $nw), 'height' => max(1, $nh)]);
+                if ($crop !== false) {
+                    imagedestroy($im);
+                    $im = $crop; $w = imagesx($im); $h = imagesy($im);
+                }
+            }
+        }
+
         imagejpeg($im, $dest, 82);
         imagedestroy($im);
         return [$w, $h];

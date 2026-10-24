@@ -96,11 +96,10 @@ function isCancellation(err) {
   );
 }
 
-export async function sharePdfDocument(report) {
+export async function sharePdfDocument(report, opts = {}) {
   const fileName = 'laporan ring lingkungan BPSDM.pdf';
   const title = `Laporan ${report.report_number}`;
-  const text = `${title} • ${report.formatted_date || report.inspection_date} • Petugas: ${report.officer_name}`;
-  const pdfUrl = `${api.defaults.baseURL}/reports/${report.id}/pdf`;
+  const text = opts.text || `${title} • ${report.formatted_date || report.inspection_date} • Petugas: ${report.officer_name}`;
 
   // 1. Native Android / iOS via Capacitor
   if (Capacitor.isNativePlatform()) {

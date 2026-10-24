@@ -402,9 +402,10 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import api from '../services/api.js';
-import { sharePdfDocument, openWhatsApp } from '../services/reportShare.js';
+import { sharePdfDocument, openWhatsApp, formatWhatsAppMessage } from '../services/reportShare.js';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.js';
 import pdfWorkerUrl from 'pdfjs-dist/legacy/build/pdf.worker.min.js?url';
+
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
 import { normalizeReportLocations } from '../services/reportSlides.js';
@@ -581,11 +582,16 @@ const shareReport = async () => {
 };
 
 // ── WhatsApp Share (Rich Formatted) ──
-const shareWhatsApp = () => {
+const shareWhatsApp = async () => {
   if (!report.value) return;
-  const { linkIncluded } = openWhatsApp(report.value);
-  if (!linkIncluded) {
-    showToast('Tautan PDF tidak disertakan (server bukan alamat publik). Kirim file PDF lewat tombol Bagikan.');
+  sharing.value = true;
+  try {
+    const result = await sharePdfDocument(report.value, { text: formatWhatsAppMessage(report.value) });
+    if (!result.success && !result.cancelled) {
+      generateError.value = 'Gagal membagikan: ' + (result.error || 'Terjadi kesalahan.');
+    }
+  } finally {
+    sharing.value = false;
   }
 };
 
