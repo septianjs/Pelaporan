@@ -1,0 +1,68 @@
+diff --git a/resources/js/services/api.js b/resources/js/services/api.js
+index 3fba4c8..8924360 100644
+--- a/resources/js/services/api.js
++++ b/resources/js/services/api.js
+@@ -8,9 +8,15 @@ const getBaseUrl = () => {
+     if (savedUrl) {
+         return savedUrl;
+     }
++    // Alamat server produksi/uji, ditetapkan saat build (lihat .env.production).
++    // Contoh: VITE_API_BASE_URL=https://domain-anda.go.id/api
++    const envUrl = import.meta.env.VITE_API_BASE_URL;
++    if (envUrl) {
++        return envUrl.replace(/\/+$/, '');
++    }
+     // Check if on capacitor or file/localhost
+     if (window.location.protocol === 'file:' || window.location.hostname === 'localhost' && window.location.port === '') {
+-        // Android WebView default host loopback to PC:
++        // Hanya untuk emulator Android (10.0.2.2 = PC pengembang). Tidak berlaku di HP sungguhan.
+         return 'http://10.0.2.2:8000/api';
+     }
+     return '/api';
+@@ -22,7 +28,7 @@ const api = axios.create({
+         'Accept': 'application/json',
+         'X-Requested-With': 'XMLHttpRequest',
+     },
+-    timeout: 30000,
++    timeout: 120000, // upload banyak foto lewat data seluler butuh waktu lebih lama
+ });
+ 
+ export const setCustomApiUrl = (url) => {
+diff --git a/resources/js/views/CreateReport.vue b/resources/js/views/CreateReport.vue
+index d23c5af..628e463 100644
+--- a/resources/js/views/CreateReport.vue
++++ b/resources/js/views/CreateReport.vue
+@@ -511,7 +511,7 @@
+ <script setup>
+ import { ref, reactive, computed, onMounted } from 'vue';
+ import { useRouter, useRoute } from 'vue-router';
+-import api from '../services/api';
++import api, { getApiUrl } from '../services/api';
+ import PhotoUploader from '../components/PhotoUploader.vue';
+ import TemplateThumb from '../components/TemplateThumb.vue';
+ import {
+@@ -865,14 +865,22 @@ const submitReport = async () => {
+     }
+   } catch (err) {
+     console.error('Error saat menyimpan laporan:', err);
+-    const isNetworkError = !err.response || err.message === 'Network Error' || !navigator.onLine;
++    // Tidak ada respons dari server = koneksi putus ATAU server tidak terjangkau
++    // (alamat API salah, timeout, CORS, mixed content). Bedakan keduanya supaya
++    // pengguna tidak mengira "offline" padahal internet aktif.
++    const noServerResponse = !err.response;
++    const deviceOffline = !navigator.onLine;
+ 
+-    if (isNetworkError) {
++    if (noServerResponse || deviceOffline) {
+       // Graceful fallback to offline queue on network drop
+       try {
+         await queueOfflineReport(form);
+         await clearFormDraft();
+         showOfflineSuccessModal.value = true;
++        if (!deviceOffline) {
++          console.warn('Server tidak terjangkau:', err.code || err.message, getApiUrl());
++          showToast(`Internet aktif, tapi server tidak terjangkau (${err.code || err.message}). Alamat: ${getApiUrl()}`, 'error');
++        }
+       } catch (qErr) {
+         showToast('Koneksi terputus dan gagal menyimpan offline: ' + qErr.message, 'error');
+       }

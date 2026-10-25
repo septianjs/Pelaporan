@@ -1,6 +1,6 @@
 {
   "node_modules/@capacitor/filesystem/dist/esm/web.js": {
-    "file": "assets/web-Cfgjw0mZ.js",
+    "file": "assets/web-jPTLcunZ.js",
     "name": "web",
     "src": "node_modules/@capacitor/filesystem/dist/esm/web.js",
     "isDynamicEntry": true,
@@ -9,7 +9,7 @@
     ]
   },
   "node_modules/@capacitor/share/dist/esm/web.js": {
-    "file": "assets/web-VAQK3TZu.js",
+    "file": "assets/web-BNQwmCCt.js",
     "name": "web",
     "src": "node_modules/@capacitor/share/dist/esm/web.js",
     "isDynamicEntry": true,
@@ -17,8 +17,12 @@
       "resources/js/app.js"
     ]
   },
+  "node_modules/pdfjs-dist/legacy/build/pdf.worker.min.js": {
+    "file": "assets/pdf.worker.min-SzY6Yteu.js",
+    "src": "node_modules/pdfjs-dist/legacy/build/pdf.worker.min.js"
+  },
   "resources/css/app.css": {
-    "file": "assets/app-CQnCshw2.css",
+    "file": "assets/app-DYgzqSd-.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -27,7 +31,7 @@
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-Btbrxq9l.js",
+    "file": "assets/app-CaS3AuXc.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
@@ -36,7 +40,10 @@
       "node_modules/@capacitor/share/dist/esm/web.js"
     ],
     "css": [
-      "assets/app-DjBaw3Qi.css"
+      "assets/app-UrAIjgZe.css"
+    ],
+    "assets": [
+      "assets/pdf.worker.min-SzY6Yteu.js"
     ]
   }
 }
