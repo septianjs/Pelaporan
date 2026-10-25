@@ -1,0 +1,9 @@
+
+RewriteEngine On
+RewriteBase /pelaporan/
+
+# Layani foto yang tersimpan pada public disk Laravel
+RewriteRule ^storage/(.*)$ storage/app/public/$1 [END]
+
+# Arahkan permintaan website ke folder public Laravel
+RewriteRule ^(.*)$ public/$1 [L]
