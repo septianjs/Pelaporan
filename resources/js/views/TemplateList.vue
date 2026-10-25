@@ -12,7 +12,6 @@
           </div>
           <div>
             <h2 class="text-base font-bold text-[#14251D]">Katalog Desain PDF</h2>
-            <p class="text-xs text-[#6F7771]">10 tema PDF dekoratif • Widescreen 16:9</p>
           </div>
         </div>
       </div>
