@@ -402,7 +402,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import api from '../services/api.js';
-import { sharePdfDocument, openWhatsApp, formatWhatsAppMessage } from '../services/reportShare.js';
+import { sharePdfDocument } from '../services/reportShare.js';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.js';
 import pdfWorkerUrl from 'pdfjs-dist/legacy/build/pdf.worker.min.js?url';
 
@@ -581,14 +581,21 @@ const shareReport = async () => {
   }
 };
 
-// ── WhatsApp Share (Rich Formatted) ──
+// -- WhatsApp Share (File PDF + Teks Terformat) --
 const shareWhatsApp = async () => {
   if (!report.value) return;
   sharing.value = true;
+  generateError.value = '';
   try {
-    const result = await sharePdfDocument(report.value, { text: formatWhatsAppMessage(report.value) });
-    if (!result.success && !result.cancelled) {
-      generateError.value = 'Gagal membagikan: ' + (result.error || 'Terjadi kesalahan.');
+    const result = await shareToWhatsApp(report.value);
+    if (result.success) {
+      if (result.method === 'web-wa-download') {
+        showToast('Membuka WhatsApp & PDF otomatis diunduh! Silakan lampirkan PDF ke chat.', 'success');
+      } else {
+        showToast('Menyiapkan WhatsApp & dokumen PDF...', 'success');
+      }
+    } else if (!result.cancelled) {
+      generateError.value = 'Gagal membagikan ke WhatsApp: ' + (result.error || 'Terjadi kesalahan.');
     }
   } finally {
     sharing.value = false;

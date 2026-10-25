@@ -537,7 +537,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue';
 import api from '../services/api.js';
-import { sharePdfDocument, openWhatsApp } from '../services/reportShare.js';
+import { sharePdfDocument, openWhatsApp, shareToWhatsApp } from '../services/reportShare.js';
 import {
   getQueuedReports,
   syncOfflineQueue,
@@ -689,13 +689,19 @@ const openShareSheet = (rep) => {
   showShareSheet.value = true;
 };
 
-const shareWhatsApp = () => {
+const shareWhatsApp = async () => {
   const rep = shareTarget.value;
   if (!rep) return;
-  const { linkIncluded } = openWhatsApp(rep);
   showShareSheet.value = false;
-  if (!linkIncluded) {
-    showToast('Tautan PDF tidak disertakan (server bukan alamat publik). Kirim file PDF lewat tombol Bagikan.');
+  const result = await shareToWhatsApp(rep);
+  if (result.success) {
+    if (result.method === 'web-wa-download') {
+      showToast('Membuka WhatsApp & PDF otomatis diunduh! Silakan lampirkan PDF ke chat.');
+    } else {
+      showToast('Menyiapkan WhatsApp & dokumen PDF...');
+    }
+  } else if (!result.cancelled) {
+    showToast(result.error || 'Gagal membagikan ke WhatsApp.', 'error');
   }
 };
 

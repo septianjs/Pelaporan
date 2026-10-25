@@ -97,7 +97,8 @@ function isCancellation(err) {
 }
 
 export async function sharePdfDocument(report, opts = {}) {
-  const fileName = 'laporan ring lingkungan BPSDM.pdf';
+  const cleanNum = (report.report_number || 'BPSDM').replace(/[^A-Za-z0-9_\-]/g, '_');
+  const fileName = `Laporan_${cleanNum}.pdf`;
   const title = `Laporan ${report.report_number}`;
   const text = opts.text || `${title} • ${report.formatted_date || report.inspection_date} • Petugas: ${report.officer_name}`;
   // null jika server belum publik (IP lokal/localhost): tautan itu tidak bisa dibuka penerima.
@@ -133,7 +134,7 @@ export async function sharePdfDocument(report, opts = {}) {
         title,
         text,
         files: [fileResult.uri],
-        dialogTitle: 'Bagikan Laporan (PDF 16:9)',
+        dialogTitle: opts.dialogTitle || 'Bagikan Laporan (PDF 16:9)',
       });
       // Share.share() resolving means the user picked a target app and the OS
       // handed the file off to it — this is the real success signal.
@@ -166,7 +167,7 @@ export async function sharePdfDocument(report, opts = {}) {
           title,
           text,
           url: pdfUrl,
-          dialogTitle: 'Bagikan Tautan Laporan',
+          dialogTitle: opts.dialogTitle || 'Bagikan Tautan Laporan',
         });
         return { success: true, method: 'native-url' };
       } catch (err2) {
@@ -200,11 +201,26 @@ export async function sharePdfDocument(report, opts = {}) {
       return { success: true, method: 'web-url' };
     }
 
-    // No Web Share API available at all: open the PDF in a new tab so the
-    // user can save/share it manually. This is a real, visible action, so
-    // it is reported as a distinct method rather than a generic "success".
-    window.open(pdfUrl || URL.createObjectURL(res.data), '_blank');
-    return { success: true, method: 'web-open' };
+    // Jika Web Share API tidak tersedia (misal browser PC/laptop):
+    // Unduh otomatis file PDF & salin teks ringkasan ke clipboard
+    try {
+      const blobUrl = URL.createObjectURL(res.data);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 2000);
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+      }
+      return { success: true, method: 'web-fallback-download' };
+    } catch {
+      window.open(pdfUrl || URL.createObjectURL(res.data), '_blank');
+      return { success: true, method: 'web-open' };
+    }
   } catch (err) {
     if (isCancellation(err)) {
       return { success: false, cancelled: true, method: 'cancelled' };
@@ -217,12 +233,67 @@ export async function sharePdfDocument(report, opts = {}) {
 
 /**
  * Open WhatsApp with prefilled formatted message.
- * Mengembalikan { linkIncluded }: false bila tautan PDF tidak disertakan karena server bukan alamat publik
- * (pemanggil sebaiknya memberi tahu pengguna agar mengirim file lewat tombol Bagikan).
+ * Di HP: membuka aplikasi WhatsApp langsung (via scheme whatsapp:// atau intent).
+ * Di PC/Laptop: membuka WhatsApp Web di tab baru.
  */
 export function openWhatsApp(report) {
   const text = formatWhatsAppMessage(report);
-  const waUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
-  window.open(waUrl, '_blank');
+  const encoded = encodeURIComponent(text);
+  const waUrl = `https://api.whatsapp.com/send?text=${encoded}`;
+
+  if (Capacitor.isNativePlatform()) {
+    // Di Android native: langsung arahkan ke intent whatsapp://
+    try {
+      window.location.href = `whatsapp://send?text=${encoded}`;
+      setTimeout(() => {
+        window.open(waUrl, '_system');
+      }, 600);
+    } catch {
+      window.open(waUrl, '_system');
+    }
+  } else {
+    // Di browser desktop / laptop: buka tab WhatsApp
+    window.open(waUrl, '_blank');
+  }
+
   return { linkIncluded: getPublicPdfUrl(report) !== null };
+}
+
+/**
+ * Berbagi Laporan ke WhatsApp (beserta file PDF terlampir).
+ * Di HP (Capacitor): Menggunakan native share dengan teks terformat WhatsApp + file PDF fisik,
+ * dengan dialogTitle yang mengarahkan untuk memilih WhatsApp.
+ * Di Browser (Web): Membuka WhatsApp Web dengan pesan terformat, sekaligus mengunduh file PDF secara otomatis.
+ */
+export async function shareToWhatsApp(report) {
+  const text = formatWhatsAppMessage(report);
+
+  if (Capacitor.isNativePlatform()) {
+    // Di HP: langsung gunakan share native yang membawa file PDF + pesan format WA
+    return await sharePdfDocument(report, {
+      text,
+      dialogTitle: 'Kirim Laporan via WhatsApp (Pilih WhatsApp)',
+    });
+  }
+
+  // Di Browser PC/Laptop: unduh file PDF & buka WhatsApp Web
+  try {
+    const res = await api.get(`/reports/${report.id}/pdf`, { responseType: 'blob' });
+    if (res.data && res.data.size > 0) {
+      const cleanNum = (report.report_number || 'BPSDM').replace(/[^A-Za-z0-9_\-]/g, '_');
+      const blobUrl = URL.createObjectURL(res.data);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = `Laporan_${cleanNum}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 2000);
+    }
+  } catch (e) {
+    console.warn('Gagal mengunduh PDF untuk WhatsApp di browser:', e);
+  }
+
+  openWhatsApp(report);
+  return { success: true, method: 'web-wa-download' };
 }
