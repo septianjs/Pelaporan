@@ -210,41 +210,19 @@
           </button>
         </div>
 
-        <!-- Share / WhatsApp / Email -->
-        <div class="grid grid-cols-3 gap-2 pt-2 border-t border-[#ECE8DD]">
-          <!-- Share via native share sheet -->
+        <!-- Share (Unified Native Sheet) -->
+        <div class="pt-2 border-t border-[#ECE8DD]">
           <button type="button" @click="shareReport" :disabled="!hasPdf || sharing"
-            class="flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-white border border-[#DCD7CA] text-[#14251D] font-bold text-xs hover:bg-[#F4F3EE] active-press transition disabled:opacity-40">
-            <svg v-if="sharing" class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+            class="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-[#1A3428] text-[#FAF9F5] font-bold text-xs hover:bg-[#14251D] active-press transition disabled:opacity-40 shadow-sm">
+            <svg v-if="sharing" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"/>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
             </svg>
-            <svg v-else class="w-3.5 h-3.5 text-[#14251D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg v-else class="w-4 h-4 text-[#D8C79C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
             </svg>
-            <span class="truncate">{{ sharing ? 'Memproses…' : 'Bagikan' }}</span>
-          </button>
-
-          <!-- WhatsApp -->
-          <button type="button" @click="shareWhatsApp" :disabled="!hasPdf"
-            class="flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-[#1A3428] text-[#FAF9F5] font-bold text-xs hover:bg-[#14251D] active-press transition disabled:opacity-40 shadow-sm">
-            <span class="text-[#D8C79C]">
-              <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-              </svg>
-            </span>
-            <span class="truncate">WhatsApp</span>
-          </button>
-
-          <!-- Email -->
-          <button type="button" @click="openEmailModal"
-            class="flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-[#2D4538] text-[#FAF9F5] font-bold text-xs hover:bg-[#23382D] active-press transition">
-            <svg class="w-3.5 h-3.5 shrink-0 text-[#D8C79C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-            </svg>
-            <span class="truncate">Email</span>
+            <span>{{ sharing ? 'Menyiapkan File…' : 'Bagikan' }}</span>
           </button>
         </div>
 
@@ -273,109 +251,6 @@
       </div>
 
     </div>
-
-    <!-- ── EMAIL BOTTOM SHEET MODAL ── -->
-    <Teleport to="body">
-      <Transition name="fade">
-        <div v-if="showEmailSheet" class="fixed inset-0 z-50 bg-[#0E1A14]/70 backdrop-blur-sm"
-          @click="showEmailSheet = false"/>
-      </Transition>
-      <Transition name="slide-up">
-        <div v-if="showEmailSheet"
-          class="fixed bottom-0 left-0 right-0 z-50 bg-[#FAF9F5] rounded-t-3xl shadow-2xl border-t border-[#E3E0D6]"
-          style="max-width: 480px; margin: 0 auto; padding-bottom: max(1.5rem, env(safe-area-inset-bottom));">
-          <div class="flex justify-center pt-3 pb-1">
-            <div class="w-10 h-1 rounded-full bg-[#D8D4C8]"/>
-          </div>
-          <div class="px-5 pt-2 pb-4 space-y-4">
-            <div class="flex items-center justify-between">
-              <div>
-                <h3 class="text-sm font-bold text-[#14251D]">Kirim Laporan via Email</h3>
-                <p class="text-xs text-[#6F7771] font-mono mt-0.5 tabular-nums">{{ report?.report_number }}</p>
-              </div>
-              <span class="text-[10px] font-bold text-[#14251D] bg-[#EAF3EC] px-2.5 py-1 rounded-full border border-[#C8E0D0]">
-                PDF 16:9 Otomatis Terlampir
-              </span>
-            </div>
-
-            <!-- Email form -->
-            <div class="space-y-3">
-              <div>
-                <label class="block text-xs font-semibold text-[#14251D] mb-1">
-                  Alamat Email Penerima <span class="text-[#A6382C]">*</span>
-                </label>
-                <div class="relative">
-                  <input
-                    v-model="emailForm.recipient"
-                    type="email"
-                    placeholder="nama@bpsdm.kemenag.go.id"
-                    class="w-full px-3.5 py-2.5 rounded-xl border border-[#DCD7CA] bg-white text-xs text-[#14251D] placeholder-[#9CA39E] focus:outline-none focus:border-[#14251D] focus:ring-1 focus:ring-[#14251D] font-medium"
-                    @keyup.enter="sendEmailReport"
-                  />
-                </div>
-                <!-- Quick email suggestions -->
-                <div class="flex items-center gap-1.5 mt-2 flex-wrap">
-                  <span class="text-[10px] text-[#808983] font-medium">Saran:</span>
-                  <button
-                    v-for="suggest in ['pimpinan@bpsdm.go.id', 'sekretariat@bpsdm.go.id', 'arsip.bpsdm@gmail.com']"
-                    :key="suggest"
-                    type="button"
-                    @click="emailForm.recipient = suggest"
-                    class="text-[10px] text-[#14251D] bg-[#EAF3EC] hover:bg-[#D8EADB] px-2 py-0.5 rounded-md font-medium border border-[#C8E0D0] transition"
-                  >
-                    {{ suggest }}
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <label class="block text-xs font-semibold text-[#14251D] mb-1">
-                  Catatan Tambahan (Opsional)
-                </label>
-                <textarea
-                  v-model="emailForm.notes"
-                  rows="2"
-                  placeholder="Contoh: Mohon arahan dan tindak lanjut terkait pemantauan hari ini..."
-                  class="w-full px-3.5 py-2 rounded-xl border border-[#DCD7CA] bg-white text-xs text-[#14251D] placeholder-[#9CA39E] focus:outline-none focus:border-[#14251D] focus:ring-1 focus:ring-[#14251D]"
-                ></textarea>
-              </div>
-
-              <!-- Error message if any -->
-              <p v-if="emailError" class="text-xs text-[#A6382C] font-medium">
-                {{ emailError }}
-              </p>
-
-              <!-- Action buttons -->
-              <div class="pt-2 flex items-center gap-2">
-                <button
-                  type="button"
-                  @click="showEmailSheet = false"
-                  class="flex-1 py-3 rounded-xl border border-[#DCD7CA] text-[#6F7771] font-semibold text-xs hover:bg-[#ECEAE3] active-press transition"
-                >
-                  Batal
-                </button>
-                <button
-                  type="button"
-                  @click="sendEmailReport"
-                  :disabled="sendingEmail || !emailForm.recipient"
-                  class="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-[#14251D] text-[#FAF9F5] font-bold text-xs shadow-sm hover:bg-[#1C362A] active-press transition disabled:opacity-50"
-                >
-                  <svg v-if="sendingEmail" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"/>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
-                  </svg>
-                  <svg v-else class="w-4 h-4 text-[#D8C79C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                  </svg>
-                  {{ sendingEmail ? 'Mengirim…' : 'Kirim Sekarang' }}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </Transition>
-    </Teleport>
 
     <!-- ── TOAST NOTIFICATION ── -->
     <Teleport to="body">
@@ -581,32 +456,7 @@ const shareReport = async () => {
   }
 };
 
-// -- WhatsApp Share (File PDF + Teks Terformat) --
-const shareWhatsApp = async () => {
-  if (!report.value) return;
-  sharing.value = true;
-  generateError.value = '';
-  try {
-    const result = await shareToWhatsApp(report.value);
-    if (result.success) {
-      if (result.method === 'web-wa-download') {
-        showToast('Membuka WhatsApp & PDF otomatis diunduh! Silakan lampirkan PDF ke chat.', 'success');
-      } else {
-        showToast('Menyiapkan WhatsApp & dokumen PDF...', 'success');
-      }
-    } else if (!result.cancelled) {
-      generateError.value = 'Gagal membagikan ke WhatsApp: ' + (result.error || 'Terjadi kesalahan.');
-    }
-  } finally {
-    sharing.value = false;
-  }
-};
 
-// ── Email State ──
-const showEmailSheet = ref(false);
-const sendingEmail = ref(false);
-const emailError = ref('');
-const emailForm = ref({ recipient: '', notes: '' });
 
 // ── Toast State ──
 const toastMessage = ref('');
@@ -620,44 +470,6 @@ const showToast = (message, type = 'success') => {
   toastTimer = setTimeout(() => {
     toastMessage.value = '';
   }, 3500);
-};
-
-const openEmailModal = () => {
-  emailError.value = '';
-  if (!emailForm.value.recipient) {
-    const saved = localStorage.getItem('last_recipient_email');
-    if (saved) emailForm.value.recipient = saved;
-  }
-  showEmailSheet.value = true;
-};
-
-const sendEmailReport = async () => {
-  if (!emailForm.value.recipient) {
-    emailError.value = 'Silakan masukkan alamat email penerima.';
-    return;
-  }
-  if (!emailForm.value.recipient.includes('@') || !emailForm.value.recipient.includes('.')) {
-    emailError.value = 'Format alamat email tidak valid.';
-    return;
-  }
-
-  sendingEmail.value = true;
-  emailError.value = '';
-
-  try {
-    const payload = {
-      email: emailForm.value.recipient,
-      notes: emailForm.value.notes || undefined,
-    };
-    const res = await api.post(`/reports/${report.value.id}/email`, payload);
-    localStorage.setItem('last_recipient_email', emailForm.value.recipient);
-    showEmailSheet.value = false;
-    showToast(res.data?.message || `Laporan berhasil dikirim ke ${emailForm.value.recipient}!`, 'success');
-  } catch (err) {
-    emailError.value = err.response?.data?.message || 'Gagal mengirim email laporan.';
-  } finally {
-    sendingEmail.value = false;
-  }
 };
 
 onMounted(async () => {
