@@ -8,9 +8,15 @@ const getBaseUrl = () => {
     if (savedUrl) {
         return savedUrl;
     }
+    // Alamat server produksi/uji, ditetapkan saat build (lihat .env.production).
+    // Contoh: VITE_API_BASE_URL=https://domain-anda.go.id/api
+    const envUrl = import.meta.env.VITE_API_BASE_URL;
+    if (envUrl) {
+        return envUrl.replace(/\/+$/, '');
+    }
     // Check if on capacitor or file/localhost
     if (window.location.protocol === 'file:' || window.location.hostname === 'localhost' && window.location.port === '') {
-        // Android WebView default host loopback to PC:
+        // Hanya untuk emulator Android (10.0.2.2 = PC pengembang). Tidak berlaku di HP sungguhan.
         return 'http://10.0.2.2:8000/api';
     }
     return '/api';
@@ -22,7 +28,7 @@ const api = axios.create({
         'Accept': 'application/json',
         'X-Requested-With': 'XMLHttpRequest',
     },
-    timeout: 30000,
+    timeout: 120000, // upload banyak foto lewat data seluler butuh waktu lebih lama
 });
 
 export const setCustomApiUrl = (url) => {

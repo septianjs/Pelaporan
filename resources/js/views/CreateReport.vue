@@ -511,7 +511,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import api from '../services/api';
+import api, { getApiUrl } from '../services/api';
 import PhotoUploader from '../components/PhotoUploader.vue';
 import TemplateThumb from '../components/TemplateThumb.vue';
 import {
@@ -865,14 +865,22 @@ const submitReport = async () => {
     }
   } catch (err) {
     console.error('Error saat menyimpan laporan:', err);
-    const isNetworkError = !err.response || err.message === 'Network Error' || !navigator.onLine;
+    // Tidak ada respons dari server = koneksi putus ATAU server tidak terjangkau
+    // (alamat API salah, timeout, CORS, mixed content). Bedakan keduanya supaya
+    // pengguna tidak mengira "offline" padahal internet aktif.
+    const noServerResponse = !err.response;
+    const deviceOffline = !navigator.onLine;
 
-    if (isNetworkError) {
+    if (noServerResponse || deviceOffline) {
       // Graceful fallback to offline queue on network drop
       try {
         await queueOfflineReport(form);
         await clearFormDraft();
         showOfflineSuccessModal.value = true;
+        if (!deviceOffline) {
+          console.warn('Server tidak terjangkau:', err.code || err.message, getApiUrl());
+          showToast(`Internet aktif, tapi server tidak terjangkau (${err.code || err.message}). Alamat: ${getApiUrl()}`, 'error');
+        }
       } catch (qErr) {
         showToast('Koneksi terputus dan gagal menyimpan offline: ' + qErr.message, 'error');
       }

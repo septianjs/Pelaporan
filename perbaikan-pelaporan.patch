@@ -1,0 +1,152 @@
+diff --git a/.gitignore b/.gitignore
+index c8efe80..c0cabbb 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -40,3 +40,4 @@ Homestead.yaml
+ 
+ # Ada Library Information
+ *.ali
++/dist/hot
+diff --git a/app/Services/ReportPdfService.php b/app/Services/ReportPdfService.php
+index a8c7429..f9e4adb 100644
+--- a/app/Services/ReportPdfService.php
++++ b/app/Services/ReportPdfService.php
+@@ -52,7 +52,7 @@ protected function templateKey(Report $report): string
+             return $dbKey;
+         }
+ 
+-        $key = collect($cfg)->search(fn ($t) => (int) $t['id'] === (int) $report->template_id);
++        $key = collect($cfg)->search(fn ($t) => isset($t['id']) && (int) $t['id'] === (int) $report->template_id);
+         if ($key !== false) {
+             return $key;
+         }
+diff --git a/capacitor.config.json b/capacitor.config.json
+index 83bc0f4..e3e1eaf 100644
+--- a/capacitor.config.json
++++ b/capacitor.config.json
+@@ -11,6 +11,8 @@
+     "Camera": {
+       "permissionsType": "prompt"
+     }
++  },
++  "android": {
++    "allowMixedContent": true
+   }
+ }
+-
+diff --git a/database/seeders/DatabaseSeeder.php b/database/seeders/DatabaseSeeder.php
+index 28f03f3..ef3819f 100644
+--- a/database/seeders/DatabaseSeeder.php
++++ b/database/seeders/DatabaseSeeder.php
+@@ -13,7 +13,7 @@ public function run(): void
+     {
+         $this->call([
+             LocationSeeder::class,
+-            BuiltinTemplateSeeder::class,
++            PptxTemplateSeeder::class,
+         ]);
+     }
+ }
+diff --git a/database/seeders/PptxTemplateSeeder.php b/database/seeders/PptxTemplateSeeder.php
+new file mode 100644
+index 0000000..c9a6d95
+--- /dev/null
++++ b/database/seeders/PptxTemplateSeeder.php
+@@ -0,0 +1,29 @@
++<?php
++
++namespace Database\Seeders;
++
++use App\Models\Template;
++use Illuminate\Database\Seeder;
++
++/**
++ * Membuat baris template untuk setiap key di config/report_templates.php
++ * (template-01, template-02, ...). Endpoint /api/templates dan validasi simpan
++ * laporan hanya menerima key tersebut, jadi tanpa seeder ini daftar template kosong
++ * di database baru. Aman dijalankan berulang (tidak menimpa data lain).
++ */
++class PptxTemplateSeeder extends Seeder
++{
++    public function run(): void
++    {
++        foreach (config('report_templates.templates', []) as $key => $meta) {
++            $template = Template::firstOrNew(['template_key' => $key]);
++            $template->name         = $meta['name'];
++            $template->description  = $meta['description'] ?? 'Desain dari file PPTX';
++            $template->type         = $template->type ?: 'builtin';
++            $template->pptx_path    = $meta['file'] ?? null;
++            $template->preview_path = $template->preview_path ?: "template-previews/{$key}.png";
++            $template->active       = true;
++            $template->save();
++        }
++    }
++}
+diff --git a/resources/js/services/api.js b/resources/js/services/api.js
+index 3fba4c8..8924360 100644
+--- a/resources/js/services/api.js
++++ b/resources/js/services/api.js
+@@ -8,9 +8,15 @@ const getBaseUrl = () => {
+     if (savedUrl) {
+         return savedUrl;
+     }
++    // Alamat server produksi/uji, ditetapkan saat build (lihat .env.production).
++    // Contoh: VITE_API_BASE_URL=https://domain-anda.go.id/api
++    const envUrl = import.meta.env.VITE_API_BASE_URL;
++    if (envUrl) {
++        return envUrl.replace(/\/+$/, '');
++    }
+     // Check if on capacitor or file/localhost
+     if (window.location.protocol === 'file:' || window.location.hostname === 'localhost' && window.location.port === '') {
+-        // Android WebView default host loopback to PC:
++        // Hanya untuk emulator Android (10.0.2.2 = PC pengembang). Tidak berlaku di HP sungguhan.
+         return 'http://10.0.2.2:8000/api';
+     }
+     return '/api';
+@@ -22,7 +28,7 @@ const api = axios.create({
+         'Accept': 'application/json',
+         'X-Requested-With': 'XMLHttpRequest',
+     },
+-    timeout: 30000,
++    timeout: 120000, // upload banyak foto lewat data seluler butuh waktu lebih lama
+ });
+ 
+ export const setCustomApiUrl = (url) => {
+diff --git a/resources/js/views/CreateReport.vue b/resources/js/views/CreateReport.vue
+index d23c5af..628e463 100644
+--- a/resources/js/views/CreateReport.vue
++++ b/resources/js/views/CreateReport.vue
+@@ -511,7 +511,7 @@
+ <script setup>
+ import { ref, reactive, computed, onMounted } from 'vue';
+ import { useRouter, useRoute } from 'vue-router';
+-import api from '../services/api';
++import api, { getApiUrl } from '../services/api';
+ import PhotoUploader from '../components/PhotoUploader.vue';
+ import TemplateThumb from '../components/TemplateThumb.vue';
+ import {
+@@ -865,14 +865,22 @@ const submitReport = async () => {
+     }
+   } catch (err) {
+     console.error('Error saat menyimpan laporan:', err);
+-    const isNetworkError = !err.response || err.message === 'Network Error' || !navigator.onLine;
++    // Tidak ada respons dari server = koneksi putus ATAU server tidak terjangkau
++    // (alamat API salah, timeout, CORS, mixed content). Bedakan keduanya supaya
++    // pengguna tidak mengira "offline" padahal internet aktif.
++    const noServerResponse = !err.response;
++    const deviceOffline = !navigator.onLine;
+ 
+-    if (isNetworkError) {
++    if (noServerResponse || deviceOffline) {
+       // Graceful fallback to offline queue on network drop
+       try {
+         await queueOfflineReport(form);
+         await clearFormDraft();
+         showOfflineSuccessModal.value = true;
++        if (!deviceOffline) {
++          console.warn('Server tidak terjangkau:', err.code || err.message, getApiUrl());
++          showToast(`Internet aktif, tapi server tidak terjangkau (${err.code || err.message}). Alamat: ${getApiUrl()}`, 'error');
++        }
+       } catch (qErr) {
+         showToast('Koneksi terputus dan gagal menyimpan offline: ' + qErr.message, 'error');
+       }

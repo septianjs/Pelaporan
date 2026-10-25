@@ -40,3 +40,4 @@ Homestead.yaml
 
 # Ada Library Information
 *.ali
+/dist/hot

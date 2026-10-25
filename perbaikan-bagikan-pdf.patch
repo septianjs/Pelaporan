@@ -1,0 +1,63 @@
+diff --git a/resources/js/services/reportShare.js b/resources/js/services/reportShare.js
+index 74fff3b..f4fe80b 100644
+--- a/resources/js/services/reportShare.js
++++ b/resources/js/services/reportShare.js
+@@ -100,10 +100,13 @@ export async function sharePdfDocument(report, opts = {}) {
+   const fileName = 'laporan ring lingkungan BPSDM.pdf';
+   const title = `Laporan ${report.report_number}`;
+   const text = opts.text || `${title} • ${report.formatted_date || report.inspection_date} • Petugas: ${report.officer_name}`;
++  // null jika server belum publik (IP lokal/localhost): tautan itu tidak bisa dibuka penerima.
++  const pdfUrl = getPublicPdfUrl(report);
+ 
+   // 1. Native Android / iOS via Capacitor
+   if (Capacitor.isNativePlatform()) {
+     let fileWriteFailed = false;
++    let fileError = null;
+     try {
+       // Fetch binary PDF blob
+       const res = await api.get(`/reports/${report.id}/pdf`, { responseType: 'blob' });
+@@ -141,10 +144,23 @@ export async function sharePdfDocument(report, opts = {}) {
+         return { success: false, cancelled: true, method: 'cancelled' };
+       }
+       fileWriteFailed = true;
++      fileError = err;
++      console.error('Berbagi file PDF gagal:', err);
+       // Fall through to URL-based fallback below, in its own try/catch.
+     }
+ 
+     if (fileWriteFailed) {
++      if (!pdfUrl) {
++        // Tidak ada tautan publik untuk dijadikan cadangan, jadi laporkan penyebab aslinya
++        // (mis. PDF gagal dibuat di server / server tidak terjangkau).
++        const status = fileError?.response?.status;
++        const detail = fileError?.response?.data?.message || fileError?.message || 'tidak diketahui';
++        return {
++          success: false,
++          method: 'native-file',
++          error: `Gagal mengambil file PDF dari server${status ? ` (HTTP ${status})` : ''}: ${detail}`,
++        };
++      }
+       try {
+         await Share.share({
+           title,
+@@ -180,18 +196,14 @@ export async function sharePdfDocument(report, opts = {}) {
+       return { success: true, method: 'web-file' };
+     } else if (navigator.share) {
+       // Fallback to text & URL share
+-      await navigator.share({
+-        title,
+-        text,
+-        url: pdfUrl,
+-      });
++      await navigator.share(pdfUrl ? { title, text, url: pdfUrl } : { title, text });
+       return { success: true, method: 'web-url' };
+     }
+ 
+     // No Web Share API available at all: open the PDF in a new tab so the
+     // user can save/share it manually. This is a real, visible action, so
+     // it is reported as a distinct method rather than a generic "success".
+-    window.open(pdfUrl, '_blank');
++    window.open(pdfUrl || URL.createObjectURL(res.data), '_blank');
+     return { success: true, method: 'web-open' };
+   } catch (err) {
+     if (isCancellation(err)) {

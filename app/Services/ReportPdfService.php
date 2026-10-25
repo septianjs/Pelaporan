@@ -52,7 +52,7 @@ class ReportPdfService
             return $dbKey;
         }
 
-        $key = collect($cfg)->search(fn ($t) => (int) $t['id'] === (int) $report->template_id);
+        $key = collect($cfg)->search(fn ($t) => isset($t['id']) && (int) $t['id'] === (int) $report->template_id);
         if ($key !== false) {
             return $key;
         }

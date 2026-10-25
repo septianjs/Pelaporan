@@ -13,7 +13,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             LocationSeeder::class,
-            BuiltinTemplateSeeder::class,
+            PptxTemplateSeeder::class,
         ]);
     }
 }

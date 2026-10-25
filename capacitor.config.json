@@ -11,6 +11,8 @@
     "Camera": {
       "permissionsType": "prompt"
     }
+  },
+  "android": {
+    "allowMixedContent": true
   }
 }
-
