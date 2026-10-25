@@ -19,6 +19,14 @@
       <p class="text-xs text-[#59635D] leading-relaxed mb-4">
         Setiap desain menghasilkan 6 halaman PDF 16:9: satu sampul dan lima titik pemantauan.
       </p>
+
+      <router-link
+        to="/templates/create"
+        class="w-full inline-flex items-center justify-center gap-2 py-3 rounded-2xl bg-[#14251D] text-[#FAF9F5] text-sm font-bold active-press transition"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14M5 12h14"/></svg>
+        Buat Template
+      </router-link>
     </div>
 
     <!-- ── SECTION TITLE ── -->
@@ -68,11 +76,11 @@
       >
         <!-- Pratinjau desain asli (CSS yang sama dengan PDF): sampul + titik pemantauan -->
         <div class="relative mb-3">
-          <TemplateThumb :theme="tpl.theme" :name="tpl.name" />
+          <TemplateThumb :theme="tpl.theme" :name="tpl.name" :preview="tpl.type === 'uploaded' ? (tpl.preview_url || '') : ''" />
 
           <!-- Type badge -->
           <div class="absolute top-1.5 left-1.5 px-2.5 py-0.5 rounded-md backdrop-blur-md bg-[#14251D]/90 text-[#D8C79C] text-[10px] font-semibold tracking-wide border border-white/10">
-            TEMA PDF
+            {{ tpl.type === 'uploaded' ? 'BUATAN ANDA' : 'TEMA PDF' }}
           </div>
         </div>
 
@@ -208,9 +216,12 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import api from '../services/api.js';
 import TemplateThumb from '../components/TemplateThumb.vue';
 
+const route = useRoute();
+const router = useRouter();
 const templates = ref([]);
 const loading = ref(true);
 const loadError = ref(false);
@@ -274,6 +285,10 @@ const deleteTemplate = async () => {
 
 onMounted(() => {
   fetchTemplates();
+  if (route.query.created) {
+    showToast(route.query.warn ? 'Template dibuat, ada peringatan pada desain.' : 'Template berhasil dibuat.');
+    router.replace({ path: '/templates' });
+  }
 });
 </script>
 

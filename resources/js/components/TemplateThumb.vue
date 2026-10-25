@@ -41,7 +41,7 @@ const previewSrc = computed(() => {
   if (imageFailed.value) return '';
 
   if (props.preview) {
-    return props.preview.startsWith('/')
+    return /^(https?:)?\/\/|^\//.test(props.preview)
       ? props.preview
       : `/storage/previews/${props.preview}`;
   }

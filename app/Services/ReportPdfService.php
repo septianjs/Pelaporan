@@ -48,7 +48,7 @@ class ReportPdfService
         $cfg = config('report_templates.templates');
 
         $dbKey = $report->template?->template_key;
-        if ($dbKey && isset($cfg[$dbKey])) {
+        if ($dbKey && (isset($cfg[$dbKey]) || $report->template?->type === 'uploaded')) {
             return $dbKey;
         }
 

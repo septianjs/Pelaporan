@@ -96,7 +96,10 @@ class ReportController extends Controller
             'inspection_date' => 'required|date',
             'officer_name' => 'required|string|max:255',
             'template_id' => ['required', \Illuminate\Validation\Rule::exists('templates', 'id')
-            ->whereIn('template_key', array_keys(config('report_templates.templates')))],
+                ->where(fn ($q) => $q->where('active', true)->where(
+                    fn ($q) => $q->whereIn('template_key', array_keys(config('report_templates.templates')))
+                        ->orWhere('type', 'uploaded')
+                ))],
             'officer_photo' => 'nullable|file|mimes:jpg,jpeg,png,webp|max:10240',
             'locations' => 'required|array|min:1',
             'locations.*.location_id' => 'required|exists:locations,id',

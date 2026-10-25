@@ -44,14 +44,7 @@ class PptxReportService
     /** Buat PPTX terisi, kembalikan path-nya. */
     public function buildPptx(array $data, string $templateKey, string $outPptx): string
     {
-        $tpl = config("report_templates.templates.$templateKey");
-        if (!$tpl) {
-            throw new RuntimeException("Template '$templateKey' tidak terdaftar.");
-        }
-        $src = rtrim(config('report_templates.path'), '/\\') . DIRECTORY_SEPARATOR . $tpl['file'];
-        if (!is_file($src)) {
-            throw new RuntimeException("File template tidak ditemukan: $src");
-        }
+        $src = $this->resolveSource($templateKey);
 
         $work = storage_path('app/tmp/pptx_' . uniqid());
         File::ensureDirectoryExists($work);
@@ -71,6 +64,198 @@ class PptxReportService
         }
 
         return $outPptx;
+    }
+
+    /**
+     * Cari file .pptx untuk sebuah template_key.
+     * Urutan: (1) config/report_templates.php (template bawaan 01-10),
+     *         (2) tabel templates bertipe "uploaded" (template buatan pengguna).
+     */
+    public function resolveSource(string $templateKey): string
+    {
+        $base = rtrim(config('report_templates.path'), '/\\');
+
+        $tpl = config("report_templates.templates.$templateKey");
+        if ($tpl) {
+            $src = $base . DIRECTORY_SEPARATOR . $tpl['file'];
+        } else {
+            $row = \App\Models\Template::where('template_key', $templateKey)
+                ->where('type', 'uploaded')
+                ->first();
+            if (!$row || !$row->pptx_path) {
+                throw new RuntimeException("Template '$templateKey' tidak terdaftar.");
+            }
+            $src = $base . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $row->pptx_path);
+        }
+
+        if (!is_file($src)) {
+            throw new RuntimeException("File template tidak ditemukan: $src");
+        }
+        return $src;
+    }
+
+    /**
+     * Periksa sebuah file .pptx memakai aturan yang SAMA dengan process()/classify().
+     * Tidak mengubah file. Kembalikan ['errors'=>[], 'warnings'=>[], 'info'=>[]].
+     */
+    public function inspectTemplate(string $file): array
+    {
+        $errors = []; $warnings = []; $info = [];
+        $result = fn () => ['errors' => $errors, 'warnings' => $warnings, 'info' => $info];
+
+        $zip = new ZipArchive();
+        if ($zip->open($file) !== true) {
+            $errors[] = 'File bukan PPTX yang valid (tidak bisa dibuka sebagai arsip).';
+            return $result();
+        }
+
+        // Keamanan: batasi jumlah entri, ukuran hasil ekstrak, dan nama path berbahaya.
+        $total = 0;
+        if ($zip->numFiles > 2000) {
+            $errors[] = 'Struktur file tidak wajar (terlalu banyak berkas di dalam PPTX).';
+        }
+        for ($i = 0; $i < $zip->numFiles; $i++) {
+            $st = $zip->statIndex($i);
+            $name = (string) ($st['name'] ?? '');
+            $total += (int) ($st['size'] ?? 0);
+            if (str_contains($name, '..') || str_starts_with($name, '/') || str_contains($name, '\\')) {
+                $errors[] = 'File berisi path yang tidak aman.';
+                break;
+            }
+            if (stripos($name, 'vbaProject') !== false) {
+                $errors[] = 'File berisi makro (vbaProject). Simpan ulang sebagai .pptx tanpa makro.';
+                break;
+            }
+        }
+        if ($total > 300 * 1024 * 1024) {
+            $errors[] = 'Ukuran isi PPTX setelah diekstrak terlalu besar (maks 300 MB).';
+        }
+        if ($errors) { $zip->close(); return $result(); }
+
+        $presXml = $zip->getFromName('ppt/presentation.xml');
+        $relsXml = $zip->getFromName('ppt/_rels/presentation.xml.rels');
+        if ($presXml === false || $relsXml === false || $zip->getFromName('[Content_Types].xml') === false) {
+            $zip->close();
+            $errors[] = 'Struktur PPTX tidak lengkap (presentation.xml / rels / [Content_Types].xml tidak ada).';
+            return $result();
+        }
+
+        $pres = new DOMDocument(); $rels = new DOMDocument();
+        if (!@$pres->loadXML($presXml) || !@$rels->loadXML($relsXml)) {
+            $zip->close();
+            $errors[] = 'XML di dalam PPTX rusak.';
+            return $result();
+        }
+        $px = $this->xp($pres);
+
+        // Ukuran slide harus 16:9
+        $sz = $px->query('//p:sldSz')->item(0);
+        $cx = $sz ? (int) $sz->getAttribute('cx') : 0;
+        $cy = $sz ? (int) $sz->getAttribute('cy') : 0;
+        if ($cx <= 0 || $cy <= 0 || abs($cx / $cy - 16 / 9) > 0.02) {
+            $errors[] = 'Ukuran slide harus Widescreen 16:9 (Design > Slide Size > Widescreen).';
+        }
+
+        $rmap = [];
+        foreach ($rels->getElementsByTagName('Relationship') as $r) {
+            $rmap[$r->getAttribute('Id')] = $r->getAttribute('Target');
+        }
+
+        $slideIds = $px->query('//p:sldIdLst/p:sldId');
+        $info['jumlah_slide'] = $slideIds->length;
+        if ($slideIds->length < 2) {
+            $zip->close();
+            $errors[] = 'Template minimal berisi 1 slide sampul dan slide lokasi.';
+            return $result();
+        }
+
+        $coverText = '';
+        $normal = []; $tidak = [];   // [nomorLokasi => true]
+        $locKinds = [];              // [nomorLokasi => [jenis => true]]
+        $unknown = [];
+
+        foreach ($slideIds as $i => $sldId) {
+            $target = $rmap[$sldId->getAttributeNS(self::R, 'id')] ?? null;
+            $xml = $target ? $zip->getFromName('ppt/' . $target) : false;
+            $slide = new DOMDocument();
+            if ($xml === false || !@$slide->loadXML($xml)) {
+                $errors[] = 'Slide ' . ($i + 1) . ' tidak bisa dibaca.';
+                continue;
+            }
+            $sx = $this->xp($slide);
+
+            // Gabungkan teks slide persis seperti process()
+            $all = '';
+            foreach ($sx->query('//a:t') as $t) $all .= $t->textContent;
+
+            // Placeholder gambar wajib punya ukuran eksplisit (a:xfrm/a:ext), kalau tidak generator error.
+            foreach ($sx->query('//p:sp') as $sp) {
+                $txBody = $sx->query('p:txBody', $sp)->item(0);
+                if (!$txBody) continue;
+                $full = '';
+                foreach ($sx->query('.//a:t', $txBody) as $t) $full .= $t->textContent;
+                if (preg_match('/^<<(Image:.+?)>>$/', trim($full))) {
+                    $ext = $sx->query('p:spPr/a:xfrm/a:ext', $sp)->item(0);
+                    if (!$ext || (int) $ext->getAttribute('cx') <= 0) {
+                        $errors[] = 'Slide ' . ($i + 1) . ': placeholder "' . trim($full) . '" harus berupa bentuk (shape) dengan ukuran sendiri, bukan placeholder bawaan layout.';
+                    }
+                }
+            }
+
+            if ($i === 0) { $coverText = $all; }
+
+            preg_match_all('/<<(.+?)>>/', $all, $m);
+            foreach ($m[1] as $tok) {
+                [$kind, $n] = $this->classify($tok);
+                if (!$kind) { $unknown[$tok] = true; continue; }
+                if ($i > 0 && $n) $locKinds[$n][$kind] = true;
+            }
+            if ($i === 0) continue;
+
+            $nums = [];
+            foreach ($m[1] as $tok) { [, $n] = $this->classify($tok); if ($n) $nums[] = $n; }
+            if (!$nums) {
+                $warnings[] = 'Slide ' . ($i + 1) . ' tidak punya penanda lokasi, akan dibuang saat laporan dibuat.';
+                continue;
+            }
+            $counts = array_count_values($nums); arsort($counts);
+            $loc = (int) array_key_first($counts);
+            if (preg_match('/\[\[tidak\d+\]\]/', $all)) $tidak[$loc] = true; else $normal[$loc] = true;
+        }
+        $zip->close();
+
+        if ($unknown) {
+            $errors[] = 'Penanda tidak dikenal: ' . implode(', ', array_map(fn ($t) => "<<$t>>", array_keys($unknown))) . '.';
+        }
+
+        foreach (['hari' => '<<Hari>>', 'tanggal' => '<<Tanggal>>', 'tim' => '<<Tim Pengawasan>>'] as $kind => $label) {
+            // nilai: ada di sampul?
+            if (!preg_match($kind === 'tim' ? '/<<[^>]*tim pengawasan[^>]*>>/i' : '/<<' . $kind . '>>/i', $coverText)) {
+                $warnings[] = "Sampul belum memuat penanda $label.";
+            }
+        }
+
+        for ($n = 1; $n <= 5; $n++) {
+            if (empty($normal[$n])) {
+                $errors[] = "Lokasi $n belum punya slide kondisi normal (slide berisi penanda lokasi $n tanpa [[tidak$n]]).";
+            }
+            if (empty($tidak[$n])) {
+                $warnings[] = "Lokasi $n belum punya slide kondisi tidak normal (berisi [[tidak$n]]). Jika kondisi lokasi ini \"perlu penanganan\", halaman lokasi $n akan hilang dari PDF.";
+            }
+            foreach (['nama' => '<<Nama Tempat ' . $n . '>>', 'kondisi' => '<<Kondisi Kebersihan ' . $n . '>>'] as $kind => $label) {
+                if (!empty($normal[$n]) && empty($locKinds[$n][$kind])) {
+                    $warnings[] = "Lokasi $n belum memuat penanda $label.";
+                }
+            }
+        }
+        for ($n = 6; $n <= 20; $n++) {
+            if (!empty($normal[$n]) || !empty($tidak[$n])) {
+                $warnings[] = "Ada slide untuk lokasi $n. Laporan hanya memakai lokasi 1-5, slide ini akan dibuang.";
+                break;
+            }
+        }
+
+        return $result();
     }
 
     /** PPTX -> PDF. Kembalikan path PDF. */
