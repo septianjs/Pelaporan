@@ -32,14 +32,6 @@
           </p>
         </div>
       </div>
-
-      <!-- Right Action / Status Badge -->
-      <div class="flex items-center space-x-1.5">
-        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-[#1B3629] text-[#97C5AC] border border-[#2C523F]">
-          <span class="w-1.5 h-1.5 rounded-full bg-[#34D399] mr-1.5 animate-pulse"></span>
-          Aktif
-        </span>
-      </div>
     </div>
   </header>
 </template>

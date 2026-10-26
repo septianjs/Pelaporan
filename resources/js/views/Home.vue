@@ -32,10 +32,6 @@
           </svg>
           <span class="font-medium tabular-nums">{{ indonesianToday }}</span>
         </div>
-        <span class="inline-flex items-center gap-1.5 text-[11px] font-medium text-[#A3E0BA]">
-          <span class="w-2 h-2 rounded-full bg-[#34D399] animate-pulse"></span>
-          Siap Bertugas
-        </span>
       </div>
     </div>
 
@@ -92,7 +88,7 @@
         </p>
         <div class="mt-3 pt-2.5 border-t border-stone-100 flex items-center justify-between text-[10px] font-semibold text-[#1A3428]">
           <span>Buka Arsip</span>
-          <span>?</span>
+          <span>></span>
         </div>
       </router-link>
 
@@ -114,28 +110,9 @@
         </p>
         <div class="mt-3 pt-2.5 border-t border-stone-100 flex items-center justify-between text-[10px] font-semibold text-[#84631D]">
           <span>Katalog</span>
-          <span>?</span>
+          <span>></span>
         </div>
       </router-link>
-    </div>
-
-    <!-- SOP Minimalist Document Card -->
-    <div class="rounded-2xl bg-white border border-[#E7E4DC] p-4 space-y-2.5 shadow-[0_1px_4px_rgba(28,25,23,0.02)]">
-      <div class="flex items-center space-x-2 text-[#14251D] font-bold text-xs">
-        <div class="w-1.5 h-1.5 rounded-full bg-[#1A3428]"></div>
-        <span class="tracking-wide uppercase text-[10.5px]">Titik Pemantauan Terstandar</span>
-      </div>
-      <p class="text-xs text-stone-600 leading-relaxed">
-        Setiap pelaporan mencakup 5 area pengawasan wajib dengan dokumentasi kondisi visual sebelum dan sesudah tindak lanjut:
-      </p>
-      <!-- Pill Tags of 5 Locations -->
-      <div class="flex flex-wrap gap-1.5 pt-1">
-        <span class="px-2.5 py-1 rounded-md bg-[#F2F1EC] text-stone-700 text-[10.5px] font-medium border border-stone-200/80">1. Halaman Depan</span>
-        <span class="px-2.5 py-1 rounded-md bg-[#F2F1EC] text-stone-700 text-[10.5px] font-medium border border-stone-200/80">2. Ruang Pelayanan</span>
-        <span class="px-2.5 py-1 rounded-md bg-[#F2F1EC] text-stone-700 text-[10.5px] font-medium border border-stone-200/80">3. Ruang Kerja</span>
-        <span class="px-2.5 py-1 rounded-md bg-[#F2F1EC] text-stone-700 text-[10.5px] font-medium border border-stone-200/80">4. Toilet</span>
-        <span class="px-2.5 py-1 rounded-md bg-[#F2F1EC] text-stone-700 text-[10.5px] font-medium border border-stone-200/80">5. Area Parkir</span>
-      </div>
     </div>
 
     <!-- API Server Status Monitor — with config action -->

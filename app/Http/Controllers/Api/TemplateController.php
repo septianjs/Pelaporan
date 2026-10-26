@@ -32,7 +32,7 @@ class TemplateController extends Controller
                     'name'        => $t->name,
                     'description' => $t->description ?: 'Template buatan pengguna',
                     'type'        => 'uploaded',
-                    'preview_url' => $t->preview_path ? asset('storage/' . $t->preview_path) : null,
+                    'preview_url' => $t->preview_path ? secure_asset('storage/' . $t->preview_path) : null,
                 ];
             }
 
@@ -41,7 +41,7 @@ class TemplateController extends Controller
                 'name'        => $cfg[$t->template_key]['name'],
                 'description' => $cfg[$t->template_key]['description'] ?? 'Desain dari file PPTX',
                 'type'        => 'builtin',
-                'preview_url' => asset("storage/template-previews/{$t->template_key}.png"),
+                'preview_url' => secure_asset("storage/template-previews/{$t->template_key}.png"),
             ];
         })->values();
 
