@@ -1,9 +1,15 @@
 
+Options -Indexes
 RewriteEngine On
 RewriteBase /pelaporan/
 
-# Layani foto yang tersimpan pada public disk Laravel
-RewriteRule ^storage/(.*)$ storage/app/public/$1 [END]
+# Lindungi file rahasia dan konfigurasi
+<FilesMatch "^(\.env|\.env\..*|artisan|composer\.(json|lock)|package(-lock)?\.json|phpunit\.xml|vite\.config\..*)$">
+    Require all denied
+</FilesMatch>
 
-# Arahkan permintaan website ke folder public Laravel
+# Blokir folder internal Laravel
+RewriteRule ^(app|bootstrap|config|database|resources|routes|tests|vendor|storage/framework|storage/logs)(/|$) - [F,L,NC]
+
+# Arahkan permintaan ke folder public
 RewriteRule ^(.*)$ public/$1 [L]
