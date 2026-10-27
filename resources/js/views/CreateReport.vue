@@ -80,23 +80,26 @@
     <!-- =============================================================== -->
     <div v-show="currentStep === 1" class="space-y-4">
       <div class="bg-white rounded-2xl p-5 border border-[#E7E5DE] shadow-[0_2px_8px_rgba(28,25,23,0.03)] space-y-4">
-        <!-- Nomor Laporan (Otomatis, Readonly) -->
+        <!-- Nomor otomatis sebagai nilai awal; pengguna dapat mengedit sebelum disimpan -->
         <div>
           <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
-            Nomor Registrasi Laporan
+            Nomor Registrasi Laporan <span class="text-rose-500">*</span>
           </label>
           <div class="relative">
             <input
+              v-model="form.report_number"
               type="text"
-              :value="form.report_number || 'LAP-BPSDM-2026-0001'"
-              readonly
-              class="w-full px-3.5 py-2.5 rounded-xl bg-[#F2F0E9] text-stone-700 font-mono text-xs font-semibold border border-[#E0DCD1] focus:outline-none cursor-not-allowed"
+              maxlength="100"
+              required
+              autocomplete="off"
+              placeholder="Masukkan nomor laporan"
+              class="w-full px-3.5 py-2.5 rounded-xl bg-[#FAF9F5] text-stone-900 font-mono text-xs font-semibold border border-[#DDD9CE] focus:bg-white focus:border-[#1A3428] focus:ring-2 focus:ring-[#1A3428]/10 transition"
             />
-            <span class="absolute right-3 top-2.5 text-[9.5px] uppercase font-bold text-stone-500 bg-stone-200/70 px-2 py-0.5 rounded tracking-wide">
-              Sistem
+            <span class="absolute right-3 top-2.5 text-[9.5px] uppercase font-bold text-stone-500 bg-[#E8EFEA] px-2 py-0.5 rounded tracking-wide">
+              Bisa diedit
             </span>
           </div>
-          <p class="text-[11px] text-stone-400 mt-1">Nomor seri unik terbit otomatis berurutan.</p>
+          <p class="text-[11px] text-stone-400 mt-1">Nomor otomatis terisi sebagai saran awal. Kamu dapat mengubahnya; setiap nomor harus unik.</p>
         </div>
 
         <!-- Tanggal & Hari Otomatis -->
@@ -631,7 +634,7 @@ const loadInitialData = async () => {
         }
       } catch {}
     } else {
-      form.report_number = `LAP-BPSDM-${new Date().getFullYear()}-OFFLINE`;
+      form.report_number = `LAP-BPSDM-${new Date().getFullYear()}-OFFLINE-${Date.now()}`;
     }
 
     // 2. Fetch locations (with IndexedDB cache fallback)
