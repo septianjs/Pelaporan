@@ -92,6 +92,11 @@ class ReportController extends Controller
         Request $request,
         ReportPdfService $pdfService
     ): JsonResponse {
+        // Normalisasi sebelum validasi agar spasi di awal/akhir tidak melewati pemeriksaan unik.
+        $request->merge([
+            'report_number' => trim((string) $request->input('report_number', '')),
+        ]);
+
         $validated = $request->validate([
             'report_number' => 'required|string|max:100|unique:reports,report_number',
             'inspection_date' => 'required|date',
@@ -284,7 +289,8 @@ class ReportController extends Controller
         // Nama dasar file yang dilihat pengguna saat mengunduh/membagikan laporan.
         // Nama penyimpanan internal (unik per laporan, berisi nomor laporan) tetap
         // dipakai di disk agar tidak saling menimpa antar laporan; keduanya sengaja dipisah.
-        $downloadName = 'laporan ring lingkungan BPSDM.pdf';
+        $cleanNumber = preg_replace('/[^A-Za-z0-9_\\-]/', '_', $report->report_number);
+        $downloadName = "Laporan_{$cleanNumber}.pdf";
 
         // If inline=1 (e.g. for previewing inside mobile webview or browser tab)
         if ($request->boolean('inline')) {
