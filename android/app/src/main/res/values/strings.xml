@@ -1,7 +1,8 @@
+
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">PELAPORAN PENGAWASAN LINGKUNGAN KANTOR BPSDM</string>
-    <string name="title_activity_main">PELAPORAN PENGAWASAN LINGKUNGAN KANTOR BPSDM</string>
+    <string name="app_name">Decura</string>
+    <string name="title_activity_main">Decura - Aplikasi Pembuatan Laporan</string>
     <string name="package_name">com.bpsdm.pelaporan</string>
     <string name="custom_url_scheme">com.bpsdm.pelaporan</string>
 </resources>
