@@ -460,17 +460,22 @@ class PptxReportService
                 if ($runs->length === 0) continue;
                 $txt = '';
                 foreach ($runs as $r) $txt .= $sx->query('a:t', $r)->item(0)?->textContent;
-                if (!preg_match('/<<.+?>>|\[\[.+?\]\]/', $txt)) continue;
+                $hasToken = preg_match('/<<.+?>>|\[\[.+?\]\]/', $txt);
+                // Ganti nomor contoh yang mungkin sudah ditulis langsung pada template PPTX lama.
+                $new = preg_replace('/LAP-BPSDM-\d{4}-\d+/i', (string) ($data['report_number'] ?? ''), $txt);
+                if (!$hasToken && $new === $txt) continue;
 
-                $new = preg_replace_callback('/<<(.+?)>>|\[\[(.+?)\]\]/', function ($mm) use ($data) {
-                    if (!empty($mm[2])) return ''; // penanda [[normal1]] dihapus
-                    [$kind, $n] = $this->classify($mm[1]);
-                    if (!$kind) {
-                        Log::warning("Token template tidak dikenal: {$mm[1]}");
-                        return '';
-                    }
-                    return $this->value($kind, $n, $data);
-                }, $txt);
+                if ($hasToken) {
+                    $new = preg_replace_callback('/<<(.+?)>>|\[\[(.+?)\]\]/', function ($mm) use ($data) {
+                        if (!empty($mm[2])) return ''; // penanda [[normal1]] dihapus
+                        [$kind, $n] = $this->classify($mm[1]);
+                        if (!$kind) {
+                            Log::warning("Token template tidak dikenal: {$mm[1]}");
+                            return '';
+                        }
+                        return $this->value($kind, $n, $data);
+                    }, $new);
+                }
 
                 $first = true;
                 foreach (iterator_to_array($runs) as $r) {
@@ -546,6 +551,7 @@ class PptxReportService
         return match (true) {
             $t === 'hari'                           => ['hari', null, null],
             $t === 'tanggal'                        => ['tanggal', null, null],
+            str_contains($t, 'nomor laporan') || str_contains($t, 'nomor registrasi') => ['report_number', null, null],
             str_contains($t, 'tim pengawasan')      => ['tim', null, null],
             str_contains($t, 'nama tempat')         => ['nama', $n, null],
             str_contains($t, 'kondisi kebersihan')  => ['kondisi', $n, null],
@@ -562,6 +568,7 @@ class PptxReportService
             'hari'    => $data['hari'] ?? '',
             'tanggal' => $data['tanggal'] ?? '',
             'tim'     => $data['tim'] ?? '',
+            'report_number' => $data['report_number'] ?? '',
             default   => $data['lokasi'][($n ?? 1) - 1][$kind] ?? '',
         };
         $v = trim((string) $v);
