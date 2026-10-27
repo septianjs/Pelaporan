@@ -14,21 +14,28 @@
     --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --font-mono: 'JetBrains Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-    --color-pine-950: #0C1712;
-    --color-pine-900: #13241C;
-    --color-pine-800: #1A3428;
-    --color-pine-700: #244938;
-    --color-pine-600: #31624C;
-    --color-pine-500: #428266;
-    --color-pine-100: #E4EFE9;
-    --color-pine-50: #F2F7F4;
+    /* Navy — diturunkan dari logo Decora (#14213D) */
+    --color-navy-950: #0B1428;
+    --color-navy-900: #14213D;
+    --color-navy-800: #1B2C4D;
+    --color-navy-700: #263B61;
+    --color-navy-600: #35507D;
+    --color-navy-500: #4A6798;
+    --color-navy-400: #7089B5;
+    --color-navy-300: #9DB0D0;
+    --color-navy-200: #C7D2E5;
+    --color-navy-100: #E4EAF3;
+    --color-navy-50: #F1F4F9;
 
-    --color-sand-500: #BCA874;
-    --color-sand-400: #D3C397;
-    --color-sand-100: #F3EFE4;
-    --color-sand-50: #FAF8F2;
+    /* Aksen amber logo (#F5A524). Di atas amber pakai teks navy; jangan jadi teks di latar putih. */
+    --color-accent-700: #B26C0C;
+    --color-accent-600: #D98A0F;
+    --color-accent-500: #F5A524;
+    --color-accent-400: #F8B63A;
+    --color-accent-100: #FEEFC7;
+    --color-accent-50: #FFF8E8;
 
-    --color-canvas: #F5F4EF;
+    --color-canvas: #F1F4F9;
     --color-surface: #FFFFFF;
 }
 
@@ -39,8 +46,8 @@ body,
     margin: 0;
     padding: 0;
     min-height: 100%;
-    background-color: #F4F3EE;
-    color: #1A1A18;
+    background-color: #F1F4F9;
+    color: #14213D;
     font-family: var(--font-sans);
     -webkit-tap-highlight-color: transparent;
     -webkit-font-smoothing: antialiased;
@@ -83,11 +90,11 @@ select {
     background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-    background: rgba(28, 25, 23, 0.12);
+    background: rgba(20, 33, 61, 0.14);
     border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-    background: rgba(28, 25, 23, 0.22);
+    background: rgba(20, 33, 61, 0.26);
 }
 
 /* Custom micro-interactions */

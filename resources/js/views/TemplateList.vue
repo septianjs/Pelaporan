@@ -1,28 +1,28 @@
 <template>
   <div class="px-4 py-5 space-y-4 pb-24">
     <!-- ── HEADER CARD ── -->
-    <div class="bg-[#FAF9F5] rounded-2xl p-5 border border-[#E3E0D6] shadow-sm">
+    <div class="bg-[#F5F7FA] rounded-2xl p-5 border border-[#D7DBE2] shadow-sm">
       <div class="flex items-center justify-between mb-3">
         <div class="flex items-center space-x-3">
-          <div class="w-10 h-10 rounded-xl bg-[#14251D] text-[#D8C79C] flex items-center justify-center shrink-0">
+          <div class="w-10 h-10 rounded-xl bg-[#14213D] text-[#F5A524] flex items-center justify-center shrink-0">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
                 d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/>
             </svg>
           </div>
           <div>
-            <h2 class="text-base font-bold text-[#14251D]">Katalog Desain PDF</h2>
+            <h2 class="text-base font-bold text-[#14213D]">Katalog Desain PDF</h2>
           </div>
         </div>
       </div>
 
-      <p class="text-xs text-[#59635D] leading-relaxed mb-4">
+      <p class="text-xs text-[#525A6A] leading-relaxed mb-4">
         Setiap desain menghasilkan 6 halaman PDF 16:9: satu sampul dan lima titik pemantauan.
       </p>
 
       <router-link
         to="/templates/create"
-        class="w-full inline-flex items-center justify-center gap-2 py-3 rounded-2xl bg-[#14251D] text-[#FAF9F5] text-sm font-bold active-press transition"
+        class="w-full inline-flex items-center justify-center gap-2 py-3 rounded-2xl bg-[#14213D] text-[#F5F7FA] text-sm font-bold active-press transition"
       >
         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14M5 12h14"/></svg>
         Buat Template
@@ -31,37 +31,37 @@
 
     <!-- ── SECTION TITLE ── -->
     <div class="flex items-center justify-between px-1 pt-1">
-      <h3 class="text-xs font-bold uppercase tracking-wider text-[#6F7771]">
+      <h3 class="text-xs font-bold uppercase tracking-wider text-[#676F7F]">
         Koleksi Template ({{ templates.length }})
       </h3>
-      <span class="text-[11px] text-[#14251D] font-mono font-medium">16:9 Widescreen</span>
+      <span class="text-[11px] text-[#14213D] font-mono font-medium">16:9 Widescreen</span>
     </div>
 
     <!-- ── LOADING SKELETON ── -->
     <div v-if="loading" class="space-y-3">
       <div v-for="i in 3" :key="i"
-        class="bg-[#FAF9F5] rounded-2xl p-4 border border-[#E3E0D6] animate-pulse space-y-3">
-        <div class="h-36 bg-[#E8E5DC] rounded-xl"/>
-        <div class="h-4 bg-[#E8E5DC] rounded w-1/2"/>
-        <div class="h-3 bg-[#E8E5DC] rounded w-3/4"/>
+        class="bg-[#F5F7FA] rounded-2xl p-4 border border-[#D7DBE2] animate-pulse space-y-3">
+        <div class="h-36 bg-[#DDE0E7] rounded-xl"/>
+        <div class="h-4 bg-[#DDE0E7] rounded w-1/2"/>
+        <div class="h-3 bg-[#DDE0E7] rounded w-3/4"/>
       </div>
     </div>
 
     <!-- ── GAGAL MEMUAT ── -->
-    <div v-else-if="loadError" class="bg-[#FAF9F5] rounded-2xl p-6 border border-[#E3E0D6] text-center space-y-3">
+    <div v-else-if="loadError" class="bg-[#F5F7FA] rounded-2xl p-6 border border-[#D7DBE2] text-center space-y-3">
       <div class="w-12 h-12 rounded-2xl bg-[#FDF0EE] border border-[#F5C7C1] text-[#A6382C] flex items-center justify-center mx-auto">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
         </svg>
       </div>
       <div>
-        <p class="text-sm font-bold text-[#14251D]">Gagal Memuat Daftar Template</p>
-        <p class="text-xs text-[#6F7771] mt-1">Periksa koneksi jaringan Anda, kemudian segarkan kembali.</p>
+        <p class="text-sm font-bold text-[#14213D]">Gagal Memuat Daftar Template</p>
+        <p class="text-xs text-[#676F7F] mt-1">Periksa koneksi jaringan Anda, kemudian segarkan kembali.</p>
       </div>
       <button
         type="button"
         @click="fetchTemplates"
-        class="px-4 py-2 rounded-xl bg-[#14251D] text-[#FAF9F5] text-xs font-bold active-press transition"
+        class="px-4 py-2 rounded-xl bg-[#14213D] text-[#F5F7FA] text-xs font-bold active-press transition"
       >
         Muat Ulang
       </button>
@@ -72,14 +72,14 @@
       <div
         v-for="tpl in templates"
         :key="tpl.id"
-        class="bg-[#FAF9F5] rounded-2xl p-4 border border-[#E3E0D6] hover:border-[#14251D]/30 transition overflow-hidden shadow-sm"
+        class="bg-[#F5F7FA] rounded-2xl p-4 border border-[#D7DBE2] hover:border-[#14213D]/30 transition overflow-hidden shadow-sm"
       >
         <!-- Pratinjau desain asli (CSS yang sama dengan PDF): sampul + titik pemantauan -->
         <div class="relative mb-3">
           <TemplateThumb :theme="tpl.theme" :name="tpl.name" :preview="tpl.preview_url || ''" />
 
           <!-- Type badge -->
-          <div class="absolute top-1.5 left-1.5 px-2.5 py-0.5 rounded-md backdrop-blur-md bg-[#14251D]/90 text-[#D8C79C] text-[10px] font-semibold tracking-wide border border-white/10">
+          <div class="absolute top-1.5 left-1.5 px-2.5 py-0.5 rounded-md backdrop-blur-md bg-[#14213D]/90 text-[#F5A524] text-[10px] font-semibold tracking-wide border border-white/10">
             {{ tpl.type === 'uploaded' ? 'BUATAN ANDA' : 'TEMA PDF' }}
           </div>
         </div>
@@ -87,18 +87,18 @@
         <!-- Template meta -->
         <div>
           <div class="flex items-center justify-between">
-            <h4 class="text-sm font-bold text-[#14251D]">{{ tpl.name }}</h4>
-            <span class="text-[10px] font-semibold text-[#1A3428] bg-[#EAF3EC] px-2.5 py-0.5 rounded-full border border-[#C8E0D0]">
+            <h4 class="text-sm font-bold text-[#14213D]">{{ tpl.name }}</h4>
+            <span class="text-[10px] font-semibold text-[#1B2C4D] bg-[#EAF3EC] px-2.5 py-0.5 rounded-full border border-[#C8E0D0]">
               Siap Digunakan
             </span>
           </div>
 
-          <p class="text-xs text-[#6F7771] mt-1 leading-relaxed">
+          <p class="text-xs text-[#676F7F] mt-1 leading-relaxed">
             {{ tpl.description || 'Format laporan pengawasan kebersihan lingkungan kantor BPSDM.' }}
           </p>
 
           <!-- Actions row -->
-          <div class="mt-3 pt-3 border-t border-[#ECE8DD] flex items-center justify-between text-[11px] text-[#808983]">
+          <div class="mt-3 pt-3 border-t border-[#DEE2EB] flex items-center justify-between text-[11px] text-[#788191]">
             <span class="font-mono">PDF 16:9 • 6 halaman</span>
             <div class="flex items-center gap-2">
               <!-- Delete (only uploaded templates) -->
@@ -118,10 +118,10 @@
               <!-- Use template -->
               <router-link
                 :to="{ path: '/create', query: { template_id: tpl.id } }"
-                class="inline-flex items-center gap-1 font-bold text-xs text-[#14251D] bg-[#ECE8DD] px-3 py-1.5 rounded-xl border border-[#DCD7CA] hover:bg-[#DFDBD0] active-press transition"
+                class="inline-flex items-center gap-1 font-bold text-xs text-[#14213D] bg-[#DEE2EB] px-3 py-1.5 rounded-xl border border-[#CBD1DB] hover:bg-[#D1D5DE] active-press transition"
               >
                 Gunakan
-                <svg class="w-3.5 h-3.5 text-[#14251D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-3.5 h-3.5 text-[#14213D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                 </svg>
               </router-link>
@@ -136,7 +136,7 @@
       <Transition name="fade">
         <div
           v-if="showDeleteSheet"
-          class="fixed inset-0 z-50 bg-[#0E1A14]/70 backdrop-blur-sm"
+          class="fixed inset-0 z-50 bg-[#0B1428]/70 backdrop-blur-sm"
           @click="showDeleteSheet = false"
         />
       </Transition>
@@ -144,11 +144,11 @@
       <Transition name="slide-up">
         <div
           v-if="showDeleteSheet"
-          class="fixed bottom-0 left-0 right-0 z-50 bg-[#FAF9F5] rounded-t-3xl shadow-2xl border-t border-[#E3E0D6]"
+          class="fixed bottom-0 left-0 right-0 z-50 bg-[#F5F7FA] rounded-t-3xl shadow-2xl border-t border-[#D7DBE2]"
           style="max-width: 480px; margin: 0 auto; padding-bottom: max(1.5rem, env(safe-area-inset-bottom));"
         >
           <div class="flex justify-center pt-3 pb-1">
-            <div class="w-10 h-1 rounded-full bg-[#D8D4C8]"/>
+            <div class="w-10 h-1 rounded-full bg-[#C9CED7]"/>
           </div>
 
           <div class="px-5 pt-2 pb-4 space-y-4">
@@ -161,9 +161,9 @@
             </div>
 
             <div class="text-center">
-              <p class="text-base font-bold text-[#14251D]">Hapus Template?</p>
-              <p class="text-xs text-[#6F7771] mt-1 leading-relaxed">
-                Template <strong class="text-[#14251D]">"{{ templateToDelete?.name }}"</strong> akan dihapus permanen dari sistem dan tidak dapat dipulihkan.
+              <p class="text-base font-bold text-[#14213D]">Hapus Template?</p>
+              <p class="text-xs text-[#676F7F] mt-1 leading-relaxed">
+                Template <strong class="text-[#14213D]">"{{ templateToDelete?.name }}"</strong> akan dihapus permanen dari sistem dan tidak dapat dipulihkan.
               </p>
             </div>
 
@@ -183,7 +183,7 @@
               <button
                 type="button"
                 @click="showDeleteSheet = false"
-                class="w-full py-3 rounded-2xl text-[#6F7771] font-semibold text-sm hover:bg-[#ECEAE3] transition"
+                class="w-full py-3 rounded-2xl text-[#676F7F] font-semibold text-sm hover:bg-[#E3E6EC] transition"
               >
                 Batalkan
               </button>
@@ -198,9 +198,9 @@
       <Transition name="toast">
         <div v-if="toast.show"
           class="fixed top-safe left-1/2 -translate-x-1/2 z-[60] px-4 py-3 rounded-2xl shadow-xl text-xs font-semibold flex items-center gap-2 min-w-[200px] max-w-[90vw] border"
-          :class="toast.type === 'success' ? 'bg-[#14251D] text-[#FAF9F5] border-[#254234]' : 'bg-[#A6382C] text-white border-[#8F2F24]'"
+          :class="toast.type === 'success' ? 'bg-[#14213D] text-[#F5F7FA] border-[#2A4068]' : 'bg-[#A6382C] text-white border-[#8F2F24]'"
           style="top: max(1.5rem, env(safe-area-inset-top));">
-          <svg v-if="toast.type === 'success'" class="w-4 h-4 shrink-0 text-[#D8C79C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg v-if="toast.type === 'success'" class="w-4 h-4 shrink-0 text-[#F5A524]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
           </svg>
           <svg v-else class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

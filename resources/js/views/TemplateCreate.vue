@@ -1,29 +1,29 @@
 <template>
   <div class="px-4 py-5 space-y-4 pb-24">
     <!-- Header -->
-    <div class="bg-[#FAF9F5] rounded-2xl p-5 border border-[#E3E0D6] shadow-sm">
+    <div class="bg-[#F5F7FA] rounded-2xl p-5 border border-[#D7DBE2] shadow-sm">
       <div class="flex items-center gap-3">
-        <router-link to="/templates" class="w-9 h-9 rounded-xl bg-[#ECE8DD] text-[#14251D] flex items-center justify-center shrink-0 active-press" aria-label="Kembali">
+        <router-link to="/templates" class="w-9 h-9 rounded-xl bg-[#DEE2EB] text-[#14213D] flex items-center justify-center shrink-0 active-press" aria-label="Kembali">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
         </router-link>
         <div>
-          <h2 class="text-base font-bold text-[#14251D]">Buat Template</h2>
-          <p class="text-xs text-[#59635D]">Unggah desain PowerPoint sebagai template laporan.</p>
+          <h2 class="text-base font-bold text-[#14213D]">Buat Template</h2>
+          <p class="text-xs text-[#525A6A]">Unggah desain PowerPoint sebagai template laporan.</p>
         </div>
       </div>
     </div>
 
     <!-- Syarat template -->
-    <div class="bg-[#FAF9F5] rounded-2xl border border-[#E3E0D6] shadow-sm overflow-hidden">
+    <div class="bg-[#F5F7FA] rounded-2xl border border-[#D7DBE2] shadow-sm overflow-hidden">
       <button type="button" @click="showReq = !showReq"
         class="w-full flex items-center justify-between px-5 py-4 text-left">
-        <span class="text-sm font-bold text-[#14251D]">Syarat membuat template</span>
-        <svg class="w-4 h-4 text-[#6F7771] transition-transform" :class="showReq ? 'rotate-180' : ''" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+        <span class="text-sm font-bold text-[#14213D]">Syarat membuat template</span>
+        <svg class="w-4 h-4 text-[#676F7F] transition-transform" :class="showReq ? 'rotate-180' : ''" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
       </button>
 
-      <div v-show="showReq" class="px-5 pb-5 space-y-4 text-xs text-[#3F4A44] leading-relaxed">
+      <div v-show="showReq" class="px-5 pb-5 space-y-4 text-xs text-[#394150] leading-relaxed">
         <div>
-          <p class="font-bold text-[#14251D] mb-1">Wajib (file ditolak jika tidak terpenuhi)</p>
+          <p class="font-bold text-[#14213D] mb-1">Wajib (file ditolak jika tidak terpenuhi)</p>
           <ul class="list-disc pl-4 space-y-1">
             <li>Berformat <b>.pptx</b>, maksimal 20 MB, tanpa makro.</li>
             <li>Ukuran slide <b>Widescreen 16:9</b>.</li>
@@ -35,7 +35,7 @@
         </div>
 
         <div>
-          <p class="font-bold text-[#14251D] mb-1">Sangat disarankan</p>
+          <p class="font-bold text-[#14213D] mb-1">Sangat disarankan</p>
           <ul class="list-disc pl-4 space-y-1">
             <li>Slide <b>kondisi tidak normal</b> untuk tiap lokasi: salin slide normal, lalu tambahkan teks <code>[[tidak1]]</code> (sesuai nomor lokasi). Tanpa slide ini, lokasi yang berstatus "perlu penanganan" tidak muncul di PDF.</li>
             <li>Penanda pada slide normal boleh ditandai <code>[[normal1]]</code>. Penanda <code>[[...]]</code> dihapus otomatis saat laporan dibuat.</li>
@@ -43,25 +43,25 @@
         </div>
 
         <div>
-          <p class="font-bold text-[#14251D] mb-1">Penanda yang tersedia</p>
-          <div class="rounded-xl border border-[#E3E0D6] overflow-hidden">
+          <p class="font-bold text-[#14213D] mb-1">Penanda yang tersedia</p>
+          <div class="rounded-xl border border-[#D7DBE2] overflow-hidden">
             <table class="w-full text-[11px]">
-              <thead class="bg-[#ECE8DD] text-[#14251D]">
+              <thead class="bg-[#DEE2EB] text-[#14213D]">
                 <tr><th class="text-left px-3 py-2">Penanda</th><th class="text-left px-3 py-2">Diisi dengan</th></tr>
               </thead>
               <tbody>
-                <tr v-for="t in tokens" :key="t[0]" class="border-t border-[#ECE8DD]">
+                <tr v-for="t in tokens" :key="t[0]" class="border-t border-[#DEE2EB]">
                   <td class="px-3 py-1.5 font-mono whitespace-nowrap">{{ t[0] }}</td>
                   <td class="px-3 py-1.5">{{ t[1] }}</td>
                 </tr>
               </tbody>
             </table>
           </div>
-          <p class="mt-2 text-[#6F7771]">Ganti angka 1 dengan nomor lokasi 1 sampai 5. Penulisan tidak membedakan huruf besar/kecil. Satu penanda sebaiknya diketik utuh dalam satu kali ketikan agar tidak terpecah.</p>
+          <p class="mt-2 text-[#676F7F]">Ganti angka 1 dengan nomor lokasi 1 sampai 5. Penulisan tidak membedakan huruf besar/kecil. Satu penanda sebaiknya diketik utuh dalam satu kali ketikan agar tidak terpecah.</p>
         </div>
 
         <div>
-          <p class="font-bold text-[#14251D] mb-1">Thumbnail</p>
+          <p class="font-bold text-[#14213D] mb-1">Thumbnail</p>
           <ul class="list-disc pl-4 space-y-1">
             <li>PNG, JPG, atau WEBP, maksimal 2 MB.</li>
             <li>Disarankan rasio 16:9 (mis. 1280 x 720), berupa tangkapan layar slide sampul.</li>
@@ -71,40 +71,40 @@
     </div>
 
     <!-- Form -->
-    <div class="bg-[#FAF9F5] rounded-2xl p-5 border border-[#E3E0D6] shadow-sm space-y-4">
+    <div class="bg-[#F5F7FA] rounded-2xl p-5 border border-[#D7DBE2] shadow-sm space-y-4">
       <div>
-        <label class="block text-xs font-bold text-[#14251D] mb-1.5" for="tpl-name">Nama template</label>
+        <label class="block text-xs font-bold text-[#14213D] mb-1.5" for="tpl-name">Nama template</label>
         <input id="tpl-name" v-model.trim="form.name" maxlength="60" type="text" placeholder="Contoh: Template Hijau Elegan"
-          class="w-full rounded-xl border border-[#DCD7CA] bg-white px-3.5 py-2.5 text-sm text-[#14251D] focus:outline-none focus:border-[#14251D]" />
+          class="w-full rounded-xl border border-[#CBD1DB] bg-white px-3.5 py-2.5 text-sm text-[#14213D] focus:outline-none focus:border-[#14213D]" />
         <p v-if="fieldError('name')" class="mt-1 text-[11px] text-[#A6382C]">{{ fieldError('name') }}</p>
       </div>
 
       <div>
-        <label class="block text-xs font-bold text-[#14251D] mb-1.5" for="tpl-desc">Deskripsi <span class="font-normal text-[#808983]">(opsional)</span></label>
+        <label class="block text-xs font-bold text-[#14213D] mb-1.5" for="tpl-desc">Deskripsi <span class="font-normal text-[#788191]">(opsional)</span></label>
         <input id="tpl-desc" v-model.trim="form.description" maxlength="255" type="text" placeholder="Keterangan singkat desain"
-          class="w-full rounded-xl border border-[#DCD7CA] bg-white px-3.5 py-2.5 text-sm text-[#14251D] focus:outline-none focus:border-[#14251D]" />
+          class="w-full rounded-xl border border-[#CBD1DB] bg-white px-3.5 py-2.5 text-sm text-[#14213D] focus:outline-none focus:border-[#14213D]" />
       </div>
 
       <div>
-        <label class="block text-xs font-bold text-[#14251D] mb-1.5" for="tpl-pptx">File desain (.pptx)</label>
+        <label class="block text-xs font-bold text-[#14213D] mb-1.5" for="tpl-pptx">File desain (.pptx)</label>
         <input id="tpl-pptx" ref="pptxInput" type="file"
           accept=".pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation"
           @change="onPptx"
-          class="block w-full text-xs text-[#3F4A44] file:mr-3 file:rounded-xl file:border-0 file:bg-[#14251D] file:px-3.5 file:py-2 file:text-xs file:font-bold file:text-[#FAF9F5]" />
-        <p v-if="form.pptx" class="mt-1 text-[11px] text-[#6F7771]">{{ form.pptx.name }} ({{ sizeLabel(form.pptx.size) }})</p>
+          class="block w-full text-xs text-[#394150] file:mr-3 file:rounded-xl file:border-0 file:bg-[#14213D] file:px-3.5 file:py-2 file:text-xs file:font-bold file:text-[#F5F7FA]" />
+        <p v-if="form.pptx" class="mt-1 text-[11px] text-[#676F7F]">{{ form.pptx.name }} ({{ sizeLabel(form.pptx.size) }})</p>
       </div>
 
       <div>
-        <label class="block text-xs font-bold text-[#14251D] mb-1.5" for="tpl-thumb">Thumbnail</label>
+        <label class="block text-xs font-bold text-[#14213D] mb-1.5" for="tpl-thumb">Thumbnail</label>
         <input id="tpl-thumb" ref="thumbInput" type="file" accept="image/png,image/jpeg,image/webp" @change="onThumb"
-          class="block w-full text-xs text-[#3F4A44] file:mr-3 file:rounded-xl file:border-0 file:bg-[#14251D] file:px-3.5 file:py-2 file:text-xs file:font-bold file:text-[#FAF9F5]" />
+          class="block w-full text-xs text-[#394150] file:mr-3 file:rounded-xl file:border-0 file:bg-[#14213D] file:px-3.5 file:py-2 file:text-xs file:font-bold file:text-[#F5F7FA]" />
         <p v-if="fieldError('thumbnail')" class="mt-1 text-[11px] text-[#A6382C]">{{ fieldError('thumbnail') }}</p>
         <img v-if="thumbUrl" :src="thumbUrl" alt="Pratinjau thumbnail"
-          class="mt-2 w-full aspect-video object-cover rounded-xl border border-[#E3E0D6]" />
+          class="mt-2 w-full aspect-video object-cover rounded-xl border border-[#D7DBE2]" />
       </div>
 
-      <label class="flex items-start gap-2.5 text-xs text-[#3F4A44] cursor-pointer">
-        <input v-model="form.agree" type="checkbox" class="mt-0.5 h-4 w-4 accent-[#14251D]" />
+      <label class="flex items-start gap-2.5 text-xs text-[#394150] cursor-pointer">
+        <input v-model="form.agree" type="checkbox" class="mt-0.5 h-4 w-4 accent-[#14213D]" />
         <span>Saya sudah membaca syarat di atas dan template saya memakai penanda yang benar.</span>
       </label>
 
@@ -124,7 +124,7 @@
       <p v-if="generalError" class="text-xs text-[#A6382C]">{{ generalError }}</p>
 
       <button type="button" :disabled="!canSubmit || submitting" @click="submit"
-        class="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-[#14251D] text-[#FAF9F5] font-bold text-sm active-press transition disabled:opacity-50">
+        class="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-[#14213D] text-[#F5F7FA] font-bold text-sm active-press transition disabled:opacity-50">
         <svg v-if="submitting" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"/>
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>

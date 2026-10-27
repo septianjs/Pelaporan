@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full overflow-hidden rounded-lg border border-stone-200 bg-white">
+  <div class="w-full overflow-hidden rounded-lg border border-navy-200 bg-white">
     <img
       v-if="previewSrc"
       :key="previewSrc"
@@ -12,7 +12,7 @@
 
     <div
       v-else
-      class="flex min-h-32 items-center justify-center bg-stone-100 p-4 text-center text-sm text-stone-500"
+      class="flex min-h-32 items-center justify-center bg-navy-100 p-4 text-center text-sm text-navy-500"
     >
       Pratinjau gambar belum tersedia
     </div>

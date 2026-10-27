@@ -2,35 +2,35 @@
   <div class="px-4 py-4 space-y-4 pb-28">
 
     <!-- ── HEADER & KPI STATS ── -->
-    <div class="bg-white rounded-2xl p-4.5 border border-[#E7E5DE] shadow-[0_2px_8px_rgba(28,25,23,0.03)] space-y-3.5">
+    <div class="bg-white rounded-2xl p-4.5 border border-[#DEE1E7] shadow-[0_2px_8px_rgba(28,25,23,0.03)] space-y-3.5">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
-          <div class="w-9 h-9 rounded-xl bg-[#EAF2ED] text-[#1B382B] flex items-center justify-center shrink-0 border border-[#D5E3DA]">
+          <div class="w-9 h-9 rounded-xl bg-[#E7ECF5] text-[#1B2C4D] flex items-center justify-center shrink-0 border border-[#D0D8E8]">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round"
                 d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
             </svg>
           </div>
           <div>
-            <h2 class="text-sm font-bold text-stone-900 tracking-tight">Arsip Riwayat Laporan</h2>
-            <p class="text-xs text-stone-500">Dokumentasi berkala kebersihan BPSDM</p>
+            <h2 class="text-sm font-bold text-navy-900 tracking-tight">Arsip Riwayat Laporan</h2>
+            <p class="text-xs text-navy-500">Dokumentasi berkala kebersihan BPSDM</p>
           </div>
         </div>
         <router-link to="/create"
-          class="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-[#14251D] text-[#D8C79C] text-xs font-semibold shadow-sm hover:bg-[#1E372A] active-press transition">
+          class="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-[#14213D] text-[#F5A524] text-xs font-semibold shadow-sm hover:bg-[#263B61] active-press transition">
           + Buat Baru
         </router-link>
       </div>
 
       <!-- KPI counters -->
       <div class="grid grid-cols-3 gap-2 text-center">
-        <div class="bg-[#FAF9F5] rounded-xl p-2.5 border border-[#E7E4DC]">
-          <span class="text-[10px] text-stone-500 block font-medium">Total Arsip</span>
-          <span class="text-lg font-bold text-stone-900 tabular-nums">{{ stats.total || 0 }}</span>
+        <div class="bg-[#F5F7FA] rounded-xl p-2.5 border border-[#DDE0E6]">
+          <span class="text-[10px] text-navy-500 block font-medium">Total Arsip</span>
+          <span class="text-lg font-bold text-navy-900 tabular-nums">{{ stats.total || 0 }}</span>
         </div>
-        <div class="bg-[#EEF4F0] rounded-xl p-2.5 border border-[#D3E3D8]">
-          <span class="text-[10px] text-[#224A35] block font-medium">Bulan Ini</span>
-          <span class="text-lg font-bold text-[#14251D] tabular-nums">{{ stats.this_month || 0 }}</span>
+        <div class="bg-[#ECEFF6] rounded-xl p-2.5 border border-[#CDD7E9]">
+          <span class="text-[10px] text-[#162C56] block font-medium">Bulan Ini</span>
+          <span class="text-lg font-bold text-[#14213D] tabular-nums">{{ stats.this_month || 0 }}</span>
         </div>
         <div class="bg-[#FDF3F1] rounded-xl p-2.5 border border-[#F2D7D3]">
           <span class="text-[10px] text-[#9A3428] block font-medium">Perlu Evaluasi</span>
@@ -40,17 +40,17 @@
     </div>
 
     <!-- ── SEARCH & FILTER ── -->
-    <div class="bg-white rounded-2xl p-3.5 border border-[#E7E5DE] shadow-[0_2px_8px_rgba(28,25,23,0.03)] space-y-2.5">
+    <div class="bg-white rounded-2xl p-3.5 border border-[#DEE1E7] shadow-[0_2px_8px_rgba(28,25,23,0.03)] space-y-2.5">
       <!-- Search -->
       <div class="relative">
         <input type="text" v-model="searchQuery" @input="onSearchInput"
           placeholder="Cari nomor laporan, nama petugas…"
-          class="w-full pl-9 pr-8 py-2.5 rounded-xl bg-[#FAF9F5] text-xs text-stone-900 placeholder:text-stone-400 border border-[#DDD9CE] focus:bg-white focus:border-[#1A3428] focus:ring-2 focus:ring-[#1A3428]/10 focus:outline-none transition"/>
-        <svg class="w-4 h-4 text-stone-400 absolute left-3 top-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          class="w-full pl-9 pr-8 py-2.5 rounded-xl bg-[#F5F7FA] text-xs text-navy-900 placeholder:text-navy-400 border border-[#CFD3DC] focus:bg-white focus:border-[#1B2C4D] focus:ring-2 focus:ring-[#1B2C4D]/10 focus:outline-none transition"/>
+        <svg class="w-4 h-4 text-navy-400 absolute left-3 top-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/>
         </svg>
         <button v-if="searchQuery" type="button" @click="clearSearch"
-          class="absolute right-2.5 top-2.5 w-5 h-5 rounded-full bg-stone-200 text-stone-600 flex items-center justify-center text-[10px] font-bold">
+          class="absolute right-2.5 top-2.5 w-5 h-5 rounded-full bg-navy-200 text-navy-600 flex items-center justify-center text-[10px] font-bold">
           ✕
         </button>
       </div>
@@ -59,12 +59,12 @@
       <div class="flex items-center gap-1.5 overflow-x-auto pb-0.5 no-scrollbar text-[11px]">
         <button type="button" @click="setFilterStatus('all')"
           :class="['px-3 py-1.5 rounded-lg font-semibold whitespace-nowrap active-press transition',
-            filterStatus === 'all' ? 'bg-[#14251D] text-white' : 'bg-[#F2F0E8] text-stone-700 hover:bg-[#EAE8DE]']">
+            filterStatus === 'all' ? 'bg-[#14213D] text-white' : 'bg-[#E9ECF2] text-navy-700 hover:bg-[#DFE2E9]']">
           Semua ({{ stats.total || 0 }})
         </button>
         <button type="button" @click="setFilterStatus('clean')"
           :class="['px-3 py-1.5 rounded-lg font-semibold whitespace-nowrap active-press transition',
-            filterStatus === 'clean' ? 'bg-[#1B382B] text-white' : 'bg-[#EDF4EE] text-[#1B382B] border border-[#CFE1D5]']">
+            filterStatus === 'clean' ? 'bg-[#1B2C4D] text-white' : 'bg-[#EBEFF6] text-[#1B2C4D] border border-[#C9D3E7]']">
           ✓ Semua Bersih
         </button>
         <button type="button" @click="setFilterStatus('needs_attention')"
@@ -74,10 +74,10 @@
         </button>
         <!-- Date filter -->
         <input type="date" v-model="filterDate" @change="fetchReports(1)"
-          class="px-2 py-1.5 rounded-lg bg-[#FAF9F5] text-stone-700 text-[11px] font-semibold border border-[#DDD9CE] focus:outline-none shrink-0"/>
+          class="px-2 py-1.5 rounded-lg bg-[#F5F7FA] text-navy-700 text-[11px] font-semibold border border-[#CFD3DC] focus:outline-none shrink-0"/>
         <!-- Reset -->
         <button v-if="hasActiveFilter" type="button" @click="resetFilters"
-          class="px-2.5 py-1.5 rounded-lg font-semibold whitespace-nowrap bg-stone-200 text-stone-700 hover:bg-stone-300 active-press transition shrink-0">
+          class="px-2.5 py-1.5 rounded-lg font-semibold whitespace-nowrap bg-navy-200 text-navy-700 hover:bg-navy-300 active-press transition shrink-0">
           × Reset
         </button>
       </div>
@@ -86,13 +86,13 @@
     <!-- ── LOADING SKELETON ── -->
     <div v-if="loading && reports.length === 0" class="space-y-3">
       <div v-for="i in 3" :key="i"
-        class="bg-white rounded-2xl p-4 border border-[#E7E5DE] animate-pulse space-y-3">
+        class="bg-white rounded-2xl p-4 border border-[#DEE1E7] animate-pulse space-y-3">
         <div class="flex justify-between">
-          <div class="h-4 bg-stone-200 rounded w-1/3"/>
-          <div class="h-3 bg-stone-200 rounded w-1/4"/>
+          <div class="h-4 bg-navy-200 rounded w-1/3"/>
+          <div class="h-3 bg-navy-200 rounded w-1/4"/>
         </div>
-        <div class="h-3 bg-stone-200 rounded w-2/3"/>
-        <div class="h-8 bg-stone-100 rounded-xl"/>
+        <div class="h-3 bg-navy-200 rounded w-2/3"/>
+        <div class="h-8 bg-navy-100 rounded-xl"/>
       </div>
     </div>
 
@@ -101,7 +101,7 @@
       <div class="flex items-center justify-between px-1">
         <div class="flex items-center gap-1.5">
           <span class="w-2 h-2 rounded-full bg-[#C27D26] animate-ping"/>
-          <h4 class="text-xs font-bold text-stone-700 uppercase tracking-wide">
+          <h4 class="text-xs font-bold text-navy-700 uppercase tracking-wide">
             Antrian Offline ({{ pendingReports.length }})
           </h4>
         </div>
@@ -110,7 +110,7 @@
           type="button"
           @click="syncPendingReports"
           :disabled="isSyncing"
-          class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#14251D] text-[#D8C79C] text-[11px] font-semibold active-press transition disabled:opacity-50"
+          class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#14213D] text-[#F5A524] text-[11px] font-semibold active-press transition disabled:opacity-50"
         >
           <svg v-if="isSyncing" class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"/>
@@ -131,36 +131,36 @@
             Menunggu Sinkronisasi
           </span>
         </div>
-        <div class="flex items-center justify-between text-xs text-stone-700">
+        <div class="flex items-center justify-between text-xs text-navy-700">
           <span class="font-semibold">{{ qRep.officer_name }}</span>
-          <span class="text-stone-500 text-[11px] font-mono tabular-nums">{{ qRep.inspection_date }}</span>
+          <span class="text-navy-500 text-[11px] font-mono tabular-nums">{{ qRep.inspection_date }}</span>
         </div>
       </div>
     </div>
 
     <!-- ── EMPTY STATE ── -->
     <div v-else-if="!loading && reports.length === 0"
-      class="bg-white rounded-2xl p-8 text-center border border-[#E7E5DE] shadow-sm space-y-3">
-      <div class="w-12 h-12 mx-auto rounded-xl bg-[#FAF9F5] text-stone-400 flex items-center justify-center border border-stone-200">
+      class="bg-white rounded-2xl p-8 text-center border border-[#DEE1E7] shadow-sm space-y-3">
+      <div class="w-12 h-12 mx-auto rounded-xl bg-[#F5F7FA] text-navy-400 flex items-center justify-center border border-navy-200">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round"
             d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
         </svg>
       </div>
       <div>
-        <p class="text-sm font-bold text-stone-800">
+        <p class="text-sm font-bold text-navy-800">
           {{ hasActiveFilter ? 'Tidak ada laporan yang cocok' : 'Belum ada arsip laporan' }}
         </p>
-        <p class="text-xs text-stone-400 mt-0.5">
+        <p class="text-xs text-navy-400 mt-0.5">
           {{ hasActiveFilter ? 'Coba ubah kata kunci atau reset filter pencarian.' : 'Mulai buat inspeksi pertama Anda.' }}
         </p>
       </div>
       <button v-if="hasActiveFilter" type="button" @click="resetFilters"
-        class="inline-flex items-center px-4 py-2 bg-[#F2F0E8] text-stone-700 rounded-xl text-xs font-semibold hover:bg-[#EAE8DE] active-press transition">
+        class="inline-flex items-center px-4 py-2 bg-[#E9ECF2] text-navy-700 rounded-xl text-xs font-semibold hover:bg-[#DFE2E9] active-press transition">
         Reset Filter
       </button>
       <router-link v-else to="/create"
-        class="inline-flex items-center px-4 py-2.5 bg-[#14251D] text-[#D8C79C] rounded-xl text-xs font-semibold hover:bg-[#1E372A] active-press transition">
+        class="inline-flex items-center px-4 py-2.5 bg-[#14213D] text-[#F5A524] rounded-xl text-xs font-semibold hover:bg-[#263B61] active-press transition">
         + Buat Laporan Baru
       </router-link>
     </div>
@@ -168,24 +168,24 @@
     <!-- ── REPORT CARDS ── -->
     <div v-else class="space-y-3">
       <div v-for="rep in reports" :key="rep.id"
-        class="bg-white rounded-2xl p-4 border border-[#E7E5DE] space-y-3 hover:border-[#14251D]/30 shadow-[0_2px_8px_rgba(28,25,23,0.02)] transition">
+        class="bg-white rounded-2xl p-4 border border-[#DEE1E7] space-y-3 hover:border-[#14213D]/30 shadow-[0_2px_8px_rgba(28,25,23,0.02)] transition">
 
         <!-- Top row: number + date -->
         <div class="flex items-center justify-between">
-          <span class="font-mono text-xs font-bold text-stone-800 bg-[#F2F0E9] px-2.5 py-0.5 rounded-md border border-stone-200/80">
+          <span class="font-mono text-xs font-bold text-navy-800 bg-[#E9ECF2] px-2.5 py-0.5 rounded-md border border-navy-200/80">
             {{ rep.report_number }}
           </span>
-          <span class="text-[11px] text-stone-500 font-medium tabular-nums">
+          <span class="text-[11px] text-navy-500 font-medium tabular-nums">
             {{ rep.formatted_date || rep.inspection_date }}
           </span>
         </div>
 
         <!-- Middle row: avatar + meta -->
         <div class="flex items-start gap-3">
-          <div class="w-11 h-11 rounded-xl bg-stone-100 overflow-hidden border border-stone-200 shrink-0">
+          <div class="w-11 h-11 rounded-xl bg-navy-100 overflow-hidden border border-navy-200 shrink-0">
             <img v-if="rep.officer_photo_url" :src="rep.officer_photo_url"
               alt="Foto Petugas" class="w-full h-full object-cover"/>
-            <div v-else class="w-full h-full flex items-center justify-center text-stone-400">
+            <div v-else class="w-full h-full flex items-center justify-center text-navy-400">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round"
                   d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
@@ -194,9 +194,9 @@
           </div>
 
           <div class="flex-1 min-w-0 text-xs space-y-0.5">
-            <p class="font-bold text-stone-900 truncate">{{ rep.officer_name }}</p>
-            <p class="text-[11px] text-stone-500">
-              Tema: <span class="text-[#1B382B] font-semibold">{{ rep.template?.name || 'Default' }}</span>
+            <p class="font-bold text-navy-900 truncate">{{ rep.officer_name }}</p>
+            <p class="text-[11px] text-navy-500">
+              Tema: <span class="text-[#1B2C4D] font-semibold">{{ rep.template?.name || 'Default' }}</span>
             </p>
 
             <!-- Badges -->
@@ -216,7 +216,7 @@
               <!-- Dokumen badges -->
 
               <span v-if="rep.pdf_path"
-                class="text-[10px] font-semibold text-[#1B382B] bg-[#EDF4EE] px-1.5 py-0.5 rounded border border-[#CFE1D5]">
+                class="text-[10px] font-semibold text-[#1B2C4D] bg-[#EBEFF6] px-1.5 py-0.5 rounded border border-[#C9D3E7]">
                 PDF ✓
               </span>
             </div>
@@ -224,12 +224,12 @@
         </div>
 
         <!-- ── ACTION BUTTONS ── -->
-        <div class="pt-2.5 border-t border-stone-100 space-y-2">
+        <div class="pt-2.5 border-t border-navy-100 space-y-2">
           <!-- Row 1: Preview + PDF -->
           <div class="flex items-center gap-1.5">
             <!-- Preview -->
             <router-link :to="`/preview/${rep.id}`"
-              class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#FAF9F5] hover:bg-[#F2EFE8] text-stone-800 text-xs font-semibold active-press transition border border-stone-200">
+              class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#F5F7FA] hover:bg-[#E9ECF2] text-navy-800 text-xs font-semibold active-press transition border border-navy-200">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -261,7 +261,7 @@
 
             <!-- Share (Native Sheet) -->
             <button type="button" @click="shareReport(rep)" :disabled="sharingId === rep.id"
-              class="ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#EDF4EE] hover:bg-[#E2EFE4] text-[#1B382B] text-xs font-semibold active-press transition border border-[#CFE1D5] disabled:opacity-50">
+              class="ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#EBEFF6] hover:bg-[#DEE5F3] text-[#1B2C4D] text-xs font-semibold active-press transition border border-[#C9D3E7] disabled:opacity-50">
               <svg v-if="sharingId === rep.id" class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"/>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
@@ -277,7 +277,7 @@
           <!-- Delete -->
           <div class="flex justify-end">
             <button type="button" @click="confirmDelete(rep)"
-              class="text-[11px] text-stone-400 hover:text-rose-600 font-semibold px-2 py-0.5 rounded transition">
+              class="text-[11px] text-navy-400 hover:text-rose-600 font-semibold px-2 py-0.5 rounded transition">
               Hapus Laporan
             </button>
           </div>
@@ -287,7 +287,7 @@
       <!-- Load more -->
       <div v-if="currentPage < totalPages" class="flex justify-center pt-2">
         <button type="button" @click="loadMore" :disabled="loadingMore"
-          class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white border border-[#DDD9CE] text-stone-700 text-xs font-semibold hover:bg-stone-50 active-press transition disabled:opacity-50">
+          class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white border border-[#CFD3DC] text-navy-700 text-xs font-semibold hover:bg-navy-50 active-press transition disabled:opacity-50">
           <svg v-if="loadingMore" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"/>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
@@ -300,15 +300,15 @@
     <!-- ── DELETE CONFIRMATION SHEET ── -->
     <Teleport to="body">
       <Transition name="fade">
-        <div v-if="showDeleteSheet" class="fixed inset-0 z-50 bg-[#0E1A14]/70 backdrop-blur-sm"
+        <div v-if="showDeleteSheet" class="fixed inset-0 z-50 bg-[#0B1428]/70 backdrop-blur-sm"
           @click="showDeleteSheet = false"/>
       </Transition>
       <Transition name="slide-up">
         <div v-if="showDeleteSheet"
-          class="fixed bottom-0 left-0 right-0 z-50 bg-[#FAF9F5] rounded-t-3xl shadow-2xl border-t border-[#E3E0D6]"
+          class="fixed bottom-0 left-0 right-0 z-50 bg-[#F5F7FA] rounded-t-3xl shadow-2xl border-t border-[#D7DBE2]"
           style="max-width: 480px; margin: 0 auto; padding-bottom: max(1.5rem, env(safe-area-inset-bottom));">
           <div class="flex justify-center pt-3 pb-1">
-            <div class="w-10 h-1 rounded-full bg-[#D8D4C8]"/>
+            <div class="w-10 h-1 rounded-full bg-[#C9CED7]"/>
           </div>
           <div class="px-5 pt-2 pb-4 space-y-4">
             <div class="w-14 h-14 rounded-2xl bg-[#FDF0EE] border border-[#F5C7C1] mx-auto flex items-center justify-center">
@@ -318,9 +318,9 @@
               </svg>
             </div>
             <div class="text-center">
-              <p class="text-base font-bold text-[#14251D]">Hapus Dokumen Laporan?</p>
-              <p class="text-xs text-[#6F7771] mt-1 leading-relaxed">
-                Nomor <strong class="font-mono text-[#14251D]">{{ reportToDelete?.report_number }}</strong> beserta seluruh berkas foto dan PDF terkait akan dihapus secara permanen.
+              <p class="text-base font-bold text-[#14213D]">Hapus Dokumen Laporan?</p>
+              <p class="text-xs text-[#676F7F] mt-1 leading-relaxed">
+                Nomor <strong class="font-mono text-[#14213D]">{{ reportToDelete?.report_number }}</strong> beserta seluruh berkas foto dan PDF terkait akan dihapus secara permanen.
               </p>
             </div>
             <div class="space-y-2">
@@ -333,7 +333,7 @@
                 {{ isDeleting ? 'Menghapus Data…' : 'Ya, Hapus Permanen' }}
               </button>
               <button type="button" @click="showDeleteSheet = false"
-                class="w-full py-3 rounded-2xl text-[#6F7771] font-semibold text-sm hover:bg-[#ECEAE3] transition">
+                class="w-full py-3 rounded-2xl text-[#676F7F] font-semibold text-sm hover:bg-[#E3E6EC] transition">
                 Batalkan
               </button>
             </div>
@@ -347,9 +347,9 @@
       <Transition name="toast">
         <div v-if="toast.show"
           class="fixed top-safe left-1/2 -translate-x-1/2 z-[60] px-4 py-3 rounded-2xl shadow-xl text-xs font-semibold flex items-center gap-2 min-w-[200px] max-w-[90vw] border"
-          :class="toast.type === 'success' ? 'bg-[#14251D] text-[#FAF9F5] border-[#254234]' : 'bg-[#A6382C] text-white border-[#8F2F24]'"
+          :class="toast.type === 'success' ? 'bg-[#14213D] text-[#F5F7FA] border-[#2A4068]' : 'bg-[#A6382C] text-white border-[#8F2F24]'"
           style="top: max(1.5rem, env(safe-area-inset-top));">
-          <svg v-if="toast.type === 'success'" class="w-4 h-4 shrink-0 text-[#D8C79C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg v-if="toast.type === 'success'" class="w-4 h-4 shrink-0 text-[#F5A524]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
           </svg>
           <svg v-else class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

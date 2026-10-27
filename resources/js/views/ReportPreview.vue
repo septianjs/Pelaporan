@@ -3,15 +3,15 @@
 
     <!-- ── LOADING SKELETON ── -->
     <div v-if="loading" class="space-y-4">
-      <div class="bg-[#FAF9F5] rounded-2xl p-5 border border-[#E3E0D6] animate-pulse space-y-3">
-        <div class="h-5 bg-[#E8E5DC] rounded w-1/3"/>
-        <div class="h-3 bg-[#E8E5DC] rounded w-2/3"/>
-        <div class="aspect-video bg-[#E8E5DC] rounded-xl w-full"/>
+      <div class="bg-[#F5F7FA] rounded-2xl p-5 border border-[#D7DBE2] animate-pulse space-y-3">
+        <div class="h-5 bg-[#DDE0E7] rounded w-1/3"/>
+        <div class="h-3 bg-[#DDE0E7] rounded w-2/3"/>
+        <div class="aspect-video bg-[#DDE0E7] rounded-xl w-full"/>
       </div>
-      <div class="bg-[#FAF9F5] rounded-2xl p-4 border border-[#E3E0D6] animate-pulse space-y-3">
-        <div class="h-4 bg-[#E8E5DC] rounded w-1/4"/>
-        <div class="h-12 bg-[#E8E5DC] rounded-xl"/>
-        <div class="h-12 bg-[#E8E5DC] rounded-xl"/>
+      <div class="bg-[#F5F7FA] rounded-2xl p-4 border border-[#D7DBE2] animate-pulse space-y-3">
+        <div class="h-4 bg-[#DDE0E7] rounded w-1/4"/>
+        <div class="h-12 bg-[#DDE0E7] rounded-xl"/>
+        <div class="h-12 bg-[#DDE0E7] rounded-xl"/>
       </div>
     </div>
 
@@ -23,9 +23,9 @@
             d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
         </svg>
       </div>
-      <p class="text-sm font-bold text-[#14251D]">{{ errorMessage }}</p>
+      <p class="text-sm font-bold text-[#14213D]">{{ errorMessage }}</p>
       <router-link to="/history"
-        class="inline-flex items-center px-4 py-2 rounded-xl bg-[#14251D] text-[#FAF9F5] text-xs font-semibold active-press transition">
+        class="inline-flex items-center px-4 py-2 rounded-xl bg-[#14213D] text-[#F5F7FA] text-xs font-semibold active-press transition">
         ← Kembali ke Riwayat
       </router-link>
     </div>
@@ -34,16 +34,16 @@
     <div v-else-if="report" class="space-y-4">
 
       <!-- ── HEADER METADATA ── -->
-      <div class="bg-[#FAF9F5] rounded-2xl px-4 py-3.5 border border-[#E3E0D6] shadow-sm">
+      <div class="bg-[#F5F7FA] rounded-2xl px-4 py-3.5 border border-[#D7DBE2] shadow-sm">
         <div class="flex items-center justify-between mb-3">
-          <span class="font-mono text-xs font-bold text-[#14251D] bg-[#ECE8DD] px-2.5 py-1 rounded-md border border-[#DCD7CA] tabular-nums">
+          <span class="font-mono text-xs font-bold text-[#14213D] bg-[#DEE2EB] px-2.5 py-1 rounded-md border border-[#CBD1DB] tabular-nums">
             {{ report.report_number }}
           </span>
           <span
             :class="[
               'text-[10px] font-bold px-2.5 py-0.5 rounded-full border',
               report.status === 'completed'
-                ? 'bg-[#EAF3EC] text-[#1A3428] border-[#C8E0D0]'
+                ? 'bg-[#EAF3EC] text-[#1B2C4D] border-[#C8E0D0]'
                 : 'bg-[#FAF2DF] text-[#8C6D1F] border-[#EADBBD]'
             ]"
           >
@@ -53,16 +53,16 @@
 
         <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
           <div>
-            <span class="text-[#808983] text-[10px] uppercase font-bold tracking-wider block">Tanggal Pemeriksaan</span>
-            <span class="font-semibold text-[#14251D] font-mono tabular-nums">{{ report.formatted_date || report.inspection_date }}</span>
+            <span class="text-[#788191] text-[10px] uppercase font-bold tracking-wider block">Tanggal Pemeriksaan</span>
+            <span class="font-semibold text-[#14213D] font-mono tabular-nums">{{ report.formatted_date || report.inspection_date }}</span>
           </div>
           <div>
-            <span class="text-[#808983] text-[10px] uppercase font-bold tracking-wider block">Petugas Pengawas</span>
-            <span class="font-semibold text-[#14251D]">{{ report.officer_name }}</span>
+            <span class="text-[#788191] text-[10px] uppercase font-bold tracking-wider block">Petugas Pengawas</span>
+            <span class="font-semibold text-[#14213D]">{{ report.officer_name }}</span>
           </div>
-          <div class="col-span-2 pt-1 border-t border-[#ECE8DD] flex items-center justify-between">
-            <span class="text-[#808983] text-[10px] uppercase font-bold tracking-wider">Format Dokumen</span>
-            <span class="font-semibold text-[#14251D] text-xs bg-[#ECE8DD] px-2 py-0.5 rounded border border-[#DCD7CA]">
+          <div class="col-span-2 pt-1 border-t border-[#DEE2EB] flex items-center justify-between">
+            <span class="text-[#788191] text-[10px] uppercase font-bold tracking-wider">Format Dokumen</span>
+            <span class="font-semibold text-[#14213D] text-xs bg-[#DEE2EB] px-2 py-0.5 rounded border border-[#CBD1DB]">
               {{ report.template?.name || 'Standar BPSDM' }}
             </span>
           </div>
@@ -70,26 +70,26 @@
       </div>
 
       <!-- ── SLIDE VIEWER (16:9 CAROUSEL) ── -->
-      <div class="bg-[#FAF9F5] rounded-2xl p-3 border border-[#E3E0D6] shadow-sm space-y-3">
+      <div class="bg-[#F5F7FA] rounded-2xl p-3 border border-[#D7DBE2] shadow-sm space-y-3">
 
         <!-- Top navigator -->
         <div class="flex items-center justify-between px-1">
           <div class="flex items-center gap-2">
             <span class="w-2 h-2 rounded-full bg-[#C8B88A] animate-pulse"/>
-            <h3 class="text-xs font-bold text-[#14251D] uppercase tracking-wider font-mono">
+            <h3 class="text-xs font-bold text-[#14213D] uppercase tracking-wider font-mono">
               Slide {{ activeSlideIndex + 1 }}/{{ totalSlides }}
             </h3>
-            <span class="text-[10px] text-[#6F7771] font-medium">• {{ activeSlideTitle }}</span>
+            <span class="text-[10px] text-[#676F7F] font-medium">• {{ activeSlideTitle }}</span>
           </div>
           <div class="flex items-center gap-1.5">
             <button type="button" @click="prevSlide" :disabled="activeSlideIndex === 0"
-              class="w-8 h-8 rounded-xl bg-white border border-[#DCD7CA] text-[#14251D] hover:bg-[#F2EFE8] disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center transition active-press">
+              class="w-8 h-8 rounded-xl bg-white border border-[#CBD1DB] text-[#14213D] hover:bg-[#E9ECF2] disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center transition active-press">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
               </svg>
             </button>
             <button type="button" @click="nextSlide" :disabled="activeSlideIndex === totalSlides - 1"
-              class="w-8 h-8 rounded-xl bg-white border border-[#DCD7CA] text-[#14251D] hover:bg-[#F2EFE8] disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center transition active-press">
+              class="w-8 h-8 rounded-xl bg-white border border-[#CBD1DB] text-[#14213D] hover:bg-[#E9ECF2] disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center transition active-press">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
               </svg>
@@ -113,13 +113,13 @@
               class="w-full block bg-white"
               style="aspect-ratio: 16 / 9; object-fit: contain;"
             />
-            <div v-else :key="'ph'" class="w-full aspect-video bg-[#ECE8DD] flex items-center justify-center p-4 text-center">
+            <div v-else :key="'ph'" class="w-full aspect-video bg-[#DEE2EB] flex items-center justify-center p-4 text-center">
               <div v-if="pagesError" class="space-y-2">
                 <p class="text-xs font-semibold text-[#A6382C]">{{ pagesError }}</p>
                 <button type="button" @click="renderPdfPages"
-                  class="px-3 py-1.5 rounded-lg bg-[#14251D] text-[#FAF9F5] text-[11px] font-bold">Coba lagi</button>
+                  class="px-3 py-1.5 rounded-lg bg-[#14213D] text-[#F5F7FA] text-[11px] font-bold">Coba lagi</button>
               </div>
-              <p v-else class="text-xs font-semibold text-[#6F7771] animate-pulse">
+              <p v-else class="text-xs font-semibold text-[#676F7F] animate-pulse">
                 Menyiapkan pratinjau dari template… (bisa sampai 40 detik)
               </p>
             </div>
@@ -131,42 +131,42 @@
           <button v-for="(_, idx) in totalSlides" :key="idx" type="button"
             @click="activeSlideIndex = idx"
             class="h-1.5 rounded-full transition-all duration-300"
-            :class="activeSlideIndex === idx ? 'w-6 bg-[#14251D]' : 'w-2 bg-[#D8D4C8] hover:bg-[#B3ADA0]'"/>
+            :class="activeSlideIndex === idx ? 'w-6 bg-[#14213D]' : 'w-2 bg-[#C9CED7] hover:bg-[#A1A7B2]'"/>
         </div>
 
         <!-- Swipe hint (only show on mobile) -->
-        <p class="text-center text-[10px] text-[#808983] font-medium">
+        <p class="text-center text-[10px] text-[#788191] font-medium">
           ← Geser layar ke kiri atau kanan untuk berpindah slide →
         </p>
       </div>
 
       <!-- ── DOKUMEN STATUS CARD ── -->
-      <div class="bg-[#FAF9F5] rounded-2xl p-4 border border-[#E3E0D6] shadow-sm space-y-3">
+      <div class="bg-[#F5F7FA] rounded-2xl p-4 border border-[#D7DBE2] shadow-sm space-y-3">
         <div class="flex items-center justify-between">
-          <h4 class="text-xs font-bold uppercase tracking-wider text-[#14251D]">Status Berkas Dokumen</h4>
-          <span class="text-[10px] text-[#808983] font-mono">Format 16:9 HD</span>
+          <h4 class="text-xs font-bold uppercase tracking-wider text-[#14213D]">Status Berkas Dokumen</h4>
+          <span class="text-[10px] text-[#788191] font-mono">Format 16:9 HD</span>
         </div>
 
         <div class="space-y-2">
           <!-- PDF status -->
           <div class="flex items-center justify-between p-3 rounded-xl border"
-            :class="hasPdf ? 'bg-white border-[#DCD7CA]' : 'bg-[#F2EFE8] border-[#E0DCD0]'">
+            :class="hasPdf ? 'bg-white border-[#CBD1DB]' : 'bg-[#E9ECF2] border-[#D1D6DF]'">
             <div class="flex items-center gap-2.5">
               <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-                :class="hasPdf ? 'bg-[#14251D] text-[#D8C79C]' : 'bg-[#D8D4C8] text-[#808983]'">
+                :class="hasPdf ? 'bg-[#14213D] text-[#F5A524]' : 'bg-[#C9CED7] text-[#788191]'">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
                 </svg>
               </div>
               <div>
-                <p class="text-xs font-bold text-[#14251D]">Dokumen PDF Resmi</p>
-                <p class="text-[10px]" :class="hasPdf ? 'text-[#1A3428] font-medium' : 'text-[#808983]'">
+                <p class="text-xs font-bold text-[#14213D]">Dokumen PDF Resmi</p>
+                <p class="text-[10px]" :class="hasPdf ? 'text-[#1B2C4D] font-medium' : 'text-[#788191]'">
                   {{ hasPdf ? 'Siap diunduh / dibagikan' : 'Belum digenerate' }}
                 </p>
               </div>
             </div>
-            <span v-if="hasPdf" class="text-[10px] text-[#1A3428] font-bold bg-[#EAF3EC] px-2 py-0.5 rounded-full border border-[#C8E0D0] flex items-center gap-1">
+            <span v-if="hasPdf" class="text-[10px] text-[#1B2C4D] font-bold bg-[#EAF3EC] px-2 py-0.5 rounded-full border border-[#C8E0D0] flex items-center gap-1">
               <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
               </svg>
@@ -176,12 +176,12 @@
 
         <!-- Generate PDF button (jika belum ada) -->
         <button v-if="!hasPdf" type="button" @click="doGeneratePdf" :disabled="generatingPdf"
-          class="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-[#14251D] text-[#FAF9F5] font-bold text-sm shadow-sm hover:bg-[#1C362A] active-press transition disabled:opacity-60">
+          class="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-[#14213D] text-[#F5F7FA] font-bold text-sm shadow-sm hover:bg-[#14213D] active-press transition disabled:opacity-60">
           <svg v-if="generatingPdf" class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"/>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
           </svg>
-          <svg v-else class="w-5 h-5 text-[#D8C79C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg v-else class="w-5 h-5 text-[#F5A524]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
           </svg>
@@ -191,8 +191,8 @@
         <!-- PDF action buttons (jika sudah ada) -->
         <div v-else class="grid grid-cols-2 gap-2">
           <button type="button" @click="openPdf"
-            class="flex items-center justify-center gap-1.5 py-3 rounded-xl bg-[#14251D] text-[#FAF9F5] font-bold text-xs shadow-sm hover:bg-[#1C362A] active-press transition">
-            <svg class="w-4 h-4 text-[#D8C79C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            class="flex items-center justify-center gap-1.5 py-3 rounded-xl bg-[#14213D] text-[#F5F7FA] font-bold text-xs shadow-sm hover:bg-[#14213D] active-press transition">
+            <svg class="w-4 h-4 text-[#F5A524]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -201,8 +201,8 @@
             Buka PDF
           </button>
           <button type="button" @click="downloadPdf"
-            class="flex items-center justify-center gap-1.5 py-3 rounded-xl bg-white border border-[#DCD7CA] text-[#14251D] font-bold text-xs hover:bg-[#F4F3EE] active-press transition">
-            <svg class="w-4 h-4 text-[#14251D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            class="flex items-center justify-center gap-1.5 py-3 rounded-xl bg-white border border-[#CBD1DB] text-[#14213D] font-bold text-xs hover:bg-[#EEF0F4] active-press transition">
+            <svg class="w-4 h-4 text-[#14213D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
             </svg>
@@ -211,14 +211,14 @@
         </div>
 
         <!-- Share (Unified Native Sheet) -->
-        <div class="pt-2 border-t border-[#ECE8DD]">
+        <div class="pt-2 border-t border-[#DEE2EB]">
           <button type="button" @click="shareReport" :disabled="!hasPdf || sharing"
-            class="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-[#1A3428] text-[#FAF9F5] font-bold text-xs hover:bg-[#14251D] active-press transition disabled:opacity-40 shadow-sm">
+            class="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-[#1B2C4D] text-[#F5F7FA] font-bold text-xs hover:bg-[#14213D] active-press transition disabled:opacity-40 shadow-sm">
             <svg v-if="sharing" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"/>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
             </svg>
-            <svg v-else class="w-4 h-4 text-[#D8C79C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg v-else class="w-4 h-4 text-[#F5A524]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
             </svg>
@@ -235,16 +235,16 @@
       <!-- ── NAVIGATION ── -->
       <div class="flex items-center justify-between text-xs px-1">
         <router-link to="/history"
-          class="text-[#6F7771] hover:text-[#14251D] font-semibold flex items-center gap-1 active-press transition">
+          class="text-[#676F7F] hover:text-[#14213D] font-semibold flex items-center gap-1 active-press transition">
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
           </svg>
           Riwayat Laporan
         </router-link>
         <router-link to="/create"
-          class="text-[#14251D] hover:text-[#1A3428] font-bold flex items-center gap-1 bg-[#ECE8DD] px-3 py-1.5 rounded-xl border border-[#DCD7CA] active-press transition">
+          class="text-[#14213D] hover:text-[#1B2C4D] font-bold flex items-center gap-1 bg-[#DEE2EB] px-3 py-1.5 rounded-xl border border-[#CBD1DB] active-press transition">
           + Laporan Baru
-          <svg class="w-3.5 h-3.5 text-[#14251D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-3.5 h-3.5 text-[#14213D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
           </svg>
         </router-link>
@@ -257,9 +257,9 @@
       <Transition name="fade">
         <div v-if="toastMessage"
           class="fixed bottom-20 left-4 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-2xl shadow-xl text-xs font-semibold border"
-          :class="toastType === 'success' ? 'bg-[#14251D] text-[#FAF9F5] border-[#254234]' : 'bg-[#A6382C] text-white border-[#8F2F24]'"
+          :class="toastType === 'success' ? 'bg-[#14213D] text-[#F5F7FA] border-[#2A4068]' : 'bg-[#A6382C] text-white border-[#8F2F24]'"
           style="max-width: 440px; margin-left: auto; margin-right: auto;">
-          <svg v-if="toastType === 'success'" class="w-4 h-4 shrink-0 text-[#D8C79C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg v-if="toastType === 'success'" class="w-4 h-4 shrink-0 text-[#F5A524]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
           </svg>
           <svg v-else class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

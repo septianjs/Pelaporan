@@ -1,6 +1,6 @@
 <template>
   <div class="space-y-2">
-    <label v-if="label" class="block text-xs font-bold text-stone-700 uppercase tracking-wider">
+    <label v-if="label" class="block text-xs font-bold text-navy-700 uppercase tracking-wider">
       {{ label }}
       <span v-if="required" class="text-rose-500">*</span>
     </label>
@@ -26,21 +26,21 @@
     <div
       v-if="isProcessing"
       :class="aspectRatioClass"
-      class="relative w-full rounded-2xl overflow-hidden bg-[#14251D] flex flex-col items-center justify-center gap-3"
+      class="relative w-full rounded-2xl overflow-hidden bg-[#14213D] flex flex-col items-center justify-center gap-3"
     >
       <!-- Spinner -->
-      <svg class="w-8 h-8 text-[#D8C79C] animate-spin" fill="none" viewBox="0 0 24 24">
+      <svg class="w-8 h-8 text-[#F5A524] animate-spin" fill="none" viewBox="0 0 24 24">
         <circle class="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"/>
         <path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
       </svg>
-      <p class="text-[#FAF8F2] text-xs font-medium">Mengoptimalkan gambar…</p>
+      <p class="text-[#F2F5FA] text-xs font-medium">Mengoptimalkan gambar…</p>
     </div>
 
     <!-- ─── PREVIEW FRAME (object-fit: cover, no stretching) ─── -->
     <div
       v-else-if="previewUrl"
       :class="aspectRatioClass"
-      class="relative w-full rounded-2xl overflow-hidden border border-[#14251D]/25 bg-stone-900 shadow-sm"
+      class="relative w-full rounded-2xl overflow-hidden border border-[#14213D]/25 bg-navy-900 shadow-sm"
     >
       <img
         :src="previewUrl"
@@ -52,7 +52,7 @@
       <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent flex flex-col justify-end p-3">
         <div :class="['flex items-center', isSquare ? 'justify-center' : 'justify-between']">
           <!-- Size info badge (disembunyikan pada foto kotak: ruangnya sempit) -->
-          <span v-if="!isSquare" class="inline-flex items-center gap-1.5 whitespace-nowrap px-2.5 py-1 rounded-full text-[10px] font-medium bg-black/60 text-[#D8C79C] border border-white/10 backdrop-blur-md">
+          <span v-if="!isSquare" class="inline-flex items-center gap-1.5 whitespace-nowrap px-2.5 py-1 rounded-full text-[10px] font-medium bg-black/60 text-[#F5A524] border border-white/10 backdrop-blur-md">
             <svg class="w-3 h-3 text-[#34D399]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
             </svg>
@@ -91,9 +91,9 @@
     <!-- ─── EMPTY PLACEHOLDER WITH BUTTONS ─── -->
     <div
       v-else
-      class="border border-dashed border-[#DDD7C9] rounded-2xl p-4 bg-[#FAF9F5] hover:bg-[#F5F3EC] transition text-center space-y-3"
+      class="border border-dashed border-[#CAD0DC] rounded-2xl p-4 bg-[#F5F7FA] hover:bg-[#ECEFF5] transition text-center space-y-3"
     >
-      <div class="w-10 h-10 mx-auto rounded-xl bg-[#EBF2EE] text-[#1B382B] flex items-center justify-center border border-[#D5E3DA]">
+      <div class="w-10 h-10 mx-auto rounded-xl bg-[#E8EDF5] text-[#1B2C4D] flex items-center justify-center border border-[#D0D8E8]">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
           <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" />
@@ -101,8 +101,8 @@
       </div>
 
       <div>
-        <p class="text-xs font-bold text-stone-800">{{ emptyTitle }}</p>
-        <p class="text-[11px] text-stone-400 mt-0.5">{{ emptyHint }}</p>
+        <p class="text-xs font-bold text-navy-800">{{ emptyTitle }}</p>
+        <p class="text-[11px] text-navy-400 mt-0.5">{{ emptyHint }}</p>
       </div>
 
       <!-- Two buttons -->
@@ -111,9 +111,9 @@
           type="button"
           :disabled="isProcessing"
           @click="captureFromCamera"
-          class="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-[#14251D] hover:bg-[#1E372A] text-white text-xs font-semibold shadow-sm active-press transition disabled:opacity-50"
+          class="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-[#14213D] hover:bg-[#263B61] text-white text-xs font-semibold shadow-sm active-press transition disabled:opacity-50"
         >
-          <svg class="w-3.5 h-3.5 text-[#D8C79C]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <svg class="w-3.5 h-3.5 text-[#F5A524]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
             <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
           </svg>
@@ -124,9 +124,9 @@
           type="button"
           :disabled="isProcessing"
           @click="selectFromGallery"
-          class="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-[#F2F0E8] hover:bg-[#E7E5DC] text-stone-800 text-xs font-semibold active-press transition border border-stone-200/80 disabled:opacity-50"
+          class="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-[#E9ECF2] hover:bg-[#DDE0E6] text-navy-800 text-xs font-semibold active-press transition border border-navy-200/80 disabled:opacity-50"
         >
-          <svg class="w-3.5 h-3.5 text-stone-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <svg class="w-3.5 h-3.5 text-navy-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
           </svg>
           <span>Pilih Berkas</span>
@@ -156,25 +156,25 @@
       <Transition name="slide-up">
         <div
           v-if="showActionSheet"
-          class="fixed bottom-0 left-0 right-0 z-50 bg-[#FAF9F5] rounded-t-3xl shadow-2xl pb-safe border-t border-stone-200"
+          class="fixed bottom-0 left-0 right-0 z-50 bg-[#F5F7FA] rounded-t-3xl shadow-2xl pb-safe border-t border-navy-200"
           style="max-width: 480px; margin: 0 auto;"
         >
           <!-- Handle -->
           <div class="flex justify-center pt-3 pb-1">
-            <div class="w-10 h-1 rounded-full bg-stone-300"/>
+            <div class="w-10 h-1 rounded-full bg-navy-300"/>
           </div>
 
           <div class="px-5 pt-2 pb-6">
-            <p class="text-sm font-bold text-stone-900 text-center mb-4">Pilih Sumber Foto</p>
+            <p class="text-sm font-bold text-navy-900 text-center mb-4">Pilih Sumber Foto</p>
 
             <div class="space-y-2.5">
               <!-- Kamera -->
               <button
                 type="button"
                 @click="sheetAction('camera')"
-                class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-[#14251D] text-white font-semibold text-xs active-press transition"
+                class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-[#14213D] text-white font-semibold text-xs active-press transition"
               >
-                <span class="w-8 h-8 rounded-lg bg-white/10 text-[#D8C79C] flex items-center justify-center shrink-0">
+                <span class="w-8 h-8 rounded-lg bg-white/10 text-[#F5A524] flex items-center justify-center shrink-0">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
                     <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
@@ -187,9 +187,9 @@
               <button
                 type="button"
                 @click="sheetAction('gallery')"
-                class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-white text-stone-800 font-semibold text-xs border border-stone-200 active-press transition"
+                class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-white text-navy-800 font-semibold text-xs border border-navy-200 active-press transition"
               >
-                <span class="w-8 h-8 rounded-lg bg-[#FAF9F5] text-stone-700 flex items-center justify-center shrink-0 border border-stone-200">
+                <span class="w-8 h-8 rounded-lg bg-[#F5F7FA] text-navy-700 flex items-center justify-center shrink-0 border border-navy-200">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
                   </svg>
@@ -201,7 +201,7 @@
               <button
                 type="button"
                 @click="showActionSheet = false"
-                class="w-full py-2.5 rounded-xl text-stone-500 font-semibold text-xs hover:bg-stone-200/60 active-press transition"
+                class="w-full py-2.5 rounded-xl text-navy-500 font-semibold text-xs hover:bg-navy-200/60 active-press transition"
               >
                 Tutup Pilihan
               </button>

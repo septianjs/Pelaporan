@@ -1,5 +1,5 @@
 <template>
-  <nav class="sticky bottom-0 z-30 bg-white/95 backdrop-blur-md border-t border-[#E8E6DE] shadow-[0_-4px_24px_rgba(28,25,23,0.04)] safe-bottom">
+  <nav class="sticky bottom-0 z-30 bg-white/95 backdrop-blur-md border-t border-[#DFE2E8] shadow-[0_-4px_24px_rgba(28,25,23,0.04)] safe-bottom">
     <div class="flex items-center justify-around h-16 max-w-md mx-auto px-3">
       <!-- Beranda -->
       <router-link
@@ -15,7 +15,7 @@
           <div
             :class="[
               'w-9 h-7 rounded-lg flex items-center justify-center transition-all duration-200',
-              isActive ? 'bg-[#14251D] text-white shadow-sm' : 'text-stone-500 group-hover:text-stone-800'
+              isActive ? 'bg-[#14213D] text-white shadow-sm' : 'text-navy-500 group-hover:text-navy-800'
             ]"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
@@ -25,7 +25,7 @@
           <span
             :class="[
               'text-[10px] tracking-tight mt-1 transition-colors',
-              isActive ? 'font-bold text-[#14251D]' : 'font-medium text-stone-500'
+              isActive ? 'font-bold text-[#14213D]' : 'font-medium text-navy-500'
             ]"
           >
             Beranda
@@ -47,7 +47,7 @@
           <div
             :class="[
               'w-9 h-7 rounded-lg flex items-center justify-center transition-all duration-200',
-              isActive ? 'bg-[#14251D] text-[#D8C79C] shadow-sm' : 'bg-[#EBF1ED] text-[#1B382B] group-hover:bg-[#DEE7E1]'
+              isActive ? 'bg-[#14213D] text-[#F5A524] shadow-sm' : 'bg-[#E9ECF3] text-[#1B2C4D] group-hover:bg-[#DAE0EB]'
             ]"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
@@ -57,7 +57,7 @@
           <span
             :class="[
               'text-[10px] tracking-tight mt-1 transition-colors',
-              isActive ? 'font-bold text-[#14251D]' : 'font-semibold text-[#1B382B]'
+              isActive ? 'font-bold text-[#14213D]' : 'font-semibold text-[#1B2C4D]'
             ]"
           >
             Input Laporan
@@ -79,7 +79,7 @@
           <div
             :class="[
               'w-9 h-7 rounded-lg flex items-center justify-center transition-all duration-200',
-              isActive ? 'bg-[#14251D] text-white shadow-sm' : 'text-stone-500 group-hover:text-stone-800'
+              isActive ? 'bg-[#14213D] text-white shadow-sm' : 'text-navy-500 group-hover:text-navy-800'
             ]"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
@@ -89,7 +89,7 @@
           <span
             :class="[
               'text-[10px] tracking-tight mt-1 transition-colors',
-              isActive ? 'font-bold text-[#14251D]' : 'font-medium text-stone-500'
+              isActive ? 'font-bold text-[#14213D]' : 'font-medium text-navy-500'
             ]"
           >
             Arsip Riwayat
@@ -111,7 +111,7 @@
           <div
             :class="[
               'w-9 h-7 rounded-lg flex items-center justify-center transition-all duration-200',
-              isActive ? 'bg-[#14251D] text-white shadow-sm' : 'text-stone-500 group-hover:text-stone-800'
+              isActive ? 'bg-[#14213D] text-white shadow-sm' : 'text-navy-500 group-hover:text-navy-800'
             ]"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
@@ -121,7 +121,7 @@
           <span
             :class="[
               'text-[10px] tracking-tight mt-1 transition-colors',
-              isActive ? 'font-bold text-[#14251D]' : 'font-medium text-stone-500'
+              isActive ? 'font-bold text-[#14213D]' : 'font-medium text-navy-500'
             ]"
           >
             Template

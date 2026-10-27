@@ -1,12 +1,12 @@
 <template>
-  <header class="sticky top-0 z-30 bg-[#14251D] text-[#F5F4EE] border-b border-[#233F31] shadow-[0_2px_12px_rgba(10,18,14,0.15)] safe-top">
+  <header class="sticky top-0 z-30 bg-[#14213D] text-[#EEF1F5] border-b border-[#2A4068] shadow-[0_2px_12px_rgba(10,18,14,0.15)] safe-top">
     <div class="px-4 py-3 flex items-center justify-between">
       <div class="flex items-center space-x-3">
         <!-- Back button if not home -->
         <button
           v-if="showBack"
           @click="goBack"
-          class="w-8 h-8 -ml-1 rounded-lg bg-[#1D3529] hover:bg-[#254435] text-[#D1C7B7] flex items-center justify-center active-press transition"
+          class="w-8 h-8 -ml-1 rounded-lg bg-[#263B61] hover:bg-[#2A4068] text-[#C7D2E5] flex items-center justify-center active-press transition"
           aria-label="Kembali"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -14,18 +14,14 @@
           </svg>
         </button>
 
-        <!-- Institutional Insignia Mark -->
-        <div v-else class="w-8 h-8 rounded-lg bg-[#1E372B] border border-[#2D503F] text-[#D8C79C] flex items-center justify-center shadow-inner">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
-          </svg>
-        </div>
+        <!-- Logo Decora -->
+        <LogoMark v-else :size="32" variant="inverse" class="shrink-0" />
 
         <div class="leading-tight">
           <div class="flex items-center gap-1.5">
-            <span class="text-[9.5px] uppercase tracking-[0.16em] font-bold text-[#C8B788]">BPSDM</span>
-            <span class="text-stone-500 text-[9px]">•</span>
-            <span class="text-[9.5px] tracking-wide text-stone-400 font-medium">Pengawasan Lingkungan</span>
+            <span class="text-[9.5px] uppercase tracking-[0.16em] font-bold text-[#F5A524]">BPSDM</span>
+            <span class="text-navy-500 text-[9px]">•</span>
+            <span class="text-[9.5px] tracking-wide text-navy-400 font-medium">Pengawasan Lingkungan</span>
           </div>
           <p class="text-sm font-semibold text-white tracking-tight truncate max-w-[210px] mt-0.5">
             {{ title || 'Beranda' }}
@@ -38,6 +34,7 @@
 
 <script setup>
 import { computed } from 'vue';
+import LogoMark from './LogoMark.vue';
 import { useRoute, useRouter } from 'vue-router';
 
 const props = defineProps({

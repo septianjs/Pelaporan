@@ -1,7 +1,7 @@
 <template>
-  <div class="h-dvh sm:h-auto sm:min-h-screen bg-[#ECEAE3] flex justify-center items-start sm:py-6 selection:bg-[#1A3428] selection:text-white">
+  <div class="h-dvh sm:h-auto sm:min-h-screen bg-[#E3E6EC] flex justify-center items-start sm:py-6 selection:bg-[#1B2C4D] selection:text-white">
     <!-- Main Frame Container: Seamless mobile edge-to-edge, refined desktop tablet dock -->
-    <div class="w-full max-w-md h-dvh sm:h-[850px] bg-[#FAF9F5] flex flex-col overflow-hidden sm:rounded-3xl sm:border sm:border-stone-300/70 shadow-[0_20px_50px_-15px_rgba(28,25,23,0.08)] relative">
+    <div class="w-full max-w-md h-dvh sm:h-[850px] bg-[#F5F7FA] flex flex-col overflow-hidden sm:rounded-3xl sm:border sm:border-navy-300/70 shadow-[0_20px_50px_-15px_rgba(28,25,23,0.08)] relative">
       <!-- Top App Bar -->
       <TopHeader :title="currentTitle" />
 
@@ -16,8 +16,8 @@
         </span>
       </div>
 
-      <div v-else-if="isSyncing" class="bg-[#E8F1EC] border-b border-[#CFE2D6] text-[#1B422E] text-[11px] font-medium px-4 py-2 flex items-center gap-2 z-30">
-        <svg class="w-3.5 h-3.5 animate-spin shrink-0 text-[#2B6144]" fill="none" viewBox="0 0 24 24">
+      <div v-else-if="isSyncing" class="bg-[#E5EAF4] border-b border-[#C8D4E9] text-[#13264A] text-[11px] font-medium px-4 py-2 flex items-center gap-2 z-30">
+        <svg class="w-3.5 h-3.5 animate-spin shrink-0 text-[#1C3970]" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"/>
           <path class="opacity-80" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
         </svg>
@@ -26,21 +26,21 @@
 
       <div v-else-if="syncSuccessMessage" class="bg-[#EAF3EC] border-b border-[#CCE4D3] text-[#1E4826] text-[11px] font-medium px-4 py-2 flex items-center justify-between z-30">
         <div class="flex items-center gap-2 truncate">
-          <svg class="w-3.5 h-3.5 text-[#2A6535] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-3.5 h-3.5 text-[#1D3B72] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
           </svg>
           <span class="truncate">{{ syncSuccessMessage }}</span>
         </div>
-        <button type="button" @click="syncSuccessMessage = ''" class="text-stone-500 hover:text-stone-800 px-1 font-bold">✕</button>
+        <button type="button" @click="syncSuccessMessage = ''" class="text-navy-500 hover:text-navy-800 px-1 font-bold">✕</button>
       </div>
 
       <!-- Pending Queue Bar (Online but pending queue exists) -->
-      <div v-else-if="isOnline && queuedCount > 0" class="bg-[#F2EFE8] border-b border-[#E0DACE] text-[#44403C] text-[11px] font-medium px-4 py-2 flex items-center justify-between z-30">
+      <div v-else-if="isOnline && queuedCount > 0" class="bg-[#E9ECF2] border-b border-[#CFD5DF] text-[#3A3E46] text-[11px] font-medium px-4 py-2 flex items-center justify-between z-30">
         <span class="truncate font-medium"><span class="tabular-nums font-semibold">{{ queuedCount }}</span> laporan offline siap dikirim</span>
         <button
           type="button"
           @click="triggerManualSync"
-          class="bg-[#1A3428] text-white px-2.5 py-0.5 rounded-lg text-[10px] font-semibold active-press transition"
+          class="bg-[#1B2C4D] text-white px-2.5 py-0.5 rounded-lg text-[10px] font-semibold active-press transition"
         >
           Kirim Sekarang
         </button>

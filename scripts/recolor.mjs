@@ -1,15 +1,16 @@
 #!/usr/bin/env node
 /**
- * Ganti palet hijau/krem lama menjadi palet baru (kobalt + stabilo kuning + kertas dingin).
+ * Selaraskan warna UI dengan logo Decora (navy #14213D + amber #F5A524).
  *
  * Jalankan dari folder utama proyek:
  *   node scripts/recolor.mjs --dry     # hanya tampilkan apa yang akan berubah
  *   node scripts/recolor.mjs           # terapkan
  *
  * - Hanya menyentuh resources/js (*.vue, *.js). CSS desain PDF/slide TIDAK diubah.
- * - Hanya mengganti kode warna #RRGGBB dan kelas Tailwind stone-* -> slate-* (abu netral jadi abu kebiruan); teks dan logika di file tidak disentuh.
+ * - Mengganti kode warna #RRGGBB (hijau tua -> navy, emas/pasir -> amber, krem -> abu kebiruan)
+ *   dan kelas Tailwind stone-* -> navy-* (token navy didefinisikan di resources/css/app.css).
  * - Aman dijalankan ulang (warna baru tidak ikut diganti lagi).
- * - Warna merah (error), kuning-oranye (peringatan/offline), dan dan titik status merah #EF4444 dibiarkan.
+ * - Dibiarkan: merah (error), hijau status sukses/online, dan kuning-oranye peringatan/offline.
  */
 import { readFileSync, writeFileSync, readdirSync, statSync } from 'node:fs';
 import { join, extname } from 'node:path';
@@ -19,39 +20,42 @@ const ROOT = join(process.cwd(), 'resources', 'js');
 
 // Penggantian eksplisit untuk warna merek utama (huruf besar semua).
 const EXPLICIT = {
-  // hijau tua -> kobalt
-  '#14251D': '#1C2BA0',
-  '#1A3428': '#1C2BA0',
-  '#1B382B': '#1C2BA0',
-  '#173023': '#16217F',
-  '#1C362A': '#16217F',
-  '#1E372A': '#2433B3',
-  '#1E372B': '#2433B3',
-  '#1D3529': '#2433B3',
-  '#254234': '#2B3CC8',
-  '#254435': '#3040C0',
-  '#233F31': '#3344C8',
-  '#2D503F': '#3F50D0',
-  '#2D5441': '#3F50D0',
-  '#0E1A14': '#0A0F2E',
-  // emas/pasir -> stabilo kuning
-  '#D8C79C': '#FFD84D',
-  '#C8B788': '#FFD84D',
-  '#CDB987': '#FFD84D',
-  '#D4C497': '#FFD84D',
-  '#D1C7B7': '#C9D0FF',
-  // centang hijau pada toast gelap -> stabilo kuning
-  '#34D399': '#FFD84D',
+  // hijau tua -> navy logo
+  '#14251D': '#14213D',
+  '#1A3428': '#1B2C4D',
+  '#1B382B': '#1B2C4D',
+  '#173023': '#14213D',
+  '#1C362A': '#14213D',
+  '#1E372A': '#263B61',
+  '#1E372B': '#263B61',
+  '#1D3529': '#263B61',
+  '#254234': '#2A4068',
+  '#254435': '#2A4068',
+  '#233F31': '#2A4068',
+  '#2D503F': '#35507D',
+  '#2D5441': '#35507D',
+  '#0E1A14': '#0B1428',
+  // teks hampir-hitam -> navy
+  '#1C1B18': '#14213D',
+  '#1A1A18': '#14213D',
+  // emas/pasir -> amber logo
+  '#D8C79C': '#F5A524',
+  '#C8B788': '#F5A524',
+  '#CDB987': '#F5A524',
+  '#D4C497': '#F5A524',
+  '#D1C7B7': '#C7D2E5',
 };
 
-// Dibiarkan apa adanya (status online/offline, dll.).
+// Dibiarkan apa adanya (status sukses/online, error, peringatan/offline).
 const KEEP = new Set([
   '#EF4444',
+  // hijau status sukses/online
+  '#34D399', '#EAF3EC', '#CCE4D3', '#1E4826', '#C8E0D0',
   // tint kuning-oranye pucat untuk banner offline/peringatan
   '#FAF2E6', '#FAF3E6', '#FAF5E8', '#FBF6E4', '#FAF2DF',
 ]);
 
-const TARGET_HUE = 232;
+const TARGET_HUE = 219;
 
 function hexToRgb(h) {
   return [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
@@ -101,9 +105,11 @@ function convert(hex) {
   const [h, s, l] = rgbToHsl(rgb);
   const chroma = Math.max(...rgb) - Math.min(...rgb);
 
-  // Hijau (zaitun s.d. toska) -> biru kobalt, terang-gelapnya dipertahankan.
+  // Hijau (zaitun s.d. toska) -> biru navy, terang-gelapnya dipertahankan.
   if (h >= 75 && h <= 175 && chroma > 4) {
-    return hslToHex([TARGET_HUE, Math.min(1, s * 1.5 + 0.05), l]);
+    // Warna gelap dijaga agar tidak lebih jenuh dari navy logo.
+    const sat = Math.min(1, s * 1.5 + 0.05);
+    return hslToHex([TARGET_HUE, l < 0.35 ? Math.min(sat, 0.6) : sat, l]);
   }
   // Krem/beige hampir-netral -> abu dingin kebiruan (untuk latar, garis, teks sekunder).
   if (h >= 25 && h <= 70 && chroma <= 24) {
@@ -132,7 +138,7 @@ for (const file of walk(ROOT)) {
   let stoneCount = 0;
   const swapped = src.replace(/-stone-(\d{2,3})\b/g, (_, n) => {
     stoneCount++;
-    return `-slate-${n}`;
+    return `-navy-${n}`;
   });
   const next = swapped.replace(/#[0-9A-Fa-f]{6}\b/g, (m) => {
     const to = convert(m);
@@ -143,7 +149,7 @@ for (const file of walk(ROOT)) {
   });
   if (count || stoneCount) {
     total += count + stoneCount;
-    console.log(`${DRY ? '[dry] ' : ''}${file.replace(process.cwd() + '/', '')}: ${count} warna, ${stoneCount} kelas stone->slate`);
+    console.log(`${DRY ? '[dry] ' : ''}${file.replace(process.cwd() + '/', '')}: ${count} warna, ${stoneCount} kelas stone->navy`);
     if (!DRY) writeFileSync(file, next);
   }
 }
