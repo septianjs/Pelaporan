@@ -585,7 +585,7 @@ const todayIso = () => {
 };
 
 const form = reactive({
-  report_number: 'LAP-BPSDM-2026-0001',
+  report_number: `LAP-BPSDM-${new Date().getFullYear()}-OFFLINE-${Date.now()}`,
   inspection_date: todayIso(),
   officer_name: '',
   officer_photo: null,
