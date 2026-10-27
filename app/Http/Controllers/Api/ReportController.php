@@ -93,6 +93,7 @@ class ReportController extends Controller
         ReportPdfService $pdfService
     ): JsonResponse {
         $validated = $request->validate([
+            'report_number' => 'required|string|max:100|unique:reports,report_number',
             'inspection_date' => 'required|date',
             'officer_name' => 'required|string|max:255',
             'template_id' => ['required', \Illuminate\Validation\Rule::exists('templates', 'id')
@@ -108,8 +109,7 @@ class ReportController extends Controller
         ]);
 
         $report = DB::transaction(function () use ($request, $validated) {
-            $year = date('Y', strtotime($validated['inspection_date']));
-            $reportNumber = $request->input('report_number') ?: Report::generateNextNumber((int)$year);
+            $reportNumber = trim($validated['report_number']);
 
             // Handle Officer Photo
             $officerPhotoPath = null;
