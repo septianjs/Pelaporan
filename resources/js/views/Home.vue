@@ -84,7 +84,7 @@
           Arsip Riwayat
         </h3>
         <p class="text-[11px] text-stone-500 mt-1 leading-snug">
-          Daftar laporan, ekspor PDF & presentasi PPTX
+            Daftar laporan, unduh & bagikan PDF
         </p>
         <div class="mt-3 pt-2.5 border-t border-stone-100 flex items-center justify-between text-[10px] font-semibold text-[#1A3428]">
           <span>Buka Arsip</span>
@@ -106,7 +106,7 @@
           Format Template
         </h3>
         <p class="text-[11px] text-stone-500 mt-1 leading-snug">
-          10 template bawaan 16:9 & unggah tema kustom
+          Pilih desain PDF 16:9 atau buat template sendiri
         </p>
         <div class="mt-3 pt-2.5 border-t border-stone-100 flex items-center justify-between text-[10px] font-semibold text-[#84631D]">
           <span>Katalog</span>

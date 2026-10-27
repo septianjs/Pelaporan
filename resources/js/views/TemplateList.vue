@@ -76,7 +76,7 @@
       >
         <!-- Pratinjau desain asli (CSS yang sama dengan PDF): sampul + titik pemantauan -->
         <div class="relative mb-3">
-          <TemplateThumb :theme="tpl.theme" :name="tpl.name" :preview="tpl.type === 'uploaded' ? (tpl.preview_url || '') : ''" />
+          <TemplateThumb :theme="tpl.theme" :name="tpl.name" :preview="tpl.preview_url || ''" />
 
           <!-- Type badge -->
           <div class="absolute top-1.5 left-1.5 px-2.5 py-0.5 rounded-md backdrop-blur-md bg-[#14251D]/90 text-[#D8C79C] text-[10px] font-semibold tracking-wide border border-white/10">

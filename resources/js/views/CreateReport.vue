@@ -313,12 +313,7 @@
             ]"
           >
             <div class="relative">
-              <img
-                :src="tpl.preview_url"
-                :alt="tpl.name"
-                loading="lazy"
-                class="w-full aspect-video object-cover rounded-xl border border-[#E7E5DE]"
-              />
+              <TemplateThumb :name="tpl.name" :preview="tpl.preview_url || ''" />
               <div
                 v-if="form.template_id === tpl.id"
                 class="absolute top-2 right-2 px-2.5 py-1 rounded-full bg-[#14251D] text-[#D8C79C] text-[10px] font-bold shadow flex items-center gap-1"
@@ -563,7 +558,7 @@ const stepDescriptions = [
   'Dokumentasi dan evaluasi kebersihan Ruang Kerja.',
   'Dokumentasi dan evaluasi kebersihan Toilet.',
   'Dokumentasi dan evaluasi kebersihan Area Parkir.',
-  'Pilih 1 dari 10 desain PDF widescreen 16:9.',
+  'Pilih salah satu desain PDF widescreen 16:9.',
   'Tinjau kembali data laporan sebelum penyimpanan final.',
 ];
 

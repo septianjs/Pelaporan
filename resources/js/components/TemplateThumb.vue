@@ -1,4 +1,3 @@
-
 <template>
   <div class="w-full overflow-hidden rounded-lg border border-stone-200 bg-white">
     <img
@@ -22,6 +21,7 @@
 
 <script setup>
 import { computed, ref, watch } from 'vue';
+import { resolveAssetUrl } from '../services/api';
 
 const props = defineProps({
   theme: {
@@ -48,47 +48,28 @@ watch(
 );
 
 const previewSrc = computed(() => {
-  if (imageFailed.value) {
-    return '';
-  }
+  if (imageFailed.value) return '';
 
   const preview = props.preview?.trim();
 
-  // 1. Prioritaskan thumbnail yang dikirim backend.
   if (preview) {
-    if (/^(https?:)?\/\//i.test(preview)) {
-      return preview;
+    if (preview.startsWith('template-previews/') || preview.startsWith('previews/')) {
+      return resolveAssetUrl(`/storage/${preview}`);
     }
-
-    if (preview.startsWith('/')) {
-      return preview;
+    if (/^(https?:)?\/\//i.test(preview) || preview.startsWith('/')) {
+      return resolveAssetUrl(preview);
     }
-
-    // Path relatif dari storage Laravel.
-    if (preview.startsWith('template-previews/')) {
-      return `/storage/${preview}`;
-    }
-
-    if (preview.startsWith('previews/')) {
-      return `/storage/${preview}`;
-    }
-
-    return `/storage/previews/${preview}`;
+    return resolveAssetUrl(`/storage/previews/${preview}`);
   }
 
-  // 2. Cadangan berdasarkan nomor template pada namanya.
-  // Tidak membuat gambar palsu untuk template yang belum memiliki preview.
   const match = props.name.match(/(?:template|templat)\s*0?(\d+)/i);
-
   if (match) {
     const number = Number(match[1]);
-
     if (number >= 1 && number <= 4) {
-      return `/storage/template-previews/template-${String(number).padStart(2, '0')}.png`;
+      return resolveAssetUrl(`/storage/template-previews/template-${String(number).padStart(2, '0')}.png`);
     }
   }
 
-  // 3. Tidak ada thumbnail yang bisa dipastikan.
   return '';
 });
 </script>

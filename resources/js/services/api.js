@@ -57,4 +57,14 @@ export const setCustomApiUrl = (url) => {
 
 export const getApiUrl = () => api.defaults.baseURL;
 
+export const resolveAssetUrl = (path) => {
+    if (!path) return '';
+    const clean = path.replace(/^https?:\/\/[^/]+/i, '');
+    const base = api.defaults.baseURL || '';
+    if (/^https?:\/\//i.test(base)) {
+        return base.replace(/\/api\/?$/, '') + clean;
+    }
+    return clean;
+};
+
 export default api;
