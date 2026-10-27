@@ -16,7 +16,7 @@ class TemplateController extends Controller
     /**
      * Daftar template: bawaan (config/report_templates.php) + buatan pengguna (type=uploaded).
      */
-    public function index(): JsonResponse
+        public function index(): JsonResponse
     {
         $cfg = config('report_templates.templates');
 
@@ -32,7 +32,8 @@ class TemplateController extends Controller
                     'name'        => $t->name,
                     'description' => $t->description ?: 'Template buatan pengguna',
                     'type'        => 'uploaded',
-                    'preview_url' => $t->preview_path ? secure_asset('storage/' . $t->preview_path) : null,
+                    // path saja, host ditentukan frontend
+                    'preview_url' => $t->preview_path ? '/storage/' . $t->preview_path : null,
                 ];
             }
 
@@ -41,7 +42,7 @@ class TemplateController extends Controller
                 'name'        => $cfg[$t->template_key]['name'],
                 'description' => $cfg[$t->template_key]['description'] ?? 'Desain dari file PPTX',
                 'type'        => 'builtin',
-                'preview_url' => secure_asset("storage/template-previews/{$t->template_key}.png"),
+                'preview_url' => "/storage/template-previews/{$t->template_key}.png",
             ];
         })->values();
 
@@ -125,7 +126,7 @@ class TemplateController extends Controller
                 'name'        => $template->name,
                 'description' => $template->description,
                 'type'        => 'uploaded',
-                'preview_url' => $template->preview_url,
+                'preview_url' => '/storage/' . $template->preview_path,
             ],
             'warnings' => $check['warnings'],
         ], 201);

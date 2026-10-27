@@ -40,10 +40,7 @@ class Template extends Model
 
     public function getPreviewUrlAttribute(): ?string
     {
-        if ($this->preview_path) {
-            return asset('storage/' . $this->preview_path);
-        }
-        return null;
+        return $this->preview_path ? '/storage/' . $this->preview_path : null;
     }
 
     /**
