@@ -111,6 +111,7 @@ class ReportPdfService
         }
 
         return [
+            'report_number' => $report->report_number,
             'hari'         => $report->day_name,
             'tanggal'      => $tanggal,
             'tim'          => $report->officer_name,
