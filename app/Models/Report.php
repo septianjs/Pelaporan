@@ -109,18 +109,16 @@ class Report extends Model
         $year = $year ?: (int)date('Y');
         $prefix = "LAP-BPSDM-{$year}-";
 
-        $lastReport = self::where('report_number', 'like', "{$prefix}%")
-            ->orderBy('id', 'desc')
-            ->first();
+        // Abaikan nomor manual/non-numerik saat menentukan urutan otomatis.
+        // Ini mencegah nomor manual terbaru membuat urutan otomatis kembali ke 0001.
+        $lastSequence = self::where('report_number', 'like', "{$prefix}%")
+            ->pluck('report_number')
+            ->map(fn ($number) => substr($number, strlen($prefix)))
+            ->filter(fn ($suffix) => $suffix !== '' && ctype_digit($suffix))
+            ->map(fn ($suffix) => (int) $suffix)
+            ->max() ?? 0;
 
-        if ($lastReport) {
-            $lastNumberPart = substr($lastReport->report_number, strlen($prefix));
-            $seq = (int)$lastNumberPart + 1;
-        } else {
-            $seq = 1;
-        }
-
-        return $prefix . str_pad((string)$seq, 4, '0', STR_PAD_LEFT);
+        return $prefix . str_pad((string) ($lastSequence + 1), 4, '0', STR_PAD_LEFT);
     }
 }
 
