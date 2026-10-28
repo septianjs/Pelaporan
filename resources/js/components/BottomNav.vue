@@ -1,6 +1,6 @@
 <template>
-  <nav class="sticky bottom-0 z-30 bg-white/95 backdrop-blur-md border-t border-[#DFE2E8] shadow-[0_-4px_24px_rgba(28,25,23,0.04)] safe-bottom">
-    <div class="flex items-center justify-around h-16 max-w-md mx-auto px-3">
+  <nav class="bottom-nav-bar safe-bottom">
+    <div class="nav-inner">
       <!-- Beranda -->
       <router-link
         to="/"
@@ -10,12 +10,12 @@
         <a
           :href="href"
           @click="navigate"
-          class="flex flex-col items-center justify-center flex-1 h-full py-1 text-center group active-press transition"
+          class="nav-tab group"
         >
           <div
             :class="[
-              'w-9 h-7 rounded-lg flex items-center justify-center transition-all duration-200',
-              isActive ? 'bg-[#14213D] text-white shadow-sm' : 'text-navy-500 group-hover:text-navy-800'
+              'nav-icon-box',
+              isActive ? 'icon-box-active' : 'icon-box-idle'
             ]"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
@@ -24,8 +24,8 @@
           </div>
           <span
             :class="[
-              'text-[10px] tracking-tight mt-1 transition-colors',
-              isActive ? 'font-bold text-[#14213D]' : 'font-medium text-navy-500'
+              'nav-tab-label',
+              isActive ? 'label-active' : 'label-idle'
             ]"
           >
             Beranda
@@ -42,12 +42,12 @@
         <a
           :href="href"
           @click="navigate"
-          class="flex flex-col items-center justify-center flex-1 h-full py-1 text-center group active-press transition"
+          class="nav-tab group"
         >
           <div
             :class="[
-              'w-9 h-7 rounded-lg flex items-center justify-center transition-all duration-200',
-              isActive ? 'bg-[#14213D] text-[#F5A524] shadow-sm' : 'bg-[#E9ECF3] text-[#1B2C4D] group-hover:bg-[#DAE0EB]'
+              'nav-icon-box',
+              isActive ? 'icon-box-action-active' : 'icon-box-action-idle'
             ]"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
@@ -56,8 +56,8 @@
           </div>
           <span
             :class="[
-              'text-[10px] tracking-tight mt-1 transition-colors',
-              isActive ? 'font-bold text-[#14213D]' : 'font-semibold text-[#1B2C4D]'
+              'nav-tab-label',
+              isActive ? 'label-active' : 'label-action-idle'
             ]"
           >
             Input Laporan
@@ -74,12 +74,12 @@
         <a
           :href="href"
           @click="navigate"
-          class="flex flex-col items-center justify-center flex-1 h-full py-1 text-center group active-press transition"
+          class="nav-tab group"
         >
           <div
             :class="[
-              'w-9 h-7 rounded-lg flex items-center justify-center transition-all duration-200',
-              isActive ? 'bg-[#14213D] text-white shadow-sm' : 'text-navy-500 group-hover:text-navy-800'
+              'nav-icon-box',
+              isActive ? 'icon-box-active' : 'icon-box-idle'
             ]"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
@@ -88,8 +88,8 @@
           </div>
           <span
             :class="[
-              'text-[10px] tracking-tight mt-1 transition-colors',
-              isActive ? 'font-bold text-[#14213D]' : 'font-medium text-navy-500'
+              'nav-tab-label',
+              isActive ? 'label-active' : 'label-idle'
             ]"
           >
             Arsip Riwayat
@@ -106,12 +106,12 @@
         <a
           :href="href"
           @click="navigate"
-          class="flex flex-col items-center justify-center flex-1 h-full py-1 text-center group active-press transition"
+          class="nav-tab group"
         >
           <div
             :class="[
-              'w-9 h-7 rounded-lg flex items-center justify-center transition-all duration-200',
-              isActive ? 'bg-[#14213D] text-white shadow-sm' : 'text-navy-500 group-hover:text-navy-800'
+              'nav-icon-box',
+              isActive ? 'icon-box-active' : 'icon-box-idle'
             ]"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
@@ -120,8 +120,8 @@
           </div>
           <span
             :class="[
-              'text-[10px] tracking-tight mt-1 transition-colors',
-              isActive ? 'font-bold text-[#14213D]' : 'font-medium text-navy-500'
+              'nav-tab-label',
+              isActive ? 'label-active' : 'label-idle'
             ]"
           >
             Template
@@ -135,3 +135,104 @@
 <script setup>
 </script>
 
+<style scoped>
+.bottom-nav-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 30;
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid #DFE2E8;
+  box-shadow: 0 -4px 24px rgba(28, 25, 23, 0.04);
+}
+
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  height: 4rem;
+  max-width: 28rem;
+  margin: 0 auto;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+
+.nav-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1 1 0%;
+  height: 100%;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  text-align: center;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.nav-tab:active {
+  transform: scale(0.95);
+}
+
+.nav-icon-box {
+  width: 2.25rem;
+  height: 1.75rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.icon-box-active {
+  background-color: #14213D;
+  color: #FFFFFF;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.icon-box-idle {
+  color: #4A6798;
+}
+
+.nav-tab:hover .icon-box-idle {
+  color: #1B2C4D;
+}
+
+.icon-box-action-active {
+  background-color: #14213D;
+  color: #F5A524;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.icon-box-action-idle {
+  background-color: #E9ECF3;
+  color: #1B2C4D;
+}
+
+.nav-tab:hover .icon-box-action-idle {
+  background-color: #DAE0EB;
+}
+
+.nav-tab-label {
+  font-size: 0.625rem;
+  letter-spacing: -0.025em;
+  margin-top: 0.25rem;
+  transition: color 0.15s ease;
+}
+
+.label-active {
+  font-weight: 700;
+  color: #14213D;
+}
+
+.label-idle {
+  font-weight: 500;
+  color: #4A6798;
+}
+
+.label-action-idle {
+  font-weight: 600;
+  color: #1B2C4D;
+}
+</style>

@@ -46,4 +46,3 @@ Route::get('/reports/{id}', [ReportController::class, 'show']);
 Route::delete('/reports/{id}', [ReportController::class, 'destroy']);
 Route::post('/reports/{id}/generate-pdf', [ReportController::class, 'generatePdf']);
 Route::get('/reports/{id}/pdf', [ReportController::class, 'downloadPdf']);
-Route::post('/reports/{id}/email', [ReportController::class, 'sendEmail']);

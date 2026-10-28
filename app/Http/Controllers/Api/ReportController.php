@@ -9,7 +9,6 @@ use App\Models\ReportLocation;
 use App\Models\ReportPhoto;
 use App\Models\Template;
 use App\Services\ReportPdfService;
-use App\Mail\ReportSubmittedMail;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -303,76 +302,6 @@ class ReportController extends Controller
         return response()->download($fullPath, $downloadName, [
             'Content-Type' => 'application/pdf',
         ]);
-    }
-
-    /**
-     * Send the report with 16:9 PDF attached via email.
-     */
-    public function sendEmail(Request $request, int $id, ReportPdfService $pdfService): JsonResponse
-    {
-        $validated = $request->validate([
-            'email' => 'required|email',
-            'subject' => 'nullable|string|max:255',
-            'notes' => 'nullable|string|max:1000',
-        ]);
-
-        $report = Report::with(['template', 'reportLocations.location', 'reportLocations.reportPhotos'])
-            ->findOrFail($id);
-
-        // Ensure 16:9 PDF exists and is valid (not empty); generate/regenerate if missing or broken.
-        $pdfFullPath = $report->pdf_path ? storage_path("app/public/{$report->pdf_path}") : null;
-        if (!$pdfFullPath || !file_exists($pdfFullPath) || filesize($pdfFullPath) === 0) {
-            try {
-                $pdfService->generatePdf($report);
-                $report->refresh();
-                $report->load(['template', 'reportLocations.location', 'reportLocations.reportPhotos']);
-                $pdfFullPath = storage_path("app/public/{$report->pdf_path}");
-            } catch (\Throwable $e) {
-                Log::error("Failed to generate PDF before emailing Report #{$id}: " . $e->getMessage());
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Gagal membuat file PDF untuk lampiran email: ' . $e->getMessage(),
-                ], 500);
-            }
-        }
-
-        // Jangan pernah mengirim email "berhasil" tanpa lampiran PDF yang valid.
-        if (!file_exists($pdfFullPath) || filesize($pdfFullPath) === 0) {
-            Log::error("PDF attachment missing/empty when emailing Report #{$id}");
-            return response()->json([
-                'status' => 'error',
-                'message' => 'File PDF lampiran tidak valid atau kosong, email tidak dikirim.',
-            ], 500);
-        }
-
-        try {
-            Mail::to($validated['email'])->send(
-                new ReportSubmittedMail(
-                    $report,
-                    $validated['notes'] ?? null,
-                    $validated['subject'] ?? null
-                )
-            );
-
-            return response()->json([
-                'status' => 'success',
-                'message' => "Laporan berhasil dikirim ke alamat email {$validated['email']}.",
-                'data' => [
-                    'recipient' => $validated['email'],
-                    'report_number' => $report->report_number,
-                    'has_pdf_attached' => !empty($report->pdf_path),
-                ],
-            ]);
-        } catch (\Throwable $e) {
-            Log::error("Failed to send email for Report #{$id}: " . $e->getMessage(), [
-                'trace' => $e->getTraceAsString(),
-            ]);
-
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Gagal mengirim email: ' . $e->getMessage(),
-            ], 500);
-        }
     }
 
     /**
