@@ -444,6 +444,8 @@
 import { ref, reactive, computed, onMounted } from 'vue';
 import api from '../services/api.js';
 import { sharePdfDocument } from '../services/reportShare.js';
+// SEMENTARA (ngrok): lihat services/ngrokWorkaround.js
+import { openReportPdf } from '../services/ngrokWorkaround.js';
 import {
   getQueuedReports,
   syncOfflineQueue,
@@ -573,7 +575,10 @@ const generatePdf = async (rep) => {
   }
 };
 
-const openPdf = (rep) => window.open(`${pdfUrl(rep)}?inline=1`, '_blank');
+const openPdf = async (rep) => {
+  const result = await openReportPdf(rep.id, rep.report_number, `${pdfUrl(rep)}?inline=1`);
+  if (!result.success && !result.cancelled) showToast(result.error || 'Gagal membuka PDF.', 'error');
+};
 
 // Share
 const shareReport = async (rep) => {

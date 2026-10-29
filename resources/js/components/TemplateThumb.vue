@@ -1,7 +1,7 @@
 <template>
   <div class="w-full overflow-hidden rounded-lg border border-navy-200 bg-white">
     <img
-      v-if="previewSrc"
+      v-if="previewSrc && !imageFailed"
       :key="previewSrc"
       :src="previewSrc"
       :alt="`Pratinjau ${name}`"
@@ -22,6 +22,9 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
 import { resolveAssetUrl } from '../services/api';
+// SEMENTARA (ngrok): lihat services/ngrokWorkaround.js. Di server non-ngrok fungsi ini
+// langsung mengembalikan URL aslinya.
+import { loadImageSrc } from '../services/ngrokWorkaround';
 
 const props = defineProps({
   theme: {
@@ -40,16 +43,7 @@ const props = defineProps({
 
 const imageFailed = ref(false);
 
-watch(
-  () => [props.preview, props.name, props.theme],
-  () => {
-    imageFailed.value = false;
-  }
-);
-
-const previewSrc = computed(() => {
-  if (imageFailed.value) return '';
-
+const rawSrc = computed(() => {
   const preview = props.preview?.trim();
 
   if (preview) {
@@ -72,4 +66,25 @@ const previewSrc = computed(() => {
 
   return '';
 });
+
+// Nilai akhir untuk <img :src>. Bukan ngrok = rawSrc apa adanya; ngrok = blob: URL.
+const previewSrc = ref('');
+let loadToken = 0;
+
+watch(
+  rawSrc,
+  async (url) => {
+    const token = ++loadToken;
+    imageFailed.value = false;
+    previewSrc.value = '';
+    if (!url) return;
+    try {
+      const src = await loadImageSrc(url);
+      if (token === loadToken) previewSrc.value = src;
+    } catch {
+      if (token === loadToken) imageFailed.value = true;
+    }
+  },
+  { immediate: true }
+);
 </script>

@@ -317,6 +317,8 @@ import { useRoute } from 'vue-router';
 import api from '../services/api.js';
 import { sharePdfDocument } from '../services/reportShare.js';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.js';
+// SEMENTARA (ngrok): lihat services/ngrokWorkaround.js. Di server non-ngrok perilakunya sama seperti kode biasa.
+import { getPdfJsSource, openReportPdf, downloadReportPdf } from '../services/ngrokWorkaround.js';
 import pdfWorkerUrl from 'pdfjs-dist/legacy/build/pdf.worker.min.js?url';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
@@ -398,10 +400,7 @@ const renderPdfPages = async () => {
   pageImages.value = [];
   try {
     const url = `${baseUrl}/reports/${reportId}/pdf?preview=1`;
-    const loadingTask = pdfjsLib.getDocument({
-      url,
-      withCredentials: false,
-    });
+    const loadingTask = pdfjsLib.getDocument(await getPdfJsSource(url));
     const pdfDoc = await loadingTask.promise;
     const numPages = pdfDoc.numPages;
 
@@ -440,11 +439,21 @@ const doGeneratePdf = async () => {
 };
 
 // Open / Download PDF
-const openPdf = () => {
-  window.open(`${baseUrl}/reports/${reportId}/pdf?inline=1`, '_blank');
+const openPdf = async () => {
+  const result = await openReportPdf(
+    reportId,
+    report.value?.report_number,
+    `${baseUrl}/reports/${reportId}/pdf?inline=1`
+  );
+  if (!result.success && !result.cancelled) generateError.value = result.error;
 };
-const downloadPdf = () => {
-  window.open(`${baseUrl}/reports/${reportId}/pdf`, '_blank');
+const downloadPdf = async () => {
+  const result = await downloadReportPdf(
+    reportId,
+    report.value?.report_number,
+    `${baseUrl}/reports/${reportId}/pdf`
+  );
+  if (!result.success && !result.cancelled) generateError.value = result.error;
 };
 
 // Share Report
