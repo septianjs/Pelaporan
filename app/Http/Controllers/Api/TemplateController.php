@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Template;
+use App\Services\BuiltinTemplateGeneratorService;
 use App\Services\PptxReportService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -33,20 +34,69 @@ class TemplateController extends Controller
                     'description' => $t->description ?: 'Template buatan pengguna',
                     'type'        => 'uploaded',
                     // path saja, host ditentukan frontend
-                    'preview_url' => $t->preview_path ? '/storage/' . $t->preview_path : null,
+                    'preview_url' => "/api/templates/{$t->id}/preview",
+                    'theme'       => $t->theme,
                 ];
             }
 
             return [
                 'id'          => $t->id,
-                'name'        => $cfg[$t->template_key]['name'],
-                'description' => $cfg[$t->template_key]['description'] ?? 'Desain dari file PPTX',
+                'name'        => $cfg[$t->template_key]['name'] ?? $t->name,
+                'description' => $cfg[$t->template_key]['description'] ?? $t->description ?? 'Desain dari file PPTX',
                 'type'        => 'builtin',
-                'preview_url' => "/storage/template-previews/{$t->template_key}.png",
+                'preview_url' => "/api/templates/{$t->id}/preview",
+                'theme'       => $t->theme,
             ];
         })->values();
 
         return response()->json(['data' => $data]);
+    }
+
+    /**
+     * Sajikan gambar thumbnail template lewat API (bukan /storage), sehingga:
+     *  - tidak perlu `php artisan storage:link` / symlink,
+     *  - ikut aturan CORS /api/* (penting untuk aplikasi Android/WebView),
+     *  - template bawaan otomatis dibuatkan gambarnya jika belum ada.
+     */
+    public function preview(int $id, BuiltinTemplateGeneratorService $generator)
+    {
+        $template = Template::findOrFail($id);
+
+        // Urutan pencarian: gambar asli dulu, sketsa otomatis (GD) hanya cadangan terakhir.
+        //  1. preview_path di database (template buatan pengguna / hasil seeder)
+        //  2. template-previews/{key}.png (hasil `php artisan templates:previews`, render PPTX asli)
+        //  3. previews/{key}.png (hasil BuiltinTemplateSeeder)
+        $candidates = array_filter([
+            $template->preview_path,
+            "template-previews/{$template->template_key}.png",
+            "previews/{$template->template_key}.png",
+        ]);
+
+        $path = null;
+        foreach ($candidates as $relative) {
+            $full = storage_path('app/public/' . $relative);
+            if (is_file($full) && filesize($full) > 0) {
+                $path = $full;
+                break;
+            }
+        }
+
+        $path ??= $generator->ensurePreview($template->template_key);
+
+        if (!$path) {
+            return response()->json(['message' => 'Thumbnail belum tersedia.'], 404);
+        }
+
+        $mime = match (strtolower(pathinfo($path, PATHINFO_EXTENSION))) {
+            'jpg', 'jpeg' => 'image/jpeg',
+            'webp'        => 'image/webp',
+            default       => 'image/png',
+        };
+
+        return response()->file($path, [
+            'Content-Type'  => $mime,
+            'Cache-Control' => 'public, max-age=3600',
+        ]);
     }
 
     /**
@@ -126,7 +176,7 @@ class TemplateController extends Controller
                 'name'        => $template->name,
                 'description' => $template->description,
                 'type'        => 'uploaded',
-                'preview_url' => '/storage/' . $template->preview_path,
+                'preview_url' => "/api/templates/{$template->id}/preview",
             ],
             'warnings' => $check['warnings'],
         ], 201);

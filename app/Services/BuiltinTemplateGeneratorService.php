@@ -209,6 +209,31 @@ class BuiltinTemplateGeneratorService
         return $results;
     }
 
+    /**
+     * Pastikan gambar pratinjau untuk satu template ada di disk, lalu kembalikan path-nya.
+     * Dibuat otomatis (GD) jika belum ada, sehingga tidak bergantung pada seeder,
+     * `php artisan storage:link`, maupun LibreOffice. Key tak dikenal memakai tema pertama,
+     * sama seperti PDF (lihat findDefinition).
+     */
+    public function ensurePreview(?string $key): ?string
+    {
+        $definition = self::findDefinition($key);
+        $dir  = storage_path('app/public/previews');
+        $path = $dir . DIRECTORY_SEPARATOR . $definition['key'] . '.png';
+
+        if (is_file($path) && filesize($path) > 0) {
+            return $path;
+        }
+        if (!extension_loaded('gd')) {
+            return null;
+        }
+
+        File::ensureDirectoryExists($dir);
+        $this->createPreviewImage($definition, $path);
+
+        return (is_file($path) && filesize($path) > 0) ? $path : null;
+    }
+
     protected function createPreviewImage(array $template, string $savePath): void
     {
         if (!extension_loaded('gd')) {
@@ -293,7 +318,7 @@ class BuiltinTemplateGeneratorService
             imagefilledellipse($img, 585, 45, 56, 56, $secondary);
         }
 
-        imagestring($img, 2, 16, 10, 'BPSDM • LAPORAN PENGAWASAN LINGKUNGAN', $white);
+        imagestring($img, 2, 16, 10, 'BPSDM - LAPORAN PENGAWASAN LINGKUNGAN', $white);
         $label = strtoupper($template['name']);
         if (strlen($label) > 36) $label = substr($label, 0, 34) . '..';
         imagestring($img, 4, 16, 31, $label, $white);
@@ -324,10 +349,10 @@ class BuiltinTemplateGeneratorService
         imagefilledrectangle($img, 28, 288, 210, 314, $pale);
         imagefilledrectangle($img, 220, 288, 410, 314, $pale);
         imagefilledrectangle($img, 420, 288, 612, 314, $pale);
-        imagestring($img, 2, 28, 264, 'STATUS • CATATAN • PERMASALAHAN • SOLUSI', $white);
+        imagestring($img, 2, 28, 264, 'STATUS | CATATAN | PERMASALAHAN | SOLUSI', $white);
         imagefilledrectangle($img, 0, 336, $w, $h, $primary);
         imagefilledrectangle($img, 0, 332, $w, 336, $accent);
-        imagestring($img, 2, 16, 344, 'PDF WIDESCREEN 16:9 • 6 HALAMAN', $white);
+        imagestring($img, 2, 16, 344, 'PDF WIDESCREEN 16:9 - 6 HALAMAN', $white);
 
         $directory = dirname($savePath);
         if (!is_dir($directory)) {

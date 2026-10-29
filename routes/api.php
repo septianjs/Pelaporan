@@ -28,6 +28,7 @@ Route::get('/locations', [LocationController::class, 'index']);
 
 // Katalog template: bawaan (config) + buatan pengguna (upload PPTX)
 Route::get('/templates', [TemplateController::class, 'index']);
+Route::get('/templates/{id}/preview', [TemplateController::class, 'preview'])->whereNumber('id');
 Route::post('/templates', [TemplateController::class, 'store']);
 Route::delete('/templates/{id}', [TemplateController::class, 'destroy']);
 
