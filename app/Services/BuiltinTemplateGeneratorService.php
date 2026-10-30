@@ -14,124 +14,16 @@ class BuiltinTemplateGeneratorService
     {
         return [
             [
-                'key' => 'corporate-blue',
-                'name' => 'Tropis Nusantara',
-                'description' => 'Komposisi tropis dengan dedaunan, asimetris, dan warna-warna botani cerah.',
-                'primary_color' => '176B45',    // Jungle Emerald
-                'secondary_color' => '35B8AC',  // Lagoon Turquoise
-                'accent_color' => 'F47768',     // Coral Bloom
-                'bg_color' => 'FFF3D8',         // Cream Blossom
-                'card_bg' => 'FFFFFF',
-                'card_alt' => 'FFD45A',         // Banana Yellow
-                'style_type' => 'tropical_pop',
-            ],
-            [
-                'key' => 'government-formal',
-                'name' => 'Batik Nusantara',
-                'description' => 'Bahasa visual ornamen warisan dengan bingkai bermotif bunga dan warna-warna yang hidup.',
-                'primary_color' => '75452D',    // Sogan Cocoa
-                'secondary_color' => '246D78',  // Indigo Teal
-                'accent_color' => 'E8B84D',     // Marigold Gold
-                'bg_color' => 'FFF4DC',         // Ivory Petal
-                'card_bg' => 'FFFFFF',
-                'card_alt' => '4F936B',         // Jade Leaf
-                'style_type' => 'batik_nusantara',
-            ],
-            [
-                'key' => 'modern-clean',
-                'name' => 'Infografis Geometris',
-                'description' => 'Grafis informasi berilustrasi ceria, bentuk geometris tak beraturan, dan pita anotasi.',
-                'primary_color' => '40C9C3',    // Aqua Splash
-                'secondary_color' => 'E85D91',  // Berry Pink
-                'accent_color' => 'F47B42',     // Tangerine Pop
-                'bg_color' => 'FFF7E7',         // Cloud Cream
-                'card_bg' => 'FFFFFF',
-                'card_alt' => 'FFD84D',         // Sunshine Lemon
-                'style_type' => 'comic_pop',
-            ],
-            [
-                'key' => 'minimal-professional',
-                'name' => 'Jurnal Dokumentasi',
-                'description' => 'Jurnal foto kreatif penuh warna dengan bentuk mirip kertas berlapis dan label anotasi.',
-                'primary_color' => '719AE8',    // Cornflower Blue
-                'secondary_color' => 'B9A5E8',  // Lilac Haze
-                'accent_color' => 'F28C5B',     // Papaya Orange
-                'bg_color' => 'FFF5E5',         // Warm Paper
-                'card_bg' => 'FFFFFF',
-                'card_alt' => 'A8DDB5',         // Mint Leaf
-                'style_type' => 'scrapbook',
-            ],
-            [
-                'key' => 'executive-report',
-                'name' => 'Merah Putih Institusional',
-                'description' => 'Perayaan flora Indonesia dengan palet merah-putih, pita mengalir, dan bunga.',
-                'primary_color' => 'D93643',    // Flag Crimson
-                'secondary_color' => '3F8A58',  // Leaf Green
-                'accent_color' => 'F17F73',     // Rosy Coral
-                'bg_color' => 'FFF9EE',         // Jasmine White
-                'card_bg' => 'FFFFFF',
-                'card_alt' => 'F4C451',         // Golden Sunrise
-                'style_type' => 'memphis',
-            ],
-            [
-                'key' => 'photo-focus',
-                'name' => 'Eco Green Report',
-                'description' => 'Penceritaan botani yang melimpah dengan batas dedaunan berlapis dan elemen alam.',
-                'primary_color' => '245A3B',    // Forest Canopy
-                'secondary_color' => '5AA9A2',  // River Blue
-                'accent_color' => 'C96E4B',     // Clay Terracotta
-                'bg_color' => 'F6EBD5',         // Oat Cream
-                'card_bg' => 'FFFFFF',
-                'card_alt' => '7B9D55',         // Moss Green
-                'style_type' => 'festival',
-            ],
-            [
-                'key' => 'elegant-report',
-                'name' => 'Arsip Klasik',
-                'description' => 'Buku catatan lapangan berilustrasi ceria dengan penanda observasi dan tab.',
-                'primary_color' => '287F83',    // Notebook Teal
-                'secondary_color' => '8C9CE6',  // Periwinkle
-                'accent_color' => 'F4A261',     // Apricot Orange
-                'bg_color' => 'FFF7E9',         // Paper White
-                'card_bg' => 'FFFFFF',
-                'card_alt' => '69A96B',         // Fresh Fern
-                'style_type' => 'retro_groovy',
-            ],
-            [
-                'key' => 'bpsdm-classic',
-                'name' => 'Majalah Editorial',
-                'description' => 'Majalah berilustrasi ekspresif dengan ukuran foto bervariasi dan sapuan dekoratif.',
-                'primary_color' => '218C8D',    // Ocean Teal
-                'secondary_color' => '9867C5',  // Violet Bloom
-                'accent_color' => 'F59E42',     // Mango Orange
-                'bg_color' => 'FFF3D9',         // Vanilla Cream
-                'card_bg' => 'FFFFFF',
-                'card_alt' => 'F06467',         // Electric Coral
-                'style_type' => 'rainbow_infographic',
-            ],
-            [
-                'key' => 'modern-government',
-                'name' => 'Blueprint Inspeksi',
-                'description' => 'Observasi lapangan berilustrasi dengan penanda lokasi, jalur putus-putus, dan simbol inspeksi.',
-                'primary_color' => '38A6B8',    // Lagoon Blue
-                'secondary_color' => '4E9669',  // Garden Green
-                'accent_color' => 'F27D65',     // Papaya Coral
-                'bg_color' => 'FFF4DF',         // Soft Sand
-                'card_bg' => 'FFFFFF',
-                'card_alt' => 'F4CB55',         // Sunflower Yellow
-                'style_type' => 'paper_cut',
-            ],
-            [
-                'key' => 'clean-documentation',
-                'name' => 'Emerald Gold Ornamental',
-                'description' => 'Taman botani zamrud dengan bingkai bunga berlapis, sulur, dan sentuhan emas.',
-                'primary_color' => '176B50',    // Emerald Velvet
-                'secondary_color' => '76B99A',  // Jade Blossom
-                'accent_color' => 'ED8179',     // Peony Coral
-                'bg_color' => 'FFF4DD',         // Pearl Cream
-                'card_bg' => 'FFFFFF',
-                'card_alt' => 'E7BD57',         // Marigold Gold
-                'style_type' => 'botanical',
+                'key' => '',
+                'name' => '',
+                'description' => '',
+                'primary_color' => '',    // Jungle Emerald
+                'secondary_color' => '',  // Lagoon Turquoise
+                'accent_color' => '',     // Coral Bloom
+                'bg_color' => '',         // Cream Blossom
+                'card_bg' => '',
+                'card_alt' => '',         // Banana Yellow
+                'style_type' => '',
             ],
         ];
     }
@@ -218,7 +110,7 @@ class BuiltinTemplateGeneratorService
     public function ensurePreview(?string $key): ?string
     {
         $definition = self::findDefinition($key);
-        $dir  = storage_path('app/public/previews');
+        $dir  = storage_path('app/public/template-previews');
         $path = $dir . DIRECTORY_SEPARATOR . $definition['key'] . '.png';
 
         if (is_file($path) && filesize($path) > 0) {

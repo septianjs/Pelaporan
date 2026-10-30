@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Template;
-use App\Services\BuiltinTemplateGeneratorService;
 use App\Services\PptxReportService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -58,33 +57,53 @@ class TemplateController extends Controller
      *  - ikut aturan CORS /api/* (penting untuk aplikasi Android/WebView),
      *  - template bawaan otomatis dibuatkan gambarnya jika belum ada.
      */
-    public function preview(int $id, BuiltinTemplateGeneratorService $generator)
+    public function preview(int $id, Request $request)
     {
         $template = Template::findOrFail($id);
 
-        // Urutan pencarian: gambar asli dulu, sketsa otomatis (GD) hanya cadangan terakhir.
-        //  1. preview_path di database (template buatan pengguna / hasil seeder)
-        //  2. template-previews/{key}.png (hasil `php artisan templates:previews`, render PPTX asli)
-        //  3. previews/{key}.png (hasil BuiltinTemplateSeeder)
-        $candidates = array_filter([
-            $template->preview_path,
-            "template-previews/{$template->template_key}.png",
-            "previews/{$template->template_key}.png",
-        ]);
+        // Hanya memakai gambar asli (render PPTX / unggahan pengguna), tanpa sketsa otomatis.
+        //  1. preview_path di database (template buatan pengguna)
+        //  2. template-previews/{key}.png (render PPTX asli)
+        //  3. template-previews/template-0N.png bila nama template berbentuk "Template 0N"
+        $candidates = [];
+        if ($template->type === 'uploaded' && $template->preview_path) {
+            $candidates[] = $template->preview_path;
+        }
+        $candidates[] = "template-previews/{$template->template_key}.png";
+        if (preg_match('/templa?te\s*0?(\d+)/i', (string) $template->name, $m)) {
+            $candidates[] = sprintf('template-previews/template-%02d.png', (int) $m[1]);
+        }
+        if ($template->preview_path) {
+            $candidates[] = $template->preview_path;
+        }
 
         $path = null;
-        foreach ($candidates as $relative) {
+        $checked = [];
+        foreach (array_unique($candidates) as $relative) {
             $full = storage_path('app/public/' . $relative);
-            if (is_file($full) && filesize($full) > 0) {
+            $ok = is_file($full) && filesize($full) > 0;
+            $checked[] = ['file' => $relative, 'ada' => $ok];
+            if ($ok && !$path) {
                 $path = $full;
-                break;
             }
         }
 
-        $path ??= $generator->ensurePreview($template->template_key);
+        // Diagnosa: /api/templates/{id}/preview?debug=1
+        if ($request->boolean('debug')) {
+            return response()->json([
+                'id'           => $template->id,
+                'name'         => $template->name,
+                'template_key' => $template->template_key,
+                'type'         => $template->type,
+                'preview_path' => $template->preview_path,
+                'storage_dir'  => storage_path('app/public'),
+                'dicek'        => $checked,
+                'dipakai'      => $path,
+            ]);
+        }
 
         if (!$path) {
-            return response()->json(['message' => 'Thumbnail belum tersedia.'], 404);
+            return response()->json(['message' => 'Thumbnail belum tersedia. Jalankan: php artisan templates:previews'], 404);
         }
 
         $mime = match (strtolower(pathinfo($path, PATHINFO_EXTENSION))) {
@@ -93,9 +112,10 @@ class TemplateController extends Controller
             default       => 'image/png',
         };
 
+        // no-cache: browser/WebView wajib cek ulang, supaya gambar lama tidak menempel.
         return response()->file($path, [
             'Content-Type'  => $mime,
-            'Cache-Control' => 'public, max-age=3600',
+            'Cache-Control' => 'no-cache, must-revalidate',
         ]);
     }
 

@@ -73,7 +73,7 @@
     </div>
 
     <!-- ── TEMPLATE CARDS ── -->
-    <div v-else class="space-y-4">
+    <div v-else class="spce-y-4">
       <div
         v-for="tpl in templates"
         :key="tpl.id"
