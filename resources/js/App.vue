@@ -1,5 +1,8 @@
 <template>
   <div class="h-dvh sm:h-auto sm:min-h-screen bg-[#E3E6EC] flex justify-center items-start sm:py-6 selection:bg-[#1B2C4D] selection:text-white">
+    <!-- Animated Splash Screen -->
+    <SplashScreen />
+
     <!-- Main Frame Container: Seamless mobile edge-to-edge, refined desktop tablet dock -->
     <div class="w-full max-w-md h-dvh sm:h-[850px] bg-[#F5F7FA] flex flex-col overflow-hidden sm:rounded-3xl sm:border sm:border-navy-300/70 shadow-[0_20px_50px_-15px_rgba(28,25,23,0.08)] relative">
       <!-- Top App Bar -->
@@ -66,6 +69,7 @@ import { computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import TopHeader from './components/TopHeader.vue';
 import BottomNav from './components/BottomNav.vue';
+import SplashScreen from './components/SplashScreen.vue';
 import api from './services/api.js';
 import {
   isOnline,

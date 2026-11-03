@@ -10,6 +10,13 @@
   "plugins": {
     "Camera": {
       "permissionsType": "prompt"
+    },
+    "SplashScreen": {
+      "launchAutoHide": false,
+      "backgroundColor": "#14213D",
+      "androidScaleType": "CENTER_CROP",
+      "splashFullScreen": true,
+      "splashImmersive": true
     }
   },
   "android": {
