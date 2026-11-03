@@ -510,6 +510,7 @@
 import { ref, reactive, computed, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import api, { getApiUrl } from '../services/api';
+import { getDeviceId, getDefaultOfficerName, setDefaultOfficerName } from '../services/deviceId.js';
 import PhotoUploader from '../components/PhotoUploader.vue';
 import TemplateThumb from '../components/TemplateThumb.vue';
 import {
@@ -587,7 +588,7 @@ const todayIso = () => {
 const form = reactive({
   report_number: `LAP-BPSDM-${new Date().getFullYear()}-OFFLINE-${Date.now()}`,
   inspection_date: todayIso(),
-  officer_name: '',
+  officer_name: getDefaultOfficerName(),
   officer_photo: null,
   template_id: 1,
   locations: [
@@ -807,6 +808,7 @@ const submitReport = async () => {
     formData.append('report_number', form.report_number);
     formData.append('inspection_date', form.inspection_date);
     formData.append('officer_name', form.officer_name);
+    formData.append('device_id', getDeviceId());
     formData.append('template_id', form.template_id);
     
     console.log('[DEBUG FOTO PETUGAS]', {
@@ -854,6 +856,7 @@ const submitReport = async () => {
     });
 
     if (res.data && res.data.status === 'success') {
+      setDefaultOfficerName(form.officer_name);
       await clearFormDraft();
       const newReportId = res.data.data.id;
       // Navigasi langsung ke halaman preview laporan yang baru dibuat —

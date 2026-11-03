@@ -55,16 +55,20 @@ const imageCache = new Map();
  * Ngrok        -> blob: URL hasil unduhan lewat axios.
  */
 export const loadImageSrc = async (url) => {
-  if (!url || !isNgrokActive()) return url;
+  if (!url) return '';
+  const requiresBearer = /\/api\/templates\/\d+\/preview(?:[/?]|$)/i.test(url);
+  if (!isNgrokActive() && !requiresBearer) return url;
 
   if (!imageCache.has(url)) {
     const job = api
       .get(url, { baseURL: '', responseType: 'blob' })
       .then((res) => {
-        if (!res.data?.type?.startsWith('image/')) {
-          throw new Error('Respons bukan gambar');
+        if (!res.data || res.data.size === 0) {
+          throw new Error('Respons blob kosong');
         }
-        return URL.createObjectURL(res.data);
+        const type = res.data.type || 'image/png';
+        const blob = type.startsWith('image/') ? res.data : new Blob([res.data], { type: 'image/png' });
+        return URL.createObjectURL(blob);
       })
       .catch((err) => {
         imageCache.delete(url); // jangan simpan kegagalan, boleh dicoba lagi

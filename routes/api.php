@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\LocationController;
+use App\Http\Controllers\Api\DeviceController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\TemplateController;
 use App\Models\Report;
@@ -11,7 +12,7 @@ use Illuminate\Support\Facades\Route;
 | API Routes
 |--------------------------------------------------------------------------
 | Pelaporan Pengawasan Lingkungan Kantor BPSDM API
-| No authentication required.
+| Device registration is public; protected resources require device bearer authentication.
 */
 
 Route::get('/ping', function () {
@@ -26,24 +27,28 @@ Route::get('/ping', function () {
 // Master Lokasi Pengawasan
 Route::get('/locations', [LocationController::class, 'index']);
 
-// Katalog template: bawaan (config) + buatan pengguna (upload PPTX)
-Route::get('/templates', [TemplateController::class, 'index']);
-Route::get('/templates/{id}/preview', [TemplateController::class, 'preview'])->whereNumber('id');
-Route::post('/templates', [TemplateController::class, 'store']);
-Route::delete('/templates/{id}', [TemplateController::class, 'destroy']);
+// Registrasi perangkat baru dibuat publik karena belum memiliki token.
+Route::post('/devices/register', [DeviceController::class, 'register'])->middleware('throttle:10,1');
 
-// Helper Nomor Laporan Otomatis
-Route::get('/reports/next-number', function () {
-    return response()->json([
-        'status' => 'success',
-        'report_number' => Report::generateNextNumber(),
-    ]);
+Route::middleware(['device.auth'])->group(function () {
+    Route::get('/templates', [TemplateController::class, 'index']);
+    Route::get('/templates/{id}/preview', [TemplateController::class, 'preview'])->whereNumber('id');
+    Route::post('/templates', [TemplateController::class, 'store'])->middleware('throttle:10,1');
+    Route::delete('/templates/{id}', [TemplateController::class, 'destroy'])->middleware('throttle:30,1');
+
+    // Helper Nomor Laporan Otomatis
+    Route::get('/reports/next-number', function () {
+        return response()->json([
+            'status' => 'success',
+            'report_number' => Report::generateNextNumber(),
+        ]);
+    });
+
+    // Laporan Pengawasan Lingkungan
+    Route::get('/reports', [ReportController::class, 'index']);
+    Route::post('/reports', [ReportController::class, 'store'])->middleware('throttle:10,1');
+    Route::get('/reports/{id}', [ReportController::class, 'show'])->whereNumber('id');
+    Route::delete('/reports/{id}', [ReportController::class, 'destroy'])->whereNumber('id')->middleware('throttle:30,1');
+    Route::post('/reports/{id}/generate-pdf', [ReportController::class, 'generatePdf'])->whereNumber('id')->middleware('throttle:10,1');
+    Route::get('/reports/{id}/pdf', [ReportController::class, 'downloadPdf'])->whereNumber('id');
 });
-
-// Laporan Pengawasan Lingkungan
-Route::get('/reports', [ReportController::class, 'index']);
-Route::post('/reports', [ReportController::class, 'store']);
-Route::get('/reports/{id}', [ReportController::class, 'show']);
-Route::delete('/reports/{id}', [ReportController::class, 'destroy']);
-Route::post('/reports/{id}/generate-pdf', [ReportController::class, 'generatePdf']);
-Route::get('/reports/{id}/pdf', [ReportController::class, 'downloadPdf']);

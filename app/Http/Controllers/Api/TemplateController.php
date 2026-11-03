@@ -16,22 +16,29 @@ class TemplateController extends Controller
     /**
      * Daftar template: bawaan (config/report_templates.php) + buatan pengguna (type=uploaded).
      */
-        public function index(): JsonResponse
+        public function index(Request $request): JsonResponse
     {
+        $deviceId = $request->attributes->get('authenticatedDevice')->public_id;
         $cfg = config('report_templates.templates');
 
         $rows = Template::where('active', true)
             ->where(fn ($q) => $q->whereIn('template_key', array_keys($cfg))->orWhere('type', 'uploaded'))
+            ->where(fn ($q) => $q->where('type', '!=', 'uploaded')
+                ->orWhereNull('device_id')
+                ->orWhere('device_id', $deviceId))
             ->orderBy('id')
             ->get();
 
-        $data = $rows->map(function (Template $t) use ($cfg) {
+        $data = $rows->map(function (Template $t) use ($cfg, $deviceId) {
+            $isOwner = $t->type === 'uploaded' && (!$t->device_id || $t->device_id === $deviceId);
+
             if ($t->type === 'uploaded') {
                 return [
                     'id'          => $t->id,
                     'name'        => $t->name,
                     'description' => $t->description ?: 'Template buatan pengguna',
                     'type'        => 'uploaded',
+                    'is_owner'    => $isOwner,
                     // path saja, host ditentukan frontend
                     'preview_url' => "/api/templates/{$t->id}/preview",
                     'theme'       => $t->theme,
@@ -43,6 +50,7 @@ class TemplateController extends Controller
                 'name'        => $cfg[$t->template_key]['name'] ?? $t->name,
                 'description' => $cfg[$t->template_key]['description'] ?? $t->description ?? 'Desain dari file PPTX',
                 'type'        => 'builtin',
+                'is_owner'    => false,
                 'preview_url' => "/api/templates/{$t->id}/preview",
                 'theme'       => $t->theme,
             ];
@@ -60,6 +68,11 @@ class TemplateController extends Controller
     public function preview(int $id, Request $request)
     {
         $template = Template::findOrFail($id);
+        if ($template->type === 'uploaded'
+            && $template->device_id !== null
+            && $template->device_id !== $request->attributes->get('authenticatedDevice')->public_id) {
+            abort(404);
+        }
 
         // Hanya memakai gambar asli (render PPTX / unggahan pengguna), tanpa sketsa otomatis.
         //  1. preview_path di database (template buatan pengguna)
@@ -80,7 +93,10 @@ class TemplateController extends Controller
         $path = null;
         $checked = [];
         foreach (array_unique($candidates) as $relative) {
-            $full = storage_path('app/public/' . $relative);
+                if (!preg_match('#^[a-zA-Z0-9][a-zA-Z0-9._/-]*$#', $relative) || str_contains($relative, '..')) {
+                    continue;
+                }
+                $full = storage_path('app/public/' . $relative);
             $ok = is_file($full) && filesize($full) > 0;
             $checked[] = ['file' => $relative, 'ada' => $ok];
             if ($ok && !$path) {
@@ -114,8 +130,11 @@ class TemplateController extends Controller
 
         // no-cache: browser/WebView wajib cek ulang, supaya gambar lama tidak menempel.
         return response()->file($path, [
-            'Content-Type'  => $mime,
-            'Cache-Control' => 'no-cache, must-revalidate',
+            'Content-Type'                  => $mime,
+            'Cache-Control'                 => 'no-cache, must-revalidate',
+            'Access-Control-Allow-Origin'   => '*',
+            'Access-Control-Allow-Methods'  => 'GET, OPTIONS',
+            'Access-Control-Allow-Headers'  => '*',
         ]);
     }
 
@@ -172,12 +191,15 @@ class TemplateController extends Controller
         File::ensureDirectoryExists($previewDir);
         $thumb->move($previewDir, "$key.$ext");
 
+        $deviceId = $request->attributes->get('authenticatedDevice')->public_id;
+
         try {
             $template = Template::create([
                 'name'         => $validated['name'],
                 'template_key' => $key,
                 'description'  => $validated['description'] ?? null,
                 'type'         => 'uploaded',
+                'device_id'    => $deviceId,
                 'pptx_path'    => "uploaded/$pptxFile",
                 'preview_path' => "template-previews/$key.$ext",
                 'active'       => true,
@@ -207,12 +229,17 @@ class TemplateController extends Controller
      * yang sudah dipakai laporan ditolak (relasi laporan -> template bersifat cascade delete,
      * sehingga menghapusnya akan ikut menghapus laporan).
      */
-    public function destroy(int $id): JsonResponse
+    public function destroy(int $id, Request $request): JsonResponse
     {
         $template = Template::findOrFail($id);
 
         if ($template->type !== 'uploaded') {
             return response()->json(['message' => 'Template bawaan tidak dapat dihapus.'], 403);
+        }
+
+        $deviceId = $request->attributes->get('authenticatedDevice')->public_id;
+        if ($template->device_id !== $deviceId) {
+            return response()->json(['message' => 'Template ini dibuat oleh perangkat lain dan tidak dapat dihapus.'], 403);
         }
 
         $used = $template->reports()->count();

@@ -1,4 +1,5 @@
 import { ref, toRaw } from 'vue';
+import { getDeviceId } from './deviceId.js';
 
 const DB_NAME = 'bpsdm_pelaporan_db';
 const DB_VERSION = 1;
@@ -189,6 +190,7 @@ export async function queueOfflineReport(reportPayload) {
       createdAt: new Date().toISOString(),
       report_number: reportPayload.report_number,
       officer_name: reportPayload.officer_name,
+      device_id: reportPayload.device_id || getDeviceId(),
       inspection_date: reportPayload.inspection_date,
       template_id: reportPayload.template_id,
       officer_photo: toPlain(reportPayload.officer_photo) || null,
@@ -260,6 +262,7 @@ export async function syncOfflineQueue(apiInstance) {
       formData.append('report_number', item.report_number);
       formData.append('inspection_date', item.inspection_date);
       formData.append('officer_name', item.officer_name);
+      formData.append('device_id', item.device_id || getDeviceId());
       formData.append('template_id', item.template_id);
 
       if (item.officer_photo instanceof Blob || item.officer_photo instanceof File) {

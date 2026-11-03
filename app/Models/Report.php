@@ -17,6 +17,7 @@ class Report extends Model
         'report_number',
         'inspection_date',
         'officer_name',
+        'device_id',
         'officer_photo',
         'template_id',
         'pdf_path',
@@ -54,7 +55,7 @@ class Report extends Model
     public function getOfficerPhotoUrlAttribute(): ?string
     {
         if ($this->officer_photo) {
-            return asset('storage/' . $this->officer_photo);
+            return '/storage/' . ltrim($this->officer_photo, '/');
         }
         return null;
     }
@@ -62,7 +63,7 @@ class Report extends Model
     public function getPdfUrlAttribute(): ?string
     {
         if ($this->pdf_path) {
-            return asset('storage/' . $this->pdf_path);
+            return '/storage/' . ltrim($this->pdf_path, '/');
         }
         return null;
     }

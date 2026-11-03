@@ -1,3 +1,14 @@
+<IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+    Header set Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept, Authorization, ngrok-skip-browser-warning"
+</IfModule>
+
+# Upload directories must never execute server-side scripts.
+<FilesMatch "\.(php[0-9]?|phtml|phar|phps|cgi|pl|py)$">
+    Require all denied
+</FilesMatch>
+
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes

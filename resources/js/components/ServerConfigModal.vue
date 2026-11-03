@@ -43,12 +43,12 @@
             <input
               v-model="serverUrlInput"
               type="url"
-              placeholder="http://192.168.1.100:8000/api"
+              placeholder="https://server.example.com/api"
               class="server-input"
               @keyup.enter="saveServerUrl"
             />
             <p class="input-hint">
-              Format: <code>http://IP_KOMPUTER:8000/api</code><br>
+              Format: <code>https://server.example.com/api</code><br>
               Jalankan <code>php artisan serve --host=0.0.0.0</code> di komputer
             </p>
           </div>
@@ -138,8 +138,15 @@ const saveServerUrl = async () => {
     configError.value = 'Masukkan alamat server.';
     return;
   }
-  if (!url.startsWith('http://') && !url.startsWith('https://')) {
-    configError.value = 'URL harus diawali dengan http:// atau https://';
+  let parsedUrl;
+  try {
+    parsedUrl = new URL(url);
+  } catch {
+    configError.value = 'Format alamat server tidak valid.';
+    return;
+  }
+  if (parsedUrl.protocol !== 'https:' || parsedUrl.username || parsedUrl.password) {
+    configError.value = 'URL server produksi harus HTTPS dan tidak boleh memuat kredensial.';
     return;
   }
 
@@ -373,4 +380,3 @@ const resetServerUrl = () => {
   transform: translateY(100%);
 }
 </style>
-

@@ -1,6 +1,7 @@
 
 import axios from 'axios';
 import { Capacitor } from '@capacitor/core';
+import { ensureDeviceRegistered, forgetDeviceToken } from './deviceId.js';
 
 const STORAGE_KEY = 'bpsdm_api_base_url';
 
@@ -15,7 +16,7 @@ const getBaseUrl = () => {
     if (Capacitor.isNativePlatform()) {
         const envUrl = import.meta.env.VITE_API_BASE_URL;
         if (envUrl) return envUrl.replace(/\/+$/, '');
-        return 'http://10.0.2.2:8000/api';
+        return '';
     }
 
     // 3. Browser: pakai /api di server yang sama
@@ -34,6 +35,30 @@ const api = axios.create({
     },
     timeout: 120000,
 });
+
+// Otomatis kirim identitas perangkat (Device ID) pada setiap permintaan
+api.interceptors.request.use(async (config) => {
+    if (config.url?.endsWith('/devices/register')) return config;
+    const token = await ensureDeviceRegistered(config.baseURL || api.defaults.baseURL, false);
+    config.headers.Authorization = `Bearer ${token}`;
+    return config;
+});
+
+api.interceptors.response.use(
+    (response) => response,
+    async (error) => {
+        const config = error.config;
+        if (error.response?.status === 401 && config && !config._deviceRegistrationRetried) {
+            config._deviceRegistrationRetried = true;
+            forgetDeviceToken();
+            const token = await ensureDeviceRegistered(config.baseURL || api.defaults.baseURL, true);
+            config.headers = config.headers || {};
+            config.headers.Authorization = `Bearer ${token}`;
+            return api.request(config);
+        }
+        return Promise.reject(error);
+    }
+);
 
 
 export const isApiUnconfigured = () => {
@@ -59,7 +84,12 @@ export const getApiUrl = () => api.defaults.baseURL;
 
 export const resolveAssetUrl = (path) => {
     if (!path) return '';
-    const clean = path.replace(/^https?:\/\/[^/]+/i, '');
+    // Strip domain if present (e.g. from an old absolute url or ngrok url)
+    let clean = path.replace(/^https?:\/\/[^/]+/i, '');
+    // If path starts with /api/storage/, normalize to /storage/
+    clean = clean.replace(/^\/api\/storage\//i, '/storage/');
+    if (!clean.startsWith('/')) clean = '/' + clean;
+
     const base = api.defaults.baseURL || '';
     if (/^https?:\/\//i.test(base)) {
         return base.replace(/\/api\/?$/, '') + clean;

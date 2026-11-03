@@ -1,11 +1,11 @@
 {
   "appId": "com.bpsdm.pelaporan",
-  "appName": "PELAPORAN PENGAWASAN LINGKUNGAN KANTOR BPSDM",
+  "appName": "Decora",
   "webDir": "dist",
   "bundledWebRuntime": false,
   "server": {
-    "androidScheme": "http",
-    "cleartext": true
+    "androidScheme": "https",
+    "cleartext": false
   },
   "plugins": {
     "Camera": {
@@ -20,6 +20,6 @@
     }
   },
   "android": {
-    "allowMixedContent": true
+    "allowMixedContent": false
   }
 }

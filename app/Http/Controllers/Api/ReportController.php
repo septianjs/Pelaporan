@@ -25,8 +25,13 @@ class ReportController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
+        $deviceId = $request->attributes->get('authenticatedDevice')->public_id;
+
         $query = Report::with(['template', 'reportLocations.location', 'reportLocations.reportPhotos'])
             ->orderBy('id', 'desc');
+
+        // Token device adalah satu-satunya identitas kepemilikan laporan.
+        $query->where('device_id', $deviceId);
 
         if ($request->filled('search')) {
             $search = $request->input('search');
@@ -66,13 +71,15 @@ class ReportController extends Controller
 
         $reports = $query->paginate($request->input('per_page', 20));
 
-        // Quick Stats Summary
+        // Quick Stats Summary yang disesuaikan dengan scope perangkat
+        $statsQuery = Report::where('device_id', $deviceId);
+
         $stats = [
-            'total' => Report::count(),
-            'this_month' => Report::whereYear('inspection_date', date('Y'))
+            'total' => (clone $statsQuery)->count(),
+            'this_month' => (clone $statsQuery)->whereYear('inspection_date', date('Y'))
                 ->whereMonth('inspection_date', date('m'))
                 ->count(),
-            'needs_attention' => Report::whereHas('reportLocations', function ($q) {
+            'needs_attention' => (clone $statsQuery)->whereHas('reportLocations', function ($q) {
                 $q->where('condition', 'needs_attention');
             })->count(),
         ];
@@ -96,8 +103,10 @@ class ReportController extends Controller
             'report_number' => trim((string) $request->input('report_number', '')),
         ]);
 
+        $deviceId = $request->attributes->get('authenticatedDevice')->public_id;
+
         $validated = $request->validate([
-            'report_number' => 'required|string|max:100|unique:reports,report_number',
+            'report_number' => 'required|string|max:100',
             'inspection_date' => 'required|date',
             'officer_name' => 'required|string|max:255',
             'template_id' => ['required', \Illuminate\Validation\Rule::exists('templates', 'id')
@@ -105,23 +114,30 @@ class ReportController extends Controller
                     fn ($q) => $q->whereIn('template_key', array_keys(config('report_templates.templates')))
                         ->orWhere('type', 'uploaded')
                 ))],
-            'officer_photo' => 'nullable|file|mimes:jpg,jpeg,png,webp|max:10240',
+            'officer_photo' => 'nullable|file|image|mimes:jpg,jpeg,png,webp|max:10240',
             'locations' => 'required|array|min:1',
             'locations.*.location_id' => 'required|exists:locations,id',
             'locations.*.name' => 'required|string|max:150',
             'locations.*.condition' => 'required|in:clean,needs_attention',
+            'locations.*.photo_1' => 'nullable|file|image|mimes:jpg,jpeg,png,webp|max:10240',
+            'locations.*.photo_2' => 'nullable|file|image|mimes:jpg,jpeg,png,webp|max:10240',
         ]);
 
-        $report = DB::transaction(function () use ($request, $validated) {
+        $report = DB::transaction(function () use ($request, $validated, $deviceId) {
             $reportNumber = trim($validated['report_number']);
+
+            // Pencegahan bentrok nomor laporan antar HP (Anti-Collision):
+            // Jika nomor laporan sudah pernah ada di database (misal disubmit HP lain),
+            // otomatis berikan nomor urut baru agar data HP ini TIDAK GAGAL & TIDAK MENIMPA!
+            while (Report::where('report_number', $reportNumber)->exists()) {
+                $reportNumber = Report::generateNextNumber();
+            }
 
             // Handle Officer Photo
             $officerPhotoPath = null;
             if ($request->hasFile('officer_photo')) {
                 $file = $request->file('officer_photo');
-                $ext = $file->getClientOriginalExtension() ?: 'jpg';
-                $fileName = 'officer_' . time() . '_' . Str::random(8) . '.' . $ext;
-                $officerPhotoPath = $file->storeAs('photos', $fileName, 'public');
+                $officerPhotoPath = $file->store('photos', 'public');
             }
 
             // Create Report
@@ -129,6 +145,7 @@ class ReportController extends Controller
                 'report_number' => $reportNumber,
                 'inspection_date' => $validated['inspection_date'],
                 'officer_name' => $validated['officer_name'],
+                'device_id' => $deviceId,
                 'officer_photo' => $officerPhotoPath,
                 'template_id' => $validated['template_id'],
                 'status' => 'completed',
@@ -166,9 +183,7 @@ class ReportController extends Controller
                 $p1Key = "locations.{$index}.photo_1";
                 if ($request->hasFile($p1Key)) {
                     $file1 = $request->file($p1Key);
-                    $ext = $file1->getClientOriginalExtension() ?: 'jpg';
-                    $fileName1 = "loc_{$locationId}_p1_" . time() . '_' . Str::random(8) . '.' . $ext;
-                    $path1 = $file1->storeAs('photos', $fileName1, 'public');
+                    $path1 = $file1->store('photos', 'public');
 
                     ReportPhoto::create([
                         'report_location_id' => $reportLocation->id,
@@ -181,9 +196,7 @@ class ReportController extends Controller
                 $p2Key = "locations.{$index}.photo_2";
                 if ($request->hasFile($p2Key)) {
                     $file2 = $request->file($p2Key);
-                    $ext = $file2->getClientOriginalExtension() ?: 'jpg';
-                    $fileName2 = "loc_{$locationId}_p2_" . time() . '_' . Str::random(8) . '.' . $ext;
-                    $path2 = $file2->storeAs('photos', $fileName2, 'public');
+                    $path2 = $file2->store('photos', 'public');
 
                     ReportPhoto::create([
                         'report_location_id' => $reportLocation->id,
@@ -218,9 +231,10 @@ class ReportController extends Controller
     /**
      * Display the specified report.
      */
-    public function show(int $id): JsonResponse
+    public function show(int $id, Request $request): JsonResponse
     {
         $report = Report::with(['template', 'reportLocations.location', 'reportLocations.reportPhotos'])
+            ->where('device_id', $request->attributes->get('authenticatedDevice')->public_id)
             ->findOrFail($id);
 
         return response()->json([
@@ -232,9 +246,9 @@ class ReportController extends Controller
     /**
      * Trigger manual generation / regeneration of 16:9 PDF for a report.
      */
-    public function generatePdf(int $id, ReportPdfService $pdfService): JsonResponse
+    public function generatePdf(int $id, ReportPdfService $pdfService, Request $request): JsonResponse
     {
-        $report = Report::findOrFail($id);
+        $report = Report::where('device_id', $request->attributes->get('authenticatedDevice')->public_id)->findOrFail($id);
         try {
             $pdfService->generatePdf($report);
             $report->refresh();
@@ -258,7 +272,7 @@ class ReportController extends Controller
      */
     public function downloadPdf(int $id, Request $request)
     {
-        $report = Report::findOrFail($id);
+        $report = Report::where('device_id', $request->attributes->get('authenticatedDevice')->public_id)->findOrFail($id);
 
         $fullPath = $report->pdf_path ? storage_path("app/public/{$report->pdf_path}") : null;
 
@@ -307,9 +321,9 @@ class ReportController extends Controller
     /**
      * Remove the specified report and associated files.
      */
-    public function destroy(int $id): JsonResponse
+    public function destroy(int $id, Request $request): JsonResponse
     {
-        $report = Report::findOrFail($id);
+        $report = Report::where('device_id', $request->attributes->get('authenticatedDevice')->public_id)->findOrFail($id);
 
         // Delete officer photo if exists
         if ($report->officer_photo && Storage::disk('public')->exists($report->officer_photo)) {

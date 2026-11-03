@@ -28,7 +28,7 @@ class ReportPhoto extends Model
     public function getPhotoUrlAttribute(): ?string
     {
         if ($this->file_path) {
-            return asset('storage/' . $this->file_path);
+            return '/storage/' . ltrim($this->file_path, '/');
         }
         return null;
     }

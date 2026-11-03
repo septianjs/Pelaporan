@@ -215,23 +215,8 @@
           </span>
         </div>
 
-        <!-- Middle row: avatar + meta -->
+        <!-- Middle row: report meta -->
         <div class="flex items-start gap-3">
-          <div class="officer-avatar-box">
-            <img
-              v-if="rep.officer_photo_url"
-              :src="rep.officer_photo_url"
-              alt="Foto Petugas"
-              class="w-full h-full object-cover"
-            />
-            <div v-else class="w-full h-full flex items-center justify-center text-navy-400">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
-              </svg>
-            </div>
-          </div>
-
           <div class="flex-1 min-w-0 text-xs space-y-0.5">
             <p class="font-bold text-navy-900 truncate">{{ rep.officer_name }}</p>
             <p class="text-[11px] text-navy-500">

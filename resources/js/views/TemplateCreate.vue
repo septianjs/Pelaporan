@@ -62,25 +62,17 @@
 
         <div>
           <p class="req-title">Penanda yang tersedia</p>
-          <div class="table-container">
-            <table class="w-full text-[11px]">
-              <thead class="table-head">
-                <tr>
-                  <th class="text-left px-3 py-2">Penanda</th>
-                  <th class="text-left px-3 py-2">Diisi dengan</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="t in tokens"
-                  :key="t[0]"
-                  class="border-t border-[#DEE2EB]"
-                >
-                  <td class="px-3 py-1.5 font-mono whitespace-nowrap">{{ t[0] }}</td>
-                  <td class="px-3 py-1.5">{{ t[1] }}</td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="tokens-container">
+            <div
+              v-for="t in tokens"
+              :key="t[0]"
+              class="token-card"
+            >
+              <div class="token-code-row">
+                <span class="token-code-badge">{{ t[0] }}</span>
+              </div>
+              <p class="token-desc-text">{{ t[1] }}</p>
+            </div>
           </div>
           <p class="mt-2 text-[#676F7F]">
             Ganti angka 1 dengan nomor lokasi 1 sampai 5. Penulisan tidak membedakan huruf besar/kecil. Satu penanda sebaiknya diketik utuh dalam satu kali ketikan agar tidak terpecah.
@@ -383,15 +375,51 @@ onBeforeUnmount(() => { if (thumbUrl.value) URL.revokeObjectURL(thumbUrl.value);
   margin-bottom: 0.25rem;
 }
 
-.table-container {
+.tokens-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 280px;
+  overflow-y: auto;
+  padding-right: 0.25rem;
   border-radius: 0.75rem;
   border: 1px solid #D7DBE2;
-  overflow: hidden;
+  background-color: #ECEEF2;
+  padding: 0.5rem;
 }
 
-.table-head {
-  background-color: #DEE2EB;
+.token-card {
+  background-color: #FFFFFF;
+  border: 1px solid #D7DBE2;
+  border-radius: 0.625rem;
+  padding: 0.5rem 0.625rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.token-code-row {
+  display: flex;
+  align-items: center;
+}
+
+.token-code-badge {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.6875rem;
+  font-weight: 700;
   color: #14213D;
+  background-color: #E6ECF5;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.375rem;
+  border: 1px solid #CBD5E1;
+  word-break: break-all;
+}
+
+.token-desc-text {
+  font-size: 0.6875rem;
+  color: #4B5565;
+  line-height: 1.4;
+  margin: 0;
 }
 
 /* Form Card */

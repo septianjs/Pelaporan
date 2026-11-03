@@ -82,7 +82,10 @@ watch(
       const src = await loadImageSrc(url);
       if (token === loadToken) previewSrc.value = src;
     } catch {
-      if (token === loadToken) imageFailed.value = true;
+      if (token === loadToken) {
+        // Fallback: coba render url langsung
+        previewSrc.value = url;
+      }
     }
   },
   { immediate: true }

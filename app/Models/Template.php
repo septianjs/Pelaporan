@@ -17,6 +17,7 @@ class Template extends Model
         'template_key',
         'description',
         'type',
+        'device_id',
         'pptx_path',
         'preview_path',
         'active',
