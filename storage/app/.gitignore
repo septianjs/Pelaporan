@@ -1,4 +1,7 @@
 *
 !private/
 !public/
+!templates/
+!templates/pptx/
+!templates/pptx/*.pptx
 !.gitignore
