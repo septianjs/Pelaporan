@@ -29,6 +29,7 @@
         "sharp@0.35.5": true
     },
     "dependencies": {
+        "@capacitor-community/file-opener": "^8.0.1",
         "@capacitor/camera": "^8.2.5",
         "@capacitor/core": "^8.5.3",
         "@capacitor/filesystem": "^8.1.4",

@@ -26,7 +26,7 @@
  */
 import { Capacitor } from '@capacitor/core';
 import { Filesystem, Directory } from '@capacitor/filesystem';
-import { Share } from '@capacitor/share';
+import { FileOpener } from '@capacitor-community/file-opener';
 import api from './api.js';
 import { blobToBase64 } from './reportShare.js';
 
@@ -116,15 +116,27 @@ const fetchPdfBlob = async (reportId, params) => {
   }
 };
 
-/** Android/iOS: WebView tidak bisa membuka blob, jadi simpan ke cache lalu buka lembar Bagikan. */
-const shareBlobNative = async (blob, fileName, dialogTitle) => {
+const writeNativePdf = async (blob, fileName, directory = Directory.Cache, path = fileName) => {
   await Filesystem.writeFile({
-    path: fileName,
+    path,
     data: await blobToBase64(blob),
-    directory: Directory.Cache,
+    directory,
+    recursive: directory === Directory.ExternalStorage,
   });
-  const { uri } = await Filesystem.getUri({ path: fileName, directory: Directory.Cache });
-  await Share.share({ title: fileName, files: [uri], dialogTitle });
+  const { uri } = await Filesystem.getUri({ path, directory });
+  return uri;
+};
+
+const openNativePdf = async (blob, fileName) => {
+  const uri = await writeNativePdf(blob, fileName);
+  await FileOpener.open({
+    filePath: uri,
+    contentType: 'application/pdf',
+  });
+};
+
+const downloadNativePdf = async (blob, fileName) => {
+  return writeNativePdf(blob, fileName, Directory.ExternalStorage, `Download/${fileName}`);
 };
 
 const isCancelled = (err) => {
@@ -154,7 +166,7 @@ export const openReportPdf = async (reportId, reportNumber, plainUrl) => {
   try {
     const blob = await fetchPdfBlob(reportId, { inline: 1 });
     if (native) {
-      await shareBlobNative(blob, fileName, 'Buka Laporan PDF');
+      await openNativePdf(blob, fileName);
     } else {
       const blobUrl = URL.createObjectURL(blob);
       if (tab) tab.location.href = blobUrl;
@@ -185,7 +197,7 @@ export const downloadReportPdf = async (reportId, reportNumber, plainUrl) => {
   try {
     const blob = await fetchPdfBlob(reportId);
     if (Capacitor.isNativePlatform()) {
-      await shareBlobNative(blob, fileName, 'Simpan / Bagikan Laporan PDF');
+      await downloadNativePdf(blob, fileName);
     } else {
       const blobUrl = URL.createObjectURL(blob);
       const a = document.createElement('a');

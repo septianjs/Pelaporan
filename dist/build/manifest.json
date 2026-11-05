@@ -1,6 +1,6 @@
 {
   "node_modules/@capacitor/filesystem/dist/esm/web.js": {
-    "file": "assets/web-CZLz9IwV.js",
+    "file": "assets/web-BvC8iWRM.js",
     "name": "web",
     "src": "node_modules/@capacitor/filesystem/dist/esm/web.js",
     "isDynamicEntry": true,
@@ -9,7 +9,7 @@
     ]
   },
   "node_modules/@capacitor/share/dist/esm/web.js": {
-    "file": "assets/web-DFrPC4n4.js",
+    "file": "assets/web-Zlf9SfVU.js",
     "name": "web",
     "src": "node_modules/@capacitor/share/dist/esm/web.js",
     "isDynamicEntry": true,
@@ -18,7 +18,7 @@
     ]
   },
   "node_modules/@capacitor/splash-screen/dist/esm/web.js": {
-    "file": "assets/web-CbLwI6gS.js",
+    "file": "assets/web-D_Dsm43S.js",
     "name": "web",
     "src": "node_modules/@capacitor/splash-screen/dist/esm/web.js",
     "isDynamicEntry": true,
@@ -40,7 +40,7 @@
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-h99SLkKW.js",
+    "file": "assets/app-zRs7XH8O.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
